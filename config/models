@@ -7,3 +7,17 @@ Email
     user UserId Maybe
     verkey Text Maybe
     UniqueEmail email
+
+Task
+    user UserId
+    title Text
+    pomos Int default=0
+    scheduledFor UTCTime default=now()
+    doneAt UTCTime Maybe
+    active Bool default=true
+    order Int
+
+    UniqueTaskOrder user order
+Estimate
+    task TaskId
+    pomos Int
