@@ -1,0 +1,24 @@
+Default: &defaults
+  user: yesodoro-reboot
+  password: yesodoro-reboot
+  host: localhost
+  port: 5432
+  database: yesodoro-reboot
+  poolsize: 10
+
+Development:
+  <<: *defaults
+
+Testing:
+  database: yesodoro-reboot_test
+  <<: *defaults
+
+Staging:
+  database: yesodoro-reboot_staging
+  poolsize: 100
+  <<: *defaults
+
+Production:
+  database: yesodoro-reboot_production
+  poolsize: 100
+  <<: *defaults
