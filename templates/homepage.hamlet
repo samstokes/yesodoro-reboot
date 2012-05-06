@@ -1,1 +1,5 @@
-Hello World
+<h1>Yesodoro
+<p>
+  You are not logged in. #
+  <a href=@{AuthR LoginR}>Login now
+  .
