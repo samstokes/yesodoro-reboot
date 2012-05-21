@@ -32,9 +32,27 @@ getTasksR = do
 
   let doneByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal) done
 
+  (newTaskWidget, newTaskEnctype) <- generateFormPost newTaskForm
+
   let taskTr taskEntity = let taskId = entityKey taskEntity; task = entityVal taskEntity in $(widgetFile "tasks/task-tr")
   defaultLayout $ do
       setTitle "tasks"
       addWidget $(widgetFile "tasks") where
 
   userTasks userId = selectList [TaskUser ==. userId] [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
+
+
+newTaskForm :: Form NewTask
+newTaskForm = renderDivs $ NewTask <$> areq textField "Title" Nothing
+
+
+postTasksR :: Handler RepHtml
+postTasksR = do
+  userId <- requireAuthId
+
+  ((result, _), _) <- runFormPost newTaskForm
+  case result of
+    FormSuccess task -> do
+      runDB $ createTaskAtBottom userId task
+      redirect TasksR
+    _ -> undefined -- TODO

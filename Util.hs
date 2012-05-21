@@ -1,10 +1,14 @@
 module Util where
 
 import Prelude
+import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.List (groupBy)
 import Data.Time
 import Text.Blaze (ToMarkup(..))
 
+
+withNow :: MonadIO m => (UTCTime -> m a) -> m a
+withNow = (liftIO getCurrentTime >>=)
 
 utcToLocalDay :: TimeZone -> UTCTime -> Day
 utcToLocalDay tz = localDay . utcToLocalTime tz

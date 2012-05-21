@@ -10,6 +10,10 @@
       $forall idAndTaskEstimatesNotes <- todo
         ^{taskTr idAndTaskEstimatesNotes}
 
+  <form method=POST action=@{TasksR} enctype=#{newTaskEnctype}>
+    ^{newTaskWidget}
+    <input type=submit value=Add>
+
 
 $if not (null tomorrow)
   <h2.collapsed>Tomorrow

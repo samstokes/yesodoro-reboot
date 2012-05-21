@@ -5,7 +5,9 @@ import Yesod
 import Data.Text (Text)
 import Data.Time (Day, TimeZone, UTCTime)
 import Database.Persist.Quasi (lowerCaseSettings)
+import Database.Persist.GenericSql (SqlPersist)
 import Database.Persist.Store (PersistValue(..))
+import Control.Monad.IO.Class (MonadIO)
 import Data.Maybe (isJust)
 import Data.String (IsString)
 import Text.Blaze (ToMarkup, toMarkup)
@@ -31,6 +33,26 @@ instance ToMarkup PersistValue where
 
 newtype TaskState = TaskState Text
   deriving (ToMarkup, IsString)
+
+
+data NewTask = NewTask { newTaskTitle :: Text } deriving (Show)
+
+newTask :: UserId -> UTCTime -> Int -> NewTask -> Task
+newTask uid scheduledFor order (NewTask title) = Task {
+    taskUser = uid
+  , taskTitle = title
+  , taskPomos = 0
+  , taskScheduledFor = scheduledFor
+  , taskDoneAt = Nothing
+  , taskActive = True
+  , taskOrder = order
+  }
+
+createTaskAtBottom :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> NewTask -> SqlPersist m TaskId
+createTaskAtBottom userId task = withNow $ \now -> do
+  maybeLastTask <- selectFirst [TaskUser ==. userId] [Desc TaskOrder]
+  let lastOrder = maybe 0 (taskOrder . entityVal) maybeLastTask
+  insert $ newTask userId now (succ lastOrder) task
 
 
 taskDone :: Task -> Bool
