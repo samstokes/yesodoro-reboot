@@ -3,3 +3,4 @@
     <h4>#{taskTitle task}
     <form .hidden method=POST action={EditTaskR taskId} enctype={editTaskEnctype}>
       {editTaskWidget}
+  <td>^{setTaskDonenessButton taskId task}

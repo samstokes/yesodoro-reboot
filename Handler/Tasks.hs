@@ -3,6 +3,7 @@ module Handler.Tasks where
 import Data.List (partition, sortBy)
 import Data.Maybe (fromJust)
 import Data.Time (getCurrentTimeZone)
+import Database.Persist.Query.Internal (Update)
 import Import
 import Util
 import Yesod.Auth (requireAuthId)
@@ -56,6 +57,38 @@ postTasksR = do
       runDB $ createTaskAtBottom userId task
       redirect TasksR
     _ -> undefined -- TODO
+
+
+oneButton :: Text -> Route App -> Widget
+oneButton label route = [whamlet|
+  <form method=POST action=@{route}>
+    <button>#{label}
+|]
+
+setTaskDonenessRoute :: Task -> TaskId -> Route App
+setTaskDonenessRoute task | taskDone task = RestartTaskR
+                          | otherwise     = CompleteTaskR
+
+setTaskDonenessButton :: TaskId -> Task -> Widget
+setTaskDonenessButton taskId task = oneButton action $ route taskId
+  where action = taskDonenessActionName task
+        route = setTaskDonenessRoute task
+
+
+updateAndRedirectR :: HasReps a => Route App -> [Update Task] -> TaskId -> Handler a
+updateAndRedirectR route updates taskId = do
+  authedTask taskId
+  runDB $ update taskId updates
+  redirect route
+
+
+postCompleteTaskR :: TaskId -> Handler RepHtml
+postCompleteTaskR taskId = do
+  time <- now
+  updateAndRedirectR TasksR [TaskDoneAt =. Just time] taskId
+
+postRestartTaskR :: TaskId -> Handler RepHtml
+postRestartTaskR = updateAndRedirectR TasksR [TaskDoneAt =. Nothing]
 
 
 authedTask :: TaskId -> Handler Task
