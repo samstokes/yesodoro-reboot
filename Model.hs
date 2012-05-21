@@ -49,10 +49,11 @@ newTask uid scheduledFor order (NewTask title) = Task {
   }
 
 createTaskAtBottom :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> NewTask -> SqlPersist m TaskId
-createTaskAtBottom userId task = withNow $ \now -> do
+createTaskAtBottom userId task = do
+  time <- now
   maybeLastTask <- selectFirst [TaskUser ==. userId] [Desc TaskOrder]
   let lastOrder = maybe 0 (taskOrder . entityVal) maybeLastTask
-  insert $ newTask userId now (succ lastOrder) task
+  insert $ newTask userId time (succ lastOrder) task
 
 
 taskDone :: Task -> Bool
@@ -60,12 +61,12 @@ taskDone = isJust . taskDoneAt
 
 
 taskTodo :: TimeZone -> UTCTime -> Task -> Bool
-taskTodo tz now task = (taskActive task) && taskScheduledForDay tz task <= today
-  where today = utcToLocalDay tz now
+taskTodo tz moment task = (taskActive task) && taskScheduledForDay tz task <= today
+  where today = utcToLocalDay tz moment
 
 taskOverdue :: TimeZone -> UTCTime -> Task -> Bool
-taskOverdue tz now task = not (taskDone task) && taskActive task && taskScheduledForDay tz task < today
-  where today = utcToLocalDay tz now
+taskOverdue tz moment task = not (taskDone task) && taskActive task && taskScheduledForDay tz task < today
+  where today = utcToLocalDay tz moment
 
 taskDoneDay :: TimeZone -> Task -> Maybe Day
 taskDoneDay tz = fmap (utcToLocalDay tz) . taskDoneAt

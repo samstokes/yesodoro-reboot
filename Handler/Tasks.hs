@@ -2,7 +2,7 @@ module Handler.Tasks where
 
 import Data.List (partition, sortBy)
 import Data.Maybe (fromJust)
-import Data.Time (getCurrentTime, getCurrentTimeZone)
+import Data.Time (getCurrentTimeZone)
 import Import
 import Util
 import Yesod.Auth (requireAuthId)
@@ -14,11 +14,11 @@ getTasksR = do
   tasks <- runDB $ userTasks userId
 
   timeZone <- liftIO getCurrentTimeZone
-  now <- liftIO getCurrentTime
+  time <- now
   let taskTodoToday :: Task -> Bool
-      taskTodoToday = taskTodo timeZone now
+      taskTodoToday = taskTodo timeZone time
       taskOverdueToday :: Task -> Bool
-      taskOverdueToday = taskOverdue timeZone now
+      taskOverdueToday = taskOverdue timeZone time
       taskDueClass :: Task -> Maybe String
       taskDueClass task | taskOverdueToday task = Just "overdue"
                         | otherwise             = Nothing

@@ -7,8 +7,8 @@ import Data.Time
 import Text.Blaze (ToMarkup(..))
 
 
-withNow :: MonadIO m => (UTCTime -> m a) -> m a
-withNow = (liftIO getCurrentTime >>=)
+now :: MonadIO m => m UTCTime
+now = liftIO getCurrentTime
 
 utcToLocalDay :: TimeZone -> UTCTime -> Day
 utcToLocalDay tz = localDay . utcToLocalTime tz
