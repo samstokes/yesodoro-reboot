@@ -1,0 +1,5 @@
+<tr .task #task-#{taskId} .#{taskState task} .#{taskDueClass task}>
+  <th .title>
+    <h4>#{taskTitle task}
+    <form .hidden method=POST action={EditTaskR taskId} enctype={editTaskEnctype}>
+      {editTaskWidget}

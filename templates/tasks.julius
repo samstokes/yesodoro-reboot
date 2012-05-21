@@ -1,0 +1,9 @@
+$(function () {
+  $('h2').click(function () {
+    var h2 = $(this);
+    h2
+      .next('section').slideToggle('fast', function () {
+        h2.toggleClass('collapsed');
+      });
+  });
+});

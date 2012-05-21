@@ -1,0 +1,17 @@
+.task .title
+    text-align: left
+.task.done .title, .task.done .estimate, .task.done .pomos
+    text-decoration: line-through
+.task.overdue .title
+    color: red
+h2.collapsed
+  font-style: italic
+
+.task .title form label
+  display: none
+
+.task .notes form label
+  display: none
+
+.hidden
+  display: none

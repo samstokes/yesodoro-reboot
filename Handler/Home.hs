@@ -10,4 +10,4 @@ getHomeR = maybeAuthId >>= getHomeR' where
   getHomeR' Nothing = defaultLayout $ do
       setTitle "yesodoro"
       $(widgetFile "homepage")
-  getHomeR' (Just _) = {-redirect-} undefined
+  getHomeR' (Just _) = redirect TasksR
