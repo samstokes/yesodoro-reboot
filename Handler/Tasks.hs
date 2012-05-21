@@ -56,3 +56,12 @@ postTasksR = do
       runDB $ createTaskAtBottom userId task
       redirect TasksR
     _ -> undefined -- TODO
+
+
+authedTask :: TaskId -> Handler Task
+authedTask taskId = do
+    userId <- requireAuthId
+    maybeAuthedTask <- runDB $ selectFirst [TaskId ==. taskId, TaskUser ==. userId] []
+    case maybeAuthedTask of
+      Just task -> return $ entityVal task
+      Nothing -> redirect TasksR
