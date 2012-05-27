@@ -67,8 +67,8 @@ data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
               deriving (Show)
 
 
-updateTask :: PersistQuery SqlPersist m => TaskEdit -> (TaskId, Task) -> SqlPersist m Bool
-updateTask (TaskTitleEdit title) (taskId, task)
+updateTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> TaskEdit -> (TaskId, Task) -> SqlPersist m Bool
+updateTask _ (TaskTitleEdit title) (taskId, task)
   | taskTitle task /= title = update taskId [TaskTitle =. title] >> return True
   | otherwise               = return False
 
