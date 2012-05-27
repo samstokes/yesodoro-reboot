@@ -23,3 +23,9 @@
       $else
         ^{oneButton "|>" (UnpauseTaskR taskId)}
   <td>^{deleteButton "☠" (TaskR taskId)}
+  <td .estimate>
+    $maybe Entity _ estimate <- listToMaybe estimateEntities
+      #{Text.replicate (estimatePomos estimate) "❏"}
+    $if taskHasPomos task
+      <br>
+    #{Text.replicate (taskPomos task) "✓"}

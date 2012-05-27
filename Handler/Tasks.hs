@@ -1,7 +1,8 @@
 module Handler.Tasks where
 
 import Data.List (partition, sortBy)
-import Data.Maybe (fromJust)
+import Data.Maybe (listToMaybe, fromJust)
+import qualified Data.Text as Text
 import Data.Time (Day, TimeZone, getCurrentTimeZone)
 import Database.Persist.Query.Internal (Update)
 import Import
@@ -15,6 +16,10 @@ getTasksR = do
   userId <- requireAuthId
   tasks <- runDB $ userTasks userId
 
+  estimates <- runDB $ mapM (taskEstimates . entityKey) tasks
+  let tasksEstimates :: [(Entity Task, [Entity Estimate])]
+      tasksEstimates = tasks `zip` estimates
+
   timeZone <- userTimeZone
   time <- now
   let taskTodoToday :: Task -> Bool
@@ -25,26 +30,29 @@ getTasksR = do
       taskDueClass task | taskOverdueToday task = Just "overdue"
                         | otherwise             = Nothing
 
-  let (unsortedDone, pending) = partition (taskDone . entityVal) tasks
-  let done = reverse $ sortBy (compareBy $ taskDoneAt . entityVal) unsortedDone
-  let (active, paused) = partition (taskActive . entityVal) pending
-  let (unsortedTodo, unsortedTomorrow) = partition (taskTodoToday . entityVal) active
-  let todo = sortBy (compareBy $ taskOrder . entityVal) unsortedTodo
-  let tomorrow = sortBy (compareBy $ taskOrder . entityVal) unsortedTomorrow
+  let (unsortedDone, pending) = partition (taskDone . entityVal . fst) tasksEstimates
+  let done = reverse $ sortBy (compareBy $ taskDoneAt . entityVal . fst) unsortedDone
+  let (active, paused) = partition (taskActive . entityVal . fst) pending
+  let (unsortedTodo, unsortedTomorrow) = partition (taskTodoToday . entityVal . fst) active
+  let todo = sortBy (compareBy $ taskOrder . entityVal . fst) unsortedTodo
+  let tomorrow = sortBy (compareBy $ taskOrder . entityVal . fst) unsortedTomorrow
 
-  let doneByDay :: [(Day, [Entity Task])]
-      doneByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal) done
+  let doneByDay :: [(Day, [(Entity Task, [Entity Estimate])])]
+      doneByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal . fst) done
 
   (newTaskWidget, newTaskEnctype) <- generateFormPost newTaskForm
   (editTaskWidget, editTaskEnctype) <- generateFormPost editTaskForm
   (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
-  let taskTr taskEntity = let taskId = entityKey taskEntity; task = entityVal taskEntity in $(widgetFile "tasks/task-tr")
+  let taskTr (taskEntity, estimateEntities) = let taskId = entityKey taskEntity; task = entityVal taskEntity in $(widgetFile "tasks/task-tr")
   defaultLayout $ do
       setTitle "tasks"
       addWidget $(widgetFile "tasks") where
 
   userTasks userId = selectList [TaskUser ==. userId] [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
+  estimatedRemaining :: (Entity Task, [Entity Estimate]) -> Int
+  estimatedRemaining (_, []) = 0
+  estimatedRemaining (Entity _ task, Entity _ estimate : _) = (estimatePomos estimate - taskPomos task) `max` 0
 
 
 newTaskForm :: Form NewTask

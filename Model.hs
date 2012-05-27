@@ -120,6 +120,10 @@ taskDone :: Task -> Bool
 taskDone = isJust . taskDoneAt
 
 
+taskHasPomos :: Task -> Bool
+taskHasPomos = (> 0) . taskPomos
+
+
 taskTodo :: TimeZone -> UTCTime -> Task -> Bool
 taskTodo tz moment task = (taskActive task) && taskScheduledForDay tz task <= today
   where today = utcToLocalDay tz moment
@@ -140,6 +144,9 @@ taskState task = if taskDone task then "done" else "pending"
 taskDonenessActionName :: Task -> Text
 taskDonenessActionName task | taskDone task = "☹"
                             | otherwise     = "☺"
+
+taskEstimates :: PersistQuery SqlPersist m => TaskId -> SqlPersist m [Entity Estimate]
+taskEstimates taskId = selectList [EstimateTask ==. taskId] []
 
 
 postponeTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()

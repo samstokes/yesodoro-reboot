@@ -7,8 +7,15 @@
     <p>Nothing to do. Congratulations! Why not take the rest of the day off?
   $else
     <table><tbody>
-      $forall taskEntity <- todo
-        ^{taskTr taskEntity}
+      $forall taskEntityAndEstimates <- todo
+        ^{taskTr taskEntityAndEstimates}
+
+    <h3>
+      Remaining: #{sum $ map estimatedRemaining todo} of
+      $with estimateses <- map (map entityVal) $ map snd todo
+        $with firstEstimates <- concatMap (take 1) estimateses
+          $with totalEstimated <- sum $ map estimatePomos firstEstimates
+            \ #{totalEstimated} estimated
 
   <form method=POST action=@{TasksR} enctype=#{newTaskEnctype}>
     ^{newTaskWidget}
@@ -19,26 +26,26 @@ $if not (null tomorrow)
   <h2.collapsed>Tomorrow
   <section #tomorrow style="display: none">
     <table><tbody>
-      $forall taskEntity <- tomorrow
-        ^{taskTr taskEntity}
+      $forall taskEntityAndEstimates <- tomorrow
+        ^{taskTr taskEntityAndEstimates}
 
 
 $if not (null paused)
   <h2.collapsed>Paused (#{length paused})
   <section #paused style="display: none">
     <table><tbody>
-      $forall taskEntity <- paused
-        ^{taskTr taskEntity}
+      $forall taskEntityAndEstimates <- paused
+        ^{taskTr taskEntityAndEstimates}
 
 
 $if not (null doneByDay)
   <h2.collapsed>Done
   <section #done style="display: none">
-    $forall dayAndTaskEntities <- doneByDay
+    $forall dayAndTaskEntitiesEstimates <- doneByDay
       <h3>
-        #{fst dayAndTaskEntities}
-        $with taskEntities <- snd dayAndTaskEntities
-          \ (#{sum $ map taskPomos $ map entityVal taskEntities})
+        #{fst dayAndTaskEntitiesEstimates}
+        $with taskEntitiesEstimates <- snd dayAndTaskEntitiesEstimates
+          \ (#{sum $ map taskPomos $ map entityVal $ map fst taskEntitiesEstimates})
       <table><tbody>
-        $forall taskEntity <- snd dayAndTaskEntities
-          ^{taskTr taskEntity}
+        $forall taskEntityAndEstimates <- snd dayAndTaskEntitiesEstimates
+          ^{taskTr taskEntityAndEstimates}
