@@ -22,22 +22,22 @@ $(function () {
     success: localSave
   });
 
+  textBox
+    .blur(function () { if (edit) form.submit(); })
+    .keyup(function (e) {
+      console.debug('#{taskId} keyUp(' + e.keyCode + ')');
+      switch (e.keyCode) {
+      case 27: leaveEdit(); break;
+      default: /* noop */
+      }
+    });
+
   container.click(function () {
     if (edit) return false;
     edit = true;
 
     console.debug('#{taskId} clicked');
     textBox.val(title.text());
-    /* FIXME horrible multiple event submission fail! */
-    textBox
-      .blur(function () { if (edit) form.submit(); })
-      .keyup(function (e) {
-        console.debug('#{taskId} keyUp(' + e.keyCode + ')');
-        switch (e.keyCode) {
-        case 27: leaveEdit(); break;
-        default: /* noop */
-        }
-      });
     title.addClass('hidden');
     form.removeClass('hidden');
     textBox.focus();
