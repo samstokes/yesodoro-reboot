@@ -13,6 +13,7 @@ import Yesod.Default.Main
 import Yesod.Default.Handlers
 import Yesod.Logger (Logger, logBS, toProduction)
 import Network.Wai.Middleware.RequestLogger (logCallback, logCallbackDev)
+import Network.Wai.Middleware.MethodOverride (methodOverride)
 import qualified Database.Persist.Store
 import Database.Persist.GenericSql (runMigration)
 import Network.HTTP.Conduit (newManager, def)
@@ -35,7 +36,7 @@ makeApplication :: AppConfig DefaultEnv Extra -> Logger -> IO Application
 makeApplication conf logger = do
     foundation <- makeFoundation conf setLogger
     app <- toWaiAppPlain foundation
-    return $ logWare app
+    return $ methodOverride $ logWare app
   where
     setLogger = if development then logger else toProduction logger
     logWare   = if development then logCallbackDev (logBS setLogger)
