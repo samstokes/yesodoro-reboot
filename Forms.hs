@@ -3,6 +3,7 @@ module Forms
   , newTaskForm
   , editTaskForm
   , reorderTaskForm
+  , newNoteForm
   ) where
 
 
@@ -26,3 +27,7 @@ editTaskForm = renderDivs $ TaskTitleEdit <$> areq textField "Title" Nothing
 
 reorderTaskForm :: Form TaskEdit
 reorderTaskForm = renderDivs $ TaskOrderEdit <$> areq intField "Delta" Nothing
+
+
+newNoteForm :: Form NewNote
+newNoteForm = renderDivs $ NewNote <$> unTextarea <$> areq textareaField "Body" Nothing

@@ -21,12 +21,12 @@
     <p>Nothing to do. Congratulations! Why not take the rest of the day off?
   $else
     <table><tbody>
-      $forall taskEntityAndEstimates <- todo
-        ^{taskTr taskEntityAndEstimates}
+      $forall taskEntityAndEstimatesAndNotes <- todo
+        ^{taskTr taskEntityAndEstimatesAndNotes}
 
     <h3>
       Remaining: #{sum $ map estimatedRemaining todo} of
-      $with estimateses <- map (map entityVal) $ map snd todo
+      $with estimateses <- map (map entityVal) $ map snd3 todo
         $with firstEstimates <- concatMap (take 1) estimateses
           $with totalEstimated <- sum $ map estimatePomos firstEstimates
             \ #{totalEstimated} estimated
@@ -42,8 +42,8 @@ $if not (null postponed)
     <span .indicator> ☞
   <section #tomorrow style="display: none">
     <table><tbody>
-      $forall taskEntityAndEstimates <- postponed
-        ^{taskTr taskEntityAndEstimates}
+      $forall taskEntityAndEstimatesAndNotes <- postponed
+        ^{taskTr taskEntityAndEstimatesAndNotes}
 
 
 $if not (null paused)
@@ -52,8 +52,8 @@ $if not (null paused)
     <span .indicator> ☞
   <section #paused style="display: none">
     <table><tbody>
-      $forall taskEntityAndEstimates <- paused
-        ^{taskTr taskEntityAndEstimates}
+      $forall taskEntityAndEstimatesAndNotes <- paused
+        ^{taskTr taskEntityAndEstimatesAndNotes}
 
 
 $if not (null doneByDay)
@@ -61,16 +61,16 @@ $if not (null doneByDay)
     Done
     <span .indicator> ☞
   <section #done style="display: none">
-    $forall (day, plans, taskEntitiesEstimates) <- doneByDay
+    $forall (day, plans, taskEntitiesEstimatesNotes) <- doneByDay
       <h3>
         #{day}
-        \ (#{sum $ map taskPomos $ map entityVal $ map fst taskEntitiesEstimates})
+        \ (#{sum $ map taskPomos $ map entityVal $ map fst3 taskEntitiesEstimatesNotes})
       $if not (null plans)
         $forall plan <- plans
           <h4 .plan>
             Completed: 
             <span .body>#{planBody (entityVal plan)}
-      $if not (null taskEntitiesEstimates)
+      $if not (null taskEntitiesEstimatesNotes)
         <table><tbody>
-          $forall taskEntityAndEstimates <- taskEntitiesEstimates
-            ^{taskTr taskEntityAndEstimates}
+          $forall taskEntityAndEstimatesAndNotes <- taskEntitiesEstimatesNotes
+            ^{taskTr taskEntityAndEstimatesAndNotes}

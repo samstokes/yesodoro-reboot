@@ -23,3 +23,5 @@
 
 /plans PlansR POST
 /plans/#PlanId/complete CompletePlanR POST
+
+/tasks/#TaskId/notes TaskNotesR POST
