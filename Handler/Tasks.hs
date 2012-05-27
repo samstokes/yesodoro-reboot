@@ -2,7 +2,7 @@ module Handler.Tasks where
 
 import Data.List (partition, sortBy)
 import Data.Maybe (fromJust)
-import Data.Time (getCurrentTimeZone)
+import Data.Time (TimeZone, getCurrentTimeZone)
 import Database.Persist.Query.Internal (Update)
 import Import
 import Data.Aeson.Types (toJSON)
@@ -15,7 +15,7 @@ getTasksR = do
   userId <- requireAuthId
   tasks <- runDB $ userTasks userId
 
-  timeZone <- liftIO getCurrentTimeZone
+  timeZone <- userTimeZone
   time <- now
   let taskTodoToday :: Task -> Bool
       taskTodoToday = taskTodo timeZone time
@@ -110,6 +110,10 @@ authedTask taskId = do
     case maybeAuthedTask of
       Just task -> return $ entityVal task
       Nothing -> redirect TasksR
+
+
+userTimeZone :: Handler TimeZone
+userTimeZone = liftIO getCurrentTimeZone
 
 
 deleteTaskR :: TaskId -> Handler RepHtml
