@@ -111,5 +111,16 @@ maybeToEither msg Nothing = Left msg
 maybeToEither _ (Just v) = Right v
 
 
+paras :: Text -> [Text]
+paras = map Text.unlines . splitBy Text.null . Text.split (== '\n')
+
+splitBy :: (a -> Bool) -> [a] -> [[a]]
+splitBy p = foldr addUnlessP []
+    where
+    addUnlessP item groups | p item = [] : groups
+    addUnlessP item [] = [[item]]
+    addUnlessP item (group : groups) = (item : group) : groups
+
+
 fieldListOptions :: (Show field, Enum field, Bounded field) => [(Text, field)]
 fieldListOptions = map (Text.pack . show &&& id) [minBound .. maxBound]

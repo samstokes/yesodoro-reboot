@@ -1,0 +1,20 @@
+$(function () {
+  var container = $('##{widgetId}'),
+      notes = container.find('ol.notes'),
+      template = container.find('.note-template'),
+      form = container.find('form');
+
+  function localSave(data) {
+    var noteLi = $('<li class="note">').html(renderNote(data[1]));
+    notes.append(noteLi);
+  }
+
+  function renderNote(note) {
+    return template.clone().removeClass('hidden')
+      .find('.body').html(note.body).end();
+  }
+
+  form.ajaxForm({
+    success: localSave
+  });
+});

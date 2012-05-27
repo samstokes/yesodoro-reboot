@@ -11,6 +11,7 @@ module Foundation
     , putR, deleteR
     , module Settings
     , module Model
+    , module Model.Note
     , module Model.Plan
     ) where
 
@@ -31,6 +32,7 @@ import Settings.StaticFiles
 import Database.Persist.GenericSql
 import Settings (widgetFile, Extra (..))
 import Model
+import Model.Note
 import Model.Plan
 import Control.Monad (join)
 import Data.Maybe (isJust)

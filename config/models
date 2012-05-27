@@ -22,6 +22,10 @@ Task
 Estimate
     task TaskId
     pomos Int
+Note
+    body Text
+    task TaskId
+    createdAt UTCTime default=now()
 Plan
     user UserId
     body Text

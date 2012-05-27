@@ -1,0 +1,3 @@
+<div .body>
+  $forall para <- paras (noteBody note)
+    <p>#{para}

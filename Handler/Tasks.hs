@@ -23,8 +23,9 @@ getTasksR = do
   plans <- runDB $ selectUserPlansSince userId horizon [Desc PlanCreatedAt, Desc PlanDoneAt]
 
   estimates <- runDB $ mapM (taskEstimates . entityKey) tasks
-  let tasksEstimates :: [(Entity Task, [Entity Estimate])]
-      tasksEstimates = tasks `zip` estimates
+  notes <- runDB $ mapM (taskNotes . entityKey) tasks
+  let tasksEstimatesNotes :: [(Entity Task, [Entity Estimate], [Entity Note])]
+      tasksEstimatesNotes = zip3 tasks estimates notes
 
   timeZone <- userTimeZone
   time <- now
@@ -33,22 +34,22 @@ getTasksR = do
       taskOverdueToday :: Task -> Bool
       taskOverdueToday = taskOverdue timeZone time
 
-  let (unsortedDone, pending) = partition (taskDone . entityVal . fst) tasksEstimates
-  let done = reverse $ sortBy (comparing $ taskDoneAt . entityVal . fst) unsortedDone
-  let (active, paused) = partition (taskActive . entityVal . fst) pending
-  let (unsortedTodo, unsortedPostponed) = partition (taskTodoToday . entityVal . fst) active
-  let todo = sortBy (comparing $ taskOrder . entityVal . fst) unsortedTodo
-  let postponed = sortBy (comparing $ taskScheduledFor . entityVal . fst) unsortedPostponed
+  let (unsortedDone, pending) = partition (taskDone . entityVal . fst3) tasksEstimatesNotes
+  let done = reverse $ sortBy (comparing $ taskDoneAt . entityVal . fst3) unsortedDone
+  let (active, paused) = partition (taskActive . entityVal . fst3) pending
+  let (unsortedTodo, unsortedPostponed) = partition (taskTodoToday . entityVal . fst3) active
+  let todo = sortBy (comparing $ taskOrder . entityVal . fst3) unsortedTodo
+  let postponed = sortBy (comparing $ taskScheduledFor . entityVal . fst3) unsortedPostponed
 
   let (donePlans, activePlans) = partition (planDone . entityVal) plans
 
-  let doneTasksByDay :: [(Day, [(Entity Task, [Entity Estimate])])]
-      doneTasksByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal . fst) done
+  let doneTasksByDay :: [(Day, [(Entity Task, [Entity Estimate], [Entity Note])])]
+      doneTasksByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal . fst3) done
 
   let donePlansByDay :: [(Day, [Entity Plan])]
       donePlansByDay = groupByEq (fromJust . planDoneDay timeZone . entityVal) donePlans
 
-  let doneByDay :: [(Day, [Entity Plan], [(Entity Task, [Entity Estimate])])]
+  let doneByDay :: [(Day, [Entity Plan], [(Entity Task, [Entity Estimate], [Entity Note])])]
       doneByDay = reverse $ sortBy (comparing fst3) $ unionBothValues donePlansByDay doneTasksByDay
 
   (newPlanWidget, newPlanEnctype) <- generateFormPost newPlanForm
@@ -57,14 +58,24 @@ getTasksR = do
   (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
   let planTr (Entity planId plan) = $(widgetFile "plans/plan-tr")
-  let taskTr (Entity taskId task, estimateEntities) = $(widgetFile "tasks/task-tr")
+  let taskTr (Entity taskId task, estimateEntities, noteEntities) = $(widgetFile "tasks/task-tr")
   defaultLayout $ do
       setTitle "tasks"
       addWidget $(widgetFile "tasks") where
 
-  estimatedRemaining :: (Entity Task, [Entity Estimate]) -> Int
-  estimatedRemaining (_, []) = 0
-  estimatedRemaining (Entity _ task, Entity _ estimate : _) = (estimatePomos estimate - taskPomos task) `max` 0
+  estimatedRemaining :: (Entity Task, [Entity Estimate], [Entity Note]) -> Int
+  estimatedRemaining (_, [], _) = 0
+  estimatedRemaining (Entity _ task, Entity _ estimate : _, _) = (estimatePomos estimate - taskPomos task) `max` 0
+
+
+notesWidget :: TaskId -> [Entity Note] -> Widget
+notesWidget taskId notes = do
+  widgetId <- lift newIdent
+  (newNoteWidget, newNoteEnctype) <- lift $ generateFormPost newNoteForm
+  time <- now
+  let dummyNote = Entity undefined $ Note "dummy" taskId time
+  let noteWidget (Entity noteId note) = $(widgetFile "notes/note")
+  $(widgetFile "notes")
 
 
 postTasksR :: Handler RepHtml
@@ -206,3 +217,14 @@ postTaskEstimatesR taskId = do
 
 postTaskPomosR :: TaskId -> Handler RepHtml
 postTaskPomosR = updateAndRedirectR TasksR [TaskPomos +=. 1]
+
+
+postTaskNotesR :: TaskId -> Handler RepJson
+postTaskNotesR taskId = do
+  _ <- authedTask taskId
+  ((result, _), _) <- runFormPost newNoteForm
+  case result of
+    FormSuccess note -> do
+      noteEntity <- runDB $ createNote taskId note
+      jsonToRepJson noteEntity
+    _ -> undefined -- TODO

@@ -25,6 +25,7 @@ library
                      Foundation
                      Import
                      Model
+                     Model.Note
                      Model.Plan
                      Settings
                      Settings.StaticFiles
