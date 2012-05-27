@@ -45,7 +45,7 @@ getTasksR = do
   (editTaskWidget, editTaskEnctype) <- generateFormPost editTaskForm
   (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
-  let taskTr (taskEntity, estimateEntities) = let taskId = entityKey taskEntity; task = entityVal taskEntity in $(widgetFile "tasks/task-tr")
+  let taskTr ((Entity taskId task), estimateEntities) = $(widgetFile "tasks/task-tr")
   defaultLayout $ do
       setTitle "tasks"
       addWidget $(widgetFile "tasks") where
