@@ -7,5 +7,7 @@
 / HomeR GET
 /tasks TasksR GET POST
 
+/tasks/#TaskId TaskR DELETE
+
 /tasks/#TaskId/complete CompleteTaskR POST
 /tasks/#TaskId/restart RestartTaskR POST

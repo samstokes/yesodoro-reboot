@@ -8,6 +8,7 @@ module Foundation
     , Form
     , maybeAuth
     , requireAuth
+    , deleteR
     , module Settings
     , module Model
     ) where
@@ -31,6 +32,7 @@ import Model
 import Text.Jasmine (minifym)
 import Web.ClientSession (getKey)
 import Text.Hamlet (hamletFile)
+import Data.Text (Text)
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -68,6 +70,11 @@ mkMessage "App" "messages" "en"
 -- usually require access to the AppRoute datatype. Therefore, we
 -- split these actions into two functions and place them in separate files.
 mkYesodData "App" $(parseRoutesFile "config/routes")
+
+
+deleteR :: Route App -> (Route App, [(Text, Text)])
+deleteR route = (route, [("_method", "DELETE")])
+
 
 type Form x = Html -> MForm App App (FormResult x, Widget)
 

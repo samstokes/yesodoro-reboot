@@ -65,6 +65,12 @@ oneButton label route = [whamlet|
     <button>#{label}
 |]
 
+deleteButton :: Text -> Route App -> Widget
+deleteButton label route = [whamlet|
+  <form method=POST action=@?{deleteR route}>
+    <button>#{label}
+|]
+
 setTaskDonenessRoute :: Task -> TaskId -> Route App
 setTaskDonenessRoute task | taskDone task = RestartTaskR
                           | otherwise     = CompleteTaskR
@@ -98,3 +104,10 @@ authedTask taskId = do
     case maybeAuthedTask of
       Just task -> return $ entityVal task
       Nothing -> redirect TasksR
+
+
+deleteTaskR :: TaskId -> Handler RepHtml
+deleteTaskR taskId = do
+  authedTask taskId
+  runDB $ delete taskId
+  redirect TasksR
