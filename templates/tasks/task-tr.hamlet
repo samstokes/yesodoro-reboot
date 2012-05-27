@@ -1,4 +1,10 @@
 <tr .task #task-#{taskId} .#{taskState task} .#{taskDueClass task}>
+  <td .reorder-handle>
+    $if not (taskDone task)
+      $if taskTodoToday task
+        ⇳
+        <form .hidden method=POST action=@{ReorderTaskR taskId} enctype=#{reorderTaskEnctype}>
+          ^{reorderTaskWidget}
   <th .title>
     <h4>#{taskTitle task}
     <form .hidden method=POST action=@?{putR (TaskR taskId)} enctype=#{editTaskEnctype}>

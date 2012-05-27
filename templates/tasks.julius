@@ -6,4 +6,22 @@ $(function () {
         h2.toggleClass('collapsed');
       });
   });
+
+  $('section#todo table tbody').sortable({
+    distance: 15,
+    handle: '.reorder-handle',
+    start: function (event, ui) {
+      var start_pos = ui.item.index();
+      ui.item.data('start_pos', start_pos);
+    },
+    update: function (event, ui) {
+      var start_pos = ui.item.data('start_pos'),
+          end_pos = ui.item.index(),
+          delta = end_pos - start_pos,
+          form = ui.item.find('.reorder-handle form'),
+          delta_input = form.find('input[type=number]');
+      delta_input.val(delta);
+      form.submit();
+    }
+  });
 });

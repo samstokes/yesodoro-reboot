@@ -36,6 +36,7 @@ getTasksR = do
 
   (newTaskWidget, newTaskEnctype) <- generateFormPost newTaskForm
   (editTaskWidget, editTaskEnctype) <- generateFormPost editTaskForm
+  (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
   let taskTr taskEntity = let taskId = entityKey taskEntity; task = entityVal taskEntity in $(widgetFile "tasks/task-tr")
   defaultLayout $ do
@@ -51,6 +52,10 @@ newTaskForm = renderDivs $ NewTask <$> areq textField "Title" Nothing
 
 editTaskForm :: Form TaskEdit
 editTaskForm = renderDivs $ TaskTitleEdit <$> areq textField "Title" Nothing
+
+
+reorderTaskForm :: Form TaskEdit
+reorderTaskForm = renderDivs $ TaskOrderEdit <$> areq intField "Delta" Nothing
 
 
 postTasksR :: Handler RepHtml
@@ -128,6 +133,18 @@ putTaskR taskId = do
   task <- authedTask taskId
   tz <- userTimeZone
   ((result, _), _) <- runFormPost editTaskForm
+  case result of
+    FormSuccess edit -> do
+      updated <- runDB $ updateTask tz edit (taskId, task)
+      jsonToRepJson $ object [("updated", toJSON updated)]
+    _ -> undefined -- TODO
+
+
+postReorderTaskR :: TaskId -> Handler RepJson
+postReorderTaskR taskId = do
+  task <- authedTask taskId
+  tz <- userTimeZone
+  ((result, _), _) <- runFormPost reorderTaskForm
   case result of
     FormSuccess edit -> do
       updated <- runDB $ updateTask tz edit (taskId, task)

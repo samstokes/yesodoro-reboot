@@ -43,3 +43,8 @@ $(function () {
     textBox.focus();
   });
 });
+
+$(function () {
+  var container = $('#task-#{taskId} .reorder-handle');
+  container.find('form').ajaxForm();
+});

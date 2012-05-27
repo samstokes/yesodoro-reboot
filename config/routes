@@ -11,6 +11,7 @@
 
 /tasks/#TaskId/complete CompleteTaskR POST
 /tasks/#TaskId/restart RestartTaskR POST
+/tasks/#TaskId/order ReorderTaskR POST
 /tasks/#TaskId/postpone PostponeTaskR POST
 /tasks/#TaskId/unpostpone UnpostponeTaskR POST
 /tasks/#TaskId/pause PauseTaskR POST

@@ -64,6 +64,7 @@ createTaskAtBottom userId task = do
 
 
 data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
+              | TaskOrderEdit { taskOrderDelta :: Int }
               deriving (Show)
 
 
@@ -71,6 +72,48 @@ updateTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> TaskEdit -> 
 updateTask _ (TaskTitleEdit title) (taskId, task)
   | taskTitle task /= title = update taskId [TaskTitle =. title] >> return True
   | otherwise               = return False
+updateTask tz (TaskOrderEdit delta) task = reorderTaskN delta tz task
+
+
+data Direction = Up | Down deriving (Show, Enum, Bounded)
+
+nextTask :: (MonadIO m, PersistQuery SqlPersist m) => Direction -> TimeZone -> Task -> SqlPersist m (Maybe (Entity Task))
+nextTask direction tz task = do
+  endOfDay <- liftIO $ endOfToday tz
+  selectFirst
+    [ TaskUser ==. (taskUser task)
+    , (orderConstraint direction) TaskOrder (taskOrder task)
+    , TaskDoneAt ==. Nothing
+    , scheduledForConstraint endOfDay TaskScheduledFor
+    , TaskActive ==. True
+    ] [(order direction) TaskOrder]
+  where
+    orderConstraint Up = (<.)
+    orderConstraint Down = (>.)
+    order Up = Desc
+    order Down = Asc
+    scheduledForConstraint endOfDay | taskScheduledFor task <= endOfDay = (<=. endOfDay)
+                                    | otherwise                           = (>. endOfDay)
+
+reorderTask :: (MonadIO m, PersistQuery SqlPersist m) => Direction -> TimeZone -> (TaskId, Task) -> SqlPersist m (TaskId, Task)
+reorderTask direction tz (taskId, task) = do
+  maybeNext <- nextTask direction tz task
+  case maybeNext of
+    Nothing -> return (taskId, task)
+    Just (Entity nextId next) -> do
+      update taskId [TaskOrder =. (-1)] -- temporary value
+      update nextId [TaskOrder =. (taskOrder task)]
+      update taskId [TaskOrder =. (taskOrder next)]
+      return (taskId, task { taskOrder = taskOrder next })
+
+
+reorderTaskN :: (MonadIO m, PersistQuery SqlPersist m) => Int -> TimeZone -> (TaskId, Task) -> SqlPersist m Bool
+reorderTaskN delta tz task
+  | delta > 0 = foldTimesM delta (reorder Down) task >> return True
+  | delta < 0 = foldTimesM (-delta) (reorder Up) task >> return True
+  | otherwise = return False
+  where
+    reorder direction = reorderTask direction tz
 
 
 taskDone :: Task -> Bool
