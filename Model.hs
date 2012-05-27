@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 module Model where
 
 import Prelude
@@ -33,9 +35,11 @@ instance ToJavascript (Key a b) where
 
 instance ToMarkup PersistValue where
   toMarkup (PersistInt64 i) = toMarkup $ show i
+  toMarkup _ = undefined
 
 instance ToJavascript PersistValue where
   toJavascript (PersistInt64 i) = toJavascript $ show i
+  toJavascript _ = undefined
 
 
 newtype TaskState = TaskState Text
@@ -149,7 +153,7 @@ taskEstimates :: PersistQuery SqlPersist m => TaskId -> SqlPersist m [Entity Est
 taskEstimates taskId = selectList [EstimateTask ==. taskId] []
 
 estimateOptions :: [Int]
-estimateOptions = [2 ^ x | x <- [0 .. 4]]
+estimateOptions = [2 ^ x | x <- [0 .. 4] :: [Int]]
 
 
 postponeTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()

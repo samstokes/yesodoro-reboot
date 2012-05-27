@@ -34,9 +34,9 @@ getTasksR = do
   let (unsortedDone, pending) = partition (taskDone . entityVal . fst) tasksEstimates
   let done = reverse $ sortBy (compareBy $ taskDoneAt . entityVal . fst) unsortedDone
   let (active, paused) = partition (taskActive . entityVal . fst) pending
-  let (unsortedTodo, unsortedTomorrow) = partition (taskTodoToday . entityVal . fst) active
+  let (unsortedTodo, unsortedPostponed) = partition (taskTodoToday . entityVal . fst) active
   let todo = sortBy (compareBy $ taskOrder . entityVal . fst) unsortedTodo
-  let tomorrow = sortBy (compareBy $ taskOrder . entityVal . fst) unsortedTomorrow
+  let postponed = sortBy (compareBy $ taskOrder . entityVal . fst) unsortedPostponed
 
   let doneByDay :: [(Day, [(Entity Task, [Entity Estimate])])]
       doneByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal . fst) done
@@ -75,7 +75,7 @@ postTasksR = do
   ((result, _), _) <- runFormPost newTaskForm
   case result of
     FormSuccess task -> do
-      runDB $ createTaskAtBottom userId task
+      _ <- runDB $ createTaskAtBottom userId task
       redirect TasksR
     _ -> undefined -- TODO
 
@@ -104,7 +104,7 @@ setTaskDonenessButton taskId task = oneButton action $ route taskId
 
 updateAndRedirectR :: HasReps a => Route App -> [Update Task] -> TaskId -> Handler a
 updateAndRedirectR route updates taskId = do
-  authedTask taskId
+  _ <- authedTask taskId
   runDB $ update taskId updates
   redirect route
 
@@ -133,7 +133,7 @@ userTimeZone = liftIO getCurrentTimeZone
 
 deleteTaskR :: TaskId -> Handler RepHtml
 deleteTaskR taskId = do
-  authedTask taskId
+  _ <- authedTask taskId
   runDB $ delete taskId
   redirect TasksR
 
@@ -164,33 +164,33 @@ postReorderTaskR taskId = do
 
 postPostponeTaskR :: TaskId -> Handler RepHtml
 postPostponeTaskR taskId = do
-  authedTask taskId
+  _ <- authedTask taskId
   runDB $ postponeTask taskId
   redirect TasksR
 
 postUnpostponeTaskR :: TaskId -> Handler RepHtml
 postUnpostponeTaskR taskId = do
-  authedTask taskId
+  _ <- authedTask taskId
   runDB $ unpostponeTask taskId
   redirect TasksR
 
 
 postPauseTaskR :: TaskId -> Handler RepHtml
 postPauseTaskR taskId = do
-  authedTask taskId
+  _ <- authedTask taskId
   runDB $ pauseTask taskId
   redirect TasksR
 
 postUnpauseTaskR :: TaskId -> Handler RepHtml
 postUnpauseTaskR taskId = do
-  authedTask taskId
+  _ <- authedTask taskId
   runDB $ unpauseTask taskId
   redirect TasksR
 
 
 postTaskEstimatesR :: TaskId -> Handler RepHtml
 postTaskEstimatesR taskId = do
-  authedTask taskId
+  _ <- authedTask taskId
   pomosParam <- lookupPostParam "pomos"
   let pomos = do
       param <- maybeToEither "no pomos" $ pomosParam
@@ -198,7 +198,7 @@ postTaskEstimatesR taskId = do
       return num
   case pomos of
     (Right numPomos) -> do
-      runDB $ insert $ Estimate taskId numPomos
+      _ <- runDB $ insert $ Estimate taskId numPomos
       redirect TasksR
     Left msg -> error msg -- TODO
 

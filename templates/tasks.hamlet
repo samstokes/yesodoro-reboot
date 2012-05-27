@@ -22,11 +22,11 @@
     <input type=submit value=Add>
 
 
-$if not (null tomorrow)
+$if not (null postponed)
   <h2.collapsed>Tomorrow
   <section #tomorrow style="display: none">
     <table><tbody>
-      $forall taskEntityAndEstimates <- tomorrow
+      $forall taskEntityAndEstimates <- postponed
         ^{taskTr taskEntityAndEstimates}
 
 
