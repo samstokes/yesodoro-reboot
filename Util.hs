@@ -3,6 +3,7 @@ module Util where
 import Prelude
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.List (groupBy)
+import Data.Text (Text)
 import Data.Time
 import Text.Blaze (ToMarkup(..))
 
@@ -35,3 +36,7 @@ instance ToMarkup Day where
 -- Mimic Ruby's nil.to_s == ''
 instance ToMarkup a => ToMarkup (Maybe a) where
   toMarkup = maybe "" toMarkup
+
+
+overrideMethodR :: method -> route -> (route, [(Text, method)])
+overrideMethodR method route = (route, [("_method", method)])
