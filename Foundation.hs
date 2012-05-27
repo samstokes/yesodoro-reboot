@@ -8,7 +8,7 @@ module Foundation
     , Form
     , maybeAuth
     , requireAuth
-    , deleteR
+    , putR, deleteR
     , module Settings
     , module Model
     ) where
@@ -72,6 +72,9 @@ mkMessage "App" "messages" "en"
 -- split these actions into two functions and place them in separate files.
 mkYesodData "App" $(parseRoutesFile "config/routes")
 
+
+putR :: Route App -> (Route App, [(Text, Text)])
+putR = overrideMethodR "PUT"
 
 deleteR :: Route App -> (Route App, [(Text, Text)])
 deleteR = overrideMethodR "DELETE"

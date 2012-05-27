@@ -5,6 +5,7 @@ import Data.Maybe (fromJust)
 import Data.Time (getCurrentTimeZone)
 import Database.Persist.Query.Internal (Update)
 import Import
+import Data.Aeson.Types (toJSON)
 import Util
 import Yesod.Auth (requireAuthId)
 
@@ -34,6 +35,7 @@ getTasksR = do
   let doneByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal) done
 
   (newTaskWidget, newTaskEnctype) <- generateFormPost newTaskForm
+  (editTaskWidget, editTaskEnctype) <- generateFormPost editTaskForm
 
   let taskTr taskEntity = let taskId = entityKey taskEntity; task = entityVal taskEntity in $(widgetFile "tasks/task-tr")
   defaultLayout $ do
@@ -45,6 +47,10 @@ getTasksR = do
 
 newTaskForm :: Form NewTask
 newTaskForm = renderDivs $ NewTask <$> areq textField "Title" Nothing
+
+
+editTaskForm :: Form TaskEdit
+editTaskForm = renderDivs $ TaskTitleEdit <$> areq textField "Title" Nothing
 
 
 postTasksR :: Handler RepHtml
@@ -111,6 +117,17 @@ deleteTaskR taskId = do
   authedTask taskId
   runDB $ delete taskId
   redirect TasksR
+
+
+putTaskR :: TaskId -> Handler RepJson
+putTaskR taskId = do
+  task <- authedTask taskId
+  ((result, _), _) <- runFormPost editTaskForm
+  case result of
+    FormSuccess edit -> do
+      updated <- runDB $ updateTask edit (taskId, task)
+      jsonToRepJson $ object [("updated", toJSON updated)]
+    _ -> undefined -- TODO
 
 
 postPostponeTaskR :: TaskId -> Handler RepHtml

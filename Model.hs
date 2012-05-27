@@ -11,6 +11,7 @@ import Control.Monad.IO.Class (MonadIO)
 import Data.Maybe (isJust)
 import Data.String (IsString)
 import Text.Blaze (ToMarkup, toMarkup)
+import Text.Julius (ToJavascript, toJavascript)
 import Util
 
 
@@ -26,9 +27,15 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll"]
 instance ToMarkup (Key a b) where
   toMarkup = toMarkup . unKey
 
+instance ToJavascript (Key a b) where
+  toJavascript = toJavascript . unKey
+
 
 instance ToMarkup PersistValue where
   toMarkup (PersistInt64 i) = toMarkup $ show i
+
+instance ToJavascript PersistValue where
+  toJavascript (PersistInt64 i) = toJavascript $ show i
 
 
 newtype TaskState = TaskState Text
@@ -54,6 +61,16 @@ createTaskAtBottom userId task = do
   maybeLastTask <- selectFirst [TaskUser ==. userId] [Desc TaskOrder]
   let lastOrder = maybe 0 (taskOrder . entityVal) maybeLastTask
   insert $ newTask userId time (succ lastOrder) task
+
+
+data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
+              deriving (Show)
+
+
+updateTask :: PersistQuery SqlPersist m => TaskEdit -> (TaskId, Task) -> SqlPersist m Bool
+updateTask (TaskTitleEdit title) (taskId, task)
+  | taskTitle task /= title = update taskId [TaskTitle =. title] >> return True
+  | otherwise               = return False
 
 
 taskDone :: Task -> Bool

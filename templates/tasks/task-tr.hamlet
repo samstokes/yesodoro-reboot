@@ -1,8 +1,8 @@
 <tr .task #task-#{taskId} .#{taskState task} .#{taskDueClass task}>
   <th .title>
     <h4>#{taskTitle task}
-    <form .hidden method=POST action={EditTaskR taskId} enctype={editTaskEnctype}>
-      {editTaskWidget}
+    <form .hidden method=POST action=@?{putR (TaskR taskId)} enctype=#{editTaskEnctype}>
+      ^{editTaskWidget}
   <td>^{setTaskDonenessButton taskId task}
   <td>
     $if not (taskDone task)
