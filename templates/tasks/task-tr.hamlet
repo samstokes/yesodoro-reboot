@@ -4,4 +4,16 @@
     <form .hidden method=POST action={EditTaskR taskId} enctype={editTaskEnctype}>
       {editTaskWidget}
   <td>^{setTaskDonenessButton taskId task}
+  <td>
+    $if not (taskDone task)
+      $if taskTodoToday task
+        ^{oneButton "☔" (PostponeTaskR taskId)}
+      $else
+        ^{oneButton "☀" (UnpostponeTaskR taskId)}
+  <td>
+    $if not (taskDone task)
+      $if taskActive task
+        ^{oneButton "||" (PauseTaskR taskId)}
+      $else
+        ^{oneButton "|>" (UnpauseTaskR taskId)}
   <td>^{deleteButton "☠" (TaskR taskId)}

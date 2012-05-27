@@ -111,3 +111,29 @@ deleteTaskR taskId = do
   authedTask taskId
   runDB $ delete taskId
   redirect TasksR
+
+
+postPostponeTaskR :: TaskId -> Handler RepHtml
+postPostponeTaskR taskId = do
+  authedTask taskId
+  runDB $ postponeTask taskId
+  redirect TasksR
+
+postUnpostponeTaskR :: TaskId -> Handler RepHtml
+postUnpostponeTaskR taskId = do
+  authedTask taskId
+  runDB $ unpostponeTask taskId
+  redirect TasksR
+
+
+postPauseTaskR :: TaskId -> Handler RepHtml
+postPauseTaskR taskId = do
+  authedTask taskId
+  runDB $ pauseTask taskId
+  redirect TasksR
+
+postUnpauseTaskR :: TaskId -> Handler RepHtml
+postUnpauseTaskR taskId = do
+  authedTask taskId
+  runDB $ unpauseTask taskId
+  redirect TasksR

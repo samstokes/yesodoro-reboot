@@ -13,6 +13,10 @@ now = liftIO getCurrentTime
 utcToLocalDay :: TimeZone -> UTCTime -> Day
 utcToLocalDay tz = localDay . utcToLocalTime tz
 
+tomorrow :: UTCTime -> UTCTime
+tomorrow = addUTCTime oneDay
+  where oneDay = 24 * 60 * 60
+
 compareBy :: Ord a => (b -> a) -> b -> b -> Ordering
 compareBy f x y = compare (f x) (f y)
 

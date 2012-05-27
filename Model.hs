@@ -80,3 +80,21 @@ taskState task = if taskDone task then "done" else "pending"
 taskDonenessActionName :: Task -> Text
 taskDonenessActionName task | taskDone task = "☹"
                             | otherwise     = "☺"
+
+
+postponeTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()
+postponeTask taskId = do
+  time <- now
+  update taskId [TaskScheduledFor =. tomorrow time]
+
+unpostponeTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()
+unpostponeTask taskId = do
+  time <- now
+  update taskId [TaskScheduledFor =. time]
+
+
+pauseTask :: PersistQuery SqlPersist m => TaskId -> SqlPersist m ()
+pauseTask taskId = update taskId [TaskActive =. False]
+
+unpauseTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()
+unpauseTask taskId = update taskId [TaskActive =. True] >> unpostponeTask taskId
