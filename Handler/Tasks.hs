@@ -2,7 +2,7 @@ module Handler.Tasks where
 
 import Data.List (partition, sortBy)
 import Data.Maybe (fromJust)
-import Data.Time (TimeZone, getCurrentTimeZone)
+import Data.Time (Day, TimeZone, getCurrentTimeZone)
 import Database.Persist.Query.Internal (Update)
 import Import
 import Data.Aeson.Types (toJSON)
@@ -32,7 +32,8 @@ getTasksR = do
   let todo = sortBy (compareBy $ taskOrder . entityVal) unsortedTodo
   let tomorrow = sortBy (compareBy $ taskOrder . entityVal) unsortedTomorrow
 
-  let doneByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal) done
+  let doneByDay :: [(Day, [Entity Task])]
+      doneByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal) done
 
   (newTaskWidget, newTaskEnctype) <- generateFormPost newTaskForm
   (editTaskWidget, editTaskEnctype) <- generateFormPost editTaskForm

@@ -7,8 +7,8 @@
     <p>Nothing to do. Congratulations! Why not take the rest of the day off?
   $else
     <table><tbody>
-      $forall idAndTaskEstimatesNotes <- todo
-        ^{taskTr idAndTaskEstimatesNotes}
+      $forall taskEntity <- todo
+        ^{taskTr taskEntity}
 
   <form method=POST action=@{TasksR} enctype=#{newTaskEnctype}>
     ^{newTaskWidget}
@@ -19,26 +19,26 @@ $if not (null tomorrow)
   <h2.collapsed>Tomorrow
   <section #tomorrow style="display: none">
     <table><tbody>
-      $forall idAndTaskEstimatesNotes <- tomorrow
-        ^{taskTr idAndTaskEstimatesNotes}
+      $forall taskEntity <- tomorrow
+        ^{taskTr taskEntity}
 
 
 $if not (null paused)
   <h2.collapsed>Paused (#{length paused})
   <section #paused style="display: none">
     <table><tbody>
-      $forall idAndTaskEstimatesNotes <- paused
-        ^{taskTr idAndTaskEstimatesNotes}
+      $forall taskEntity <- paused
+        ^{taskTr taskEntity}
 
 
 $if not (null doneByDay)
   <h2.collapsed>Done
   <section #done style="display: none">
-    $forall dayAndTasksEstimatesNotes <- doneByDay
+    $forall dayAndTaskEntities <- doneByDay
       <h3>
-        #{fst dayAndTasksEstimatesNotes}
-        $with tasks <- snd dayAndTasksEstimatesNotes
-          \ (#{sum $ map taskPomos $ map entityVal tasks})
+        #{fst dayAndTaskEntities}
+        $with taskEntities <- snd dayAndTaskEntities
+          \ (#{sum $ map taskPomos $ map entityVal taskEntities})
       <table><tbody>
-        $forall idAndTaskEstimatesNotes <- snd dayAndTasksEstimatesNotes
-          ^{taskTr idAndTaskEstimatesNotes}
+        $forall taskEntity <- snd dayAndTaskEntities
+          ^{taskTr taskEntity}
