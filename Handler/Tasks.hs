@@ -3,6 +3,7 @@ module Handler.Tasks where
 import Data.List (partition, sortBy)
 import Data.Maybe (listToMaybe, fromJust)
 import qualified Data.Text as Text
+import Data.Text.Read (decimal)
 import Data.Time (Day, TimeZone, getCurrentTimeZone)
 import Database.Persist.Query.Internal (Update)
 import Import
@@ -185,3 +186,22 @@ postUnpauseTaskR taskId = do
   authedTask taskId
   runDB $ unpauseTask taskId
   redirect TasksR
+
+
+postTaskEstimatesR :: TaskId -> Handler RepHtml
+postTaskEstimatesR taskId = do
+  authedTask taskId
+  pomosParam <- lookupPostParam "pomos"
+  let pomos = do
+      param <- maybeToEither "no pomos" $ pomosParam
+      (num, _) <- decimal param
+      return num
+  case pomos of
+    (Right numPomos) -> do
+      runDB $ insert $ Estimate taskId numPomos
+      redirect TasksR
+    Left msg -> error msg -- TODO
+
+
+postTaskPomosR :: TaskId -> Handler RepHtml
+postTaskPomosR = updateAndRedirectR TasksR [TaskPomos +=. 1]

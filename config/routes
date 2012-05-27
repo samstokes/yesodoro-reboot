@@ -16,3 +16,7 @@
 /tasks/#TaskId/unpostpone UnpostponeTaskR POST
 /tasks/#TaskId/pause PauseTaskR POST
 /tasks/#TaskId/unpause UnpauseTaskR POST
+
+/tasks/#TaskId/estimates TaskEstimatesR POST
+
+/tasks/#TaskId/pomos TaskPomosR POST

@@ -148,6 +148,9 @@ taskDonenessActionName task | taskDone task = "☹"
 taskEstimates :: PersistQuery SqlPersist m => TaskId -> SqlPersist m [Entity Estimate]
 taskEstimates taskId = selectList [EstimateTask ==. taskId] []
 
+estimateOptions :: [Int]
+estimateOptions = [2 ^ x | x <- [0 .. 4]]
+
 
 postponeTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()
 postponeTask taskId = do

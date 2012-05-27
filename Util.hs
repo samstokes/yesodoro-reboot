@@ -59,3 +59,8 @@ foldTimesM :: Monad m => Int -> (a -> m a) -> a -> m a
 foldTimesM n f initial = foldM f' initial (replicate n ())
   where
     f' intermediate _ = f intermediate
+
+
+maybeToEither :: String -> Maybe a -> Either String a
+maybeToEither msg Nothing = Left msg
+maybeToEither _ (Just v) = Right v
