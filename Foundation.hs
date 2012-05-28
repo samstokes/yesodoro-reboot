@@ -18,10 +18,11 @@ import Yesod
 import Yesod.Static
 import Yesod.Auth
 import Yesod.Auth.BrowserId
+import Yesod.Auth.Email
 import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
-import Yesod.Logger (Logger, logMsg, formatLogText)
+import Yesod.Logger (Logger, logMsg, formatLogText, logLazyText)
 import Network.HTTP.Conduit (Manager)
 import qualified Settings
 import qualified Database.Persist.Store
@@ -29,9 +30,12 @@ import Settings.StaticFiles
 import Database.Persist.GenericSql
 import Settings (widgetFile, Extra (..))
 import Model
+import Control.Monad (join)
+import Data.Maybe (isJust)
 import Text.Jasmine (minifym)
 import Web.ClientSession (getKey)
 import Text.Hamlet (hamletFile)
+import Text.Shakespeare.Text (stext)
 import Data.Text (Text)
 import Util
 
@@ -156,7 +160,7 @@ instance YesodAuth App where
                 fmap Just $ insert $ User (credsIdent creds) Nothing
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [authBrowserId, authGoogleEmail]
+    authPlugins _ = [authBrowserId, authGoogleEmail, authEmail]
 
     authHttpManager = httpManager
 
@@ -171,3 +175,45 @@ instance RenderMessage App FormMessage where
 -- wiki:
 --
 -- https://github.com/yesodweb/yesod/wiki/Sending-email
+
+instance YesodAuthEmail App where
+    type AuthEmailId App = EmailId
+
+    addUnverified email verkey =
+        runDB $ insert $ Email email Nothing $ Just verkey
+
+    sendVerifyEmail email _ verurl = do
+        y <- getYesod
+        -- Just log the verification URL for now, rather than emailing it...
+        -- TODO this is insecure and user-unfriendly!
+        liftIO $ logLazyText (getLogger y) [stext|
+Hello #{email}!
+Please go to #{verurl}.
+|]
+    getVerifyKey = runDB . fmap (join . fmap emailVerkey) . get
+    setVerifyKey eid key = runDB $ update eid [EmailVerkey =. Just key]
+    verifyAccount eid = runDB $ do
+        me <- get eid
+        case me of
+            Nothing -> return Nothing
+            Just e -> do
+                let email = emailEmail e
+                case emailUser e of
+                    Just uid -> return $ Just uid
+                    Nothing -> do
+                        uid <- insert $ User email Nothing
+                        update eid [EmailUser =. Just uid, EmailVerkey =. Nothing]
+                        return $ Just uid
+    getPassword = runDB . fmap (join . fmap userPassword) . get
+    setPassword uid pass = runDB $ update uid [UserPassword =. Just pass]
+    getEmailCreds email = runDB $ do
+        me <- getBy $ UniqueEmail email
+        case me of
+            Nothing -> return Nothing
+            Just (Entity eid e) -> return $ Just EmailCreds
+                { emailCredsId = eid
+                , emailCredsAuthId = emailUser e
+                , emailCredsStatus = isJust $ emailUser e
+                , emailCredsVerkey = emailVerkey e
+                }
+    getEmail = runDB . fmap (fmap emailEmail) . get
