@@ -11,12 +11,14 @@ import Yesod.Auth
 import Yesod.Default.Config
 import Yesod.Default.Main
 import Yesod.Default.Handlers
-import Yesod.Logger (Logger, logBS, toProduction)
+import Yesod.Logger (Logger, logBS, toProduction, flushLogger)
 import Network.Wai.Middleware.RequestLogger (logCallback, logCallbackDev)
 import Network.Wai.Middleware.MethodOverride (methodOverride)
 import qualified Database.Persist.Store
 import Database.Persist.GenericSql (runMigration)
 import Network.HTTP.Conduit (newManager, def)
+import Control.Concurrent (forkIO, threadDelay)
+import Control.Monad (forever)
 
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
@@ -44,6 +46,10 @@ makeApplication conf logger = do
 
 makeFoundation :: AppConfig DefaultEnv Extra -> Logger -> IO App
 makeFoundation conf setLogger = do
+    _ <- forkIO $ forever $ do
+        threadDelay $ 1000 * 1000
+        flushLogger setLogger
+
     manager <- newManager def
     s <- staticSite
     dbconf <- withYamlEnvironment "config/postgresql.yml" (appEnv conf)
