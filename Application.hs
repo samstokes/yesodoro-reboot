@@ -20,6 +20,16 @@ import Database.Persist.GenericSql (runMigration)
 import Network.HTTP.Conduit (newManager, def)
 import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad (forever)
+import qualified Data.Aeson as Aeson
+import qualified Data.HashMap.Strict as HashMap
+
+#ifdef DEVELOPMENT
+import qualified Data.Aeson.Types as Aeson.Types
+#else
+-- stuff for Heroku config parsing
+import Control.Arrow (second)
+import qualified Web.Heroku
+#endif
 
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
@@ -63,8 +73,9 @@ makeFoundation conf setLogger = do
 
     manager <- newManager def
     s <- staticSite
+    heroku <- loadHerokuConfig
     dbconf <- withYamlEnvironment "config/postgresql.yml" (appEnv conf)
-              Database.Persist.Store.loadConfig >>=
+              (Database.Persist.Store.loadConfig . combineMappings heroku) >>=
               Database.Persist.Store.applyEnv
     p <- Database.Persist.Store.createPoolConfig (dbconf :: Settings.PersistConfig)
     Database.Persist.Store.runPool dbconf (runMigration migrateAll) p
@@ -78,3 +89,24 @@ getApplicationDev =
     loader = loadConfig (configSettings Development)
         { csParseExtra = parseExtra
         }
+
+
+#ifndef DEVELOPMENT
+canonicalizeKey :: (Text, val) -> (Text, val)
+canonicalizeKey ("dbname", val) = ("database", val)
+canonicalizeKey pair = pair
+
+toMapping :: [(Text, Text)] -> Aeson.Value
+toMapping xs = Aeson.object $ map (second Aeson.String) xs
+#endif
+
+combineMappings :: Aeson.Value -> Aeson.Value -> Aeson.Value
+combineMappings (Aeson.Object m1) (Aeson.Object m2) = Aeson.Object $ HashMap.union m1 m2
+combineMappings _ _ = error "not a mapping!"
+
+loadHerokuConfig :: IO Aeson.Value
+#ifdef DEVELOPMENT
+loadHerokuConfig = return Aeson.Types.emptyObject
+#else
+loadHerokuConfig = Web.Heroku.dbConnParams >>= return . toMapping . map canonicalizeKey
+#endif

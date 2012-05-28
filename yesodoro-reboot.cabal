@@ -98,6 +98,8 @@ library
                  , data-default
                  , cookie
                  , safe
+                 , unordered-containers
+                 , heroku
 
 executable         yesodoro-reboot
     if flag(library-only)
