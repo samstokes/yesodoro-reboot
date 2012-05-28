@@ -89,6 +89,8 @@ library
                  , old-locale
                  , data-default
                  , iCalendar                     >= 0.2
+                 , unordered-containers
+                 , heroku
 
 executable         yesodoro-reboot
     if flag(library-only)
