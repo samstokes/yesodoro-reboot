@@ -38,8 +38,12 @@ makeApplication :: AppConfig DefaultEnv Extra -> Logger -> IO Application
 makeApplication conf logger = do
     foundation <- makeFoundation conf setLogger
     app <- toWaiAppPlain foundation
-    return $ methodOverride $ logWare app
+    return $ foldr ($) app middlewares
   where
+    middlewares = [
+        methodOverride
+      , logWare
+      ]
     setLogger = if development then logger else toProduction logger
     logWare   = if development then logCallbackDev (logBS setLogger)
                                else logCallback    (logBS setLogger)
