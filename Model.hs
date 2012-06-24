@@ -46,6 +46,10 @@ newtype TaskState = TaskState Text
   deriving (ToMarkup, IsString)
 
 
+selectUserTasks :: PersistQuery SqlPersist m => UserId -> [SelectOpt Task] -> SqlPersist m [Entity Task]
+selectUserTasks userId = selectList [TaskUser ==. userId]
+
+
 data NewTask = NewTask { newTaskTitle :: Text } deriving (Show)
 
 newTask :: UserId -> UTCTime -> Int -> NewTask -> Task

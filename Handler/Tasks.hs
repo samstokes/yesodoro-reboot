@@ -15,7 +15,7 @@ import Yesod.Auth (requireAuthId)
 getTasksR :: Handler RepHtml
 getTasksR = do
   userId <- requireAuthId
-  tasks <- runDB $ userTasks userId
+  tasks <- runDB $ selectUserTasks userId [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
 
   estimates <- runDB $ mapM (taskEstimates . entityKey) tasks
   let tasksEstimates :: [(Entity Task, [Entity Estimate])]
@@ -50,7 +50,6 @@ getTasksR = do
       setTitle "tasks"
       addWidget $(widgetFile "tasks") where
 
-  userTasks userId = selectList [TaskUser ==. userId] [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
   estimatedRemaining :: (Entity Task, [Entity Estimate]) -> Int
   estimatedRemaining (_, []) = 0
   estimatedRemaining (Entity _ task, Entity _ estimate : _) = (estimatePomos estimate - taskPomos task) `max` 0
