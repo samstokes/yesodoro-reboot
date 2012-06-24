@@ -46,8 +46,15 @@ newtype TaskState = TaskState Text
   deriving (ToMarkup, IsString)
 
 
-selectUserTasks :: PersistQuery SqlPersist m => UserId -> [SelectOpt Task] -> SqlPersist m [Entity Task]
-selectUserTasks userId = selectList [TaskUser ==. userId]
+selectUserTasksSince :: PersistQuery SqlPersist m => UserId -> UTCTime -> [SelectOpt Task] -> SqlPersist m [Entity Task]
+selectUserTasksSince userId doneSince = selectList (belongsToUser ++ doneSinceLimit)
+  where
+    belongsToUser = [TaskUser ==. userId]
+    doneSinceLimit = [TaskDoneAt ==. Nothing] ||. [TaskDoneAt >=. Just doneSince]
+
+
+selectUserRecentTasks :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> [SelectOpt Task] -> SqlPersist m [Entity Task]
+selectUserRecentTasks userId opts = liftIO (ago $ weeks 2) >>= flip (selectUserTasksSince userId) opts
 
 
 data NewTask = NewTask { newTaskTitle :: Text } deriving (Show)

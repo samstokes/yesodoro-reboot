@@ -15,7 +15,7 @@ import Yesod.Auth (requireAuthId)
 getTasksR :: Handler RepHtml
 getTasksR = do
   userId <- requireAuthId
-  tasks <- runDB $ selectUserTasks userId [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
+  tasks <- runDB $ selectUserRecentTasks userId [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
 
   estimates <- runDB $ mapM (taskEstimates . entityKey) tasks
   let tasksEstimates :: [(Entity Task, [Entity Estimate])]
