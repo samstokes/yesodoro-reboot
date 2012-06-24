@@ -12,6 +12,7 @@ import Yesod.Default.Config
 import Yesod.Default.Main
 import Yesod.Default.Handlers
 import Yesod.Logger (Logger, logBS, toProduction, flushLogger)
+import qualified Network.Wai.Middleware.Gzip as GZ
 import Network.Wai.Middleware.RequestLogger (logCallback, logCallbackDev)
 import Network.Wai.Middleware.MethodOverride (methodOverride)
 import qualified Database.Persist.Store
@@ -43,6 +44,7 @@ makeApplication conf logger = do
     middlewares = [
         methodOverride
       , logWare
+      , GZ.gzip GZ.def
       ]
     setLogger = if development then logger else toProduction logger
     logWare   = if development then logCallbackDev (logBS setLogger)
