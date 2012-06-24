@@ -14,6 +14,25 @@ import Text.Blaze (ToMarkup(..))
 now :: MonadIO m => m UTCTime
 now = liftIO getCurrentTime
 
+
+ago, hence :: (Functor m, MonadIO m) => NominalDiffTime -> m UTCTime
+ago interval = fmap (earlier interval) now
+hence interval = fmap (later interval) now
+
+
+earlier, later :: NominalDiffTime -> UTCTime -> UTCTime
+earlier = addUTCTime . negate
+later = addUTCTime
+
+
+minutes, hours, days, weeks :: Num a => a -> a
+
+minutes = (60 *)
+hours = (60 *) . minutes
+days = (24 *) . hours
+weeks = (7 *) . days
+
+
 utcToLocalDay :: TimeZone -> UTCTime -> Day
 utcToLocalDay tz = localDay . utcToLocalTime tz
 
