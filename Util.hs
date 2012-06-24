@@ -36,10 +36,6 @@ weeks = (7 *) . days
 utcToLocalDay :: TimeZone -> UTCTime -> Day
 utcToLocalDay tz = localDay . utcToLocalTime tz
 
-tomorrow :: UTCTime -> UTCTime
-tomorrow = addUTCTime oneDay
-  where oneDay = 24 * 60 * 60
-
 localEndOfDay :: LocalTime -> LocalTime
 localEndOfDay time = time { localTimeOfDay = TimeOfDay 23 59 59 }
 

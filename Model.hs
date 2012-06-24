@@ -158,8 +158,8 @@ estimateOptions = [2 ^ x | x <- [0 .. 4] :: [Int]]
 
 postponeTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()
 postponeTask taskId = do
-  time <- now
-  update taskId [TaskScheduledFor =. tomorrow time]
+  tomorrow <- hence $ days 1
+  update taskId [TaskScheduledFor =. tomorrow]
 
 unpostponeTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()
 unpostponeTask taskId = do
