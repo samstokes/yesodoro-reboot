@@ -5,6 +5,7 @@ module Util where
 import Prelude
 import Control.Monad (foldM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
+import Data.Function (on)
 import Data.List (groupBy)
 import Data.Text (Text)
 import Data.Time
@@ -48,15 +49,9 @@ endOfToday tz = do
   return $ locally tz localEndOfDay utcNow
 
 
-compareBy :: Ord a => (b -> a) -> b -> b -> Ordering
-compareBy f x y = compare (f x) (f y)
-
-eqUnder :: Eq b => (a -> b) -> a -> a -> Bool
-eqUnder f a b = f a == f b
-
 groupByEq :: Eq g => (a -> g) -> [a] -> [(g, [a])]
 groupByEq f as = zip gs groups where
-  groups = groupBy (eqUnder f) as
+  groups = groupBy ((==) `on` f) as
   gs = map (f . head) groups
 
 

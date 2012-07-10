@@ -1,5 +1,6 @@
 module Handler.Tasks where
 
+import Data.Function (on)
 import Data.List (partition, sortBy)
 import Data.Maybe (listToMaybe, fromJust)
 import qualified Data.Text as Text
@@ -32,11 +33,11 @@ getTasksR = do
                         | otherwise             = Nothing
 
   let (unsortedDone, pending) = partition (taskDone . entityVal . fst) tasksEstimates
-  let done = reverse $ sortBy (compareBy $ taskDoneAt . entityVal . fst) unsortedDone
+  let done = reverse $ sortBy (compare `on` taskDoneAt . entityVal . fst) unsortedDone
   let (active, paused) = partition (taskActive . entityVal . fst) pending
   let (unsortedTodo, unsortedPostponed) = partition (taskTodoToday . entityVal . fst) active
-  let todo = sortBy (compareBy $ taskOrder . entityVal . fst) unsortedTodo
-  let postponed = sortBy (compareBy $ taskOrder . entityVal . fst) unsortedPostponed
+  let todo = sortBy (compare `on` taskOrder . entityVal . fst) unsortedTodo
+  let postponed = sortBy (compare `on` taskOrder . entityVal . fst) unsortedPostponed
 
   let doneByDay :: [(Day, [(Entity Task, [Entity Estimate])])]
       doneByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal . fst) done
