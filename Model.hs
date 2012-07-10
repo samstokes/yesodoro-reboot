@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Model where
 
@@ -8,7 +9,7 @@ import Data.Text (Text)
 import Data.Time (Day, TimeZone, UTCTime)
 import Database.Persist.Quasi (lowerCaseSettings)
 import Database.Persist.GenericSql (SqlPersist)
-import Database.Persist.Store (PersistValue(..))
+import Database.Persist.Store (PersistValue(..), deleteCascade)
 import Control.Monad.IO.Class (MonadIO)
 import Data.Maybe (isJust)
 import Data.String (IsString)
@@ -21,7 +22,7 @@ import Util
 -- You can find more information on persistent and how to declare entities
 -- at:
 -- http://www.yesodweb.com/book/persistent/
-share [mkPersist sqlSettings, mkMigrate "migrateAll"]
+share [mkPersist sqlSettings, mkMigrate "migrateAll", mkDeleteCascade]
     $(persistFileWith lowerCaseSettings "config/models")
 
 

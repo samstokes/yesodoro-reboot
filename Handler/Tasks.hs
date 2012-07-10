@@ -7,6 +7,7 @@ import qualified Data.Text as Text
 import Data.Text.Read (decimal)
 import Data.Time (Day, TimeZone, getCurrentTimeZone)
 import Database.Persist.Query.Internal (Update)
+import Database.Persist.Store (deleteCascade)
 import Import
 import Data.Aeson.Types (toJSON)
 import Util
@@ -134,7 +135,7 @@ userTimeZone = liftIO getCurrentTimeZone
 deleteTaskR :: TaskId -> Handler RepHtml
 deleteTaskR taskId = do
   _ <- authedTask taskId
-  runDB $ delete taskId
+  runDB $ deleteCascade taskId
   redirect TasksR
 
 
