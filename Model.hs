@@ -5,6 +5,7 @@ module Model where
 
 import Prelude
 import Yesod
+import Control.Applicative ((<$>))
 import Data.Text (Text)
 import Data.Time (Day, TimeZone, UTCTime)
 import Database.Persist.Quasi (lowerCaseSettings)
@@ -84,6 +85,33 @@ completeTask tz taskEntity = do
     time <- now
     update (entityKey taskEntity) [TaskDoneAt =. Just time]
 
+
+cloneTask :: Int -> Task -> Task
+cloneTask order task = Task {
+    taskUser = taskUser task
+  , taskTitle = taskTitle task
+  , taskPomos = 0
+  , taskScheduledFor = taskScheduledFor task
+  , taskDoneAt = Nothing
+  , taskActive = True
+  , taskOrder = order
+  }
+
+
+duplicateTask :: PersistQuery SqlPersist m => UTCTime -> Entity Task -> SqlPersist m TaskId
+duplicateTask scheduledFor taskEntity = do
+    let (taskId, task) = (entityKey taskEntity, entityVal taskEntity)
+    let order = taskOrder task + 1 -- TODO
+    newTaskId <- insert $ (cloneTask order task) { taskScheduledFor = scheduledFor }
+    _ <- copyFirstEstimate taskId newTaskId
+    return newTaskId
+  where
+    copyFirstEstimate :: PersistQuery SqlPersist m => TaskId -> TaskId -> SqlPersist m [EstimateId]
+    copyFirstEstimate taskId newTaskId = do
+      firstEstimate <- take 1 <$> taskEstimates taskId
+      mapM (copyEstimate newTaskId . entityVal) firstEstimate
+    copyEstimate :: PersistQuery SqlPersist m => TaskId -> Estimate -> SqlPersist m EstimateId
+    copyEstimate newTaskId (Estimate _ pomos) = insert $ Estimate newTaskId pomos
 
 
 data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
