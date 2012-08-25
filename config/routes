@@ -10,6 +10,7 @@
 /tasks/#TaskId TaskR PUT DELETE
 
 /tasks/#TaskId/complete CompleteTaskR POST
+/tasks/#TaskId/complete_and_duplicate CompleteAndDuplicateTaskR POST
 /tasks/#TaskId/restart RestartTaskR POST
 /tasks/#TaskId/order ReorderTaskR POST
 /tasks/#TaskId/postpone PostponeTaskR POST

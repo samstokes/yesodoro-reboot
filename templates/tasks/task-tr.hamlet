@@ -10,6 +10,8 @@
     <form .hidden method=POST action=@?{putR (TaskR taskId)} enctype=#{editTaskEnctype}>
       ^{editTaskWidget}
   <td>^{setTaskDonenessButton taskId task}
+  $if not (taskDone task)
+    <td>^{oneButton "%" (CompleteAndDuplicateTaskR taskId)}
   <td>
     $if not (taskDone task)
       $if taskTodoToday task

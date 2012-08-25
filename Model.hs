@@ -114,6 +114,13 @@ duplicateTask scheduledFor taskEntity = do
     copyEstimate newTaskId (Estimate _ pomos) = insert $ Estimate newTaskId pomos
 
 
+recurTask :: (MonadIO m, PersistQuery SqlPersist m) => UTCTime -> Entity Task -> SqlPersist m TaskId
+recurTask time taskEntity = do
+  newTaskId <- duplicateTask time taskEntity
+  postponeTask newTaskId
+  return newTaskId
+
+
 data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
               | TaskOrderEdit { taskOrderDelta :: Int }
               deriving (Show)
