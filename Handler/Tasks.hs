@@ -64,9 +64,10 @@ getTasksR = do
 postCompleteAndDuplicateTaskR :: TaskId -> Handler RepHtml
 postCompleteAndDuplicateTaskR taskId = do
   task <- authedTask taskId
+  tz <- userTimeZone
   time <- now
   runDB $ do
-    _ <- recurTask time $ Entity taskId task
+    _ <- recurTask tz time $ Entity taskId task
     update taskId [TaskDoneAt =. Just time]
   redirect TasksR
 

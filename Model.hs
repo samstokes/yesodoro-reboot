@@ -98,13 +98,22 @@ cloneTask order task = Task {
   }
 
 
-duplicateTask :: PersistQuery SqlPersist m => UTCTime -> Entity Task -> SqlPersist m TaskId
-duplicateTask scheduledFor taskEntity = do
+duplicateTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> UTCTime -> Entity Task -> SqlPersist m TaskId
+duplicateTask tz scheduledFor taskEntity = do
     let (taskId, task) = (entityKey taskEntity, entityVal taskEntity)
-    let order = taskOrder task + 1 -- TODO
-    newTaskId <- insert $ (cloneTask order task) { taskScheduledFor = scheduledFor }
-    _ <- copyFirstEstimate taskId newTaskId
-    return newTaskId
+
+    maybeFirstTask <- selectFirst [TaskUser ==. taskUser task] [Asc TaskOrder]
+    let firstOrder = maybe 0 (taskOrder . entityVal) maybeFirstTask
+
+    let dupeTask = cloneTask (pred firstOrder) task
+    dupeTaskId <- insert $ dupeTask { taskScheduledFor = scheduledFor }
+
+    -- TODO can this loop infinitely?
+    untilM ((>= taskOrder task) . taskOrder . snd) (\dupeTask' -> reorderTask Down tz dupeTask') (dupeTaskId, dupeTask)
+
+    _ <- copyFirstEstimate taskId dupeTaskId
+
+    return dupeTaskId
   where
     copyFirstEstimate :: PersistQuery SqlPersist m => TaskId -> TaskId -> SqlPersist m [EstimateId]
     copyFirstEstimate taskId newTaskId = do
@@ -114,9 +123,9 @@ duplicateTask scheduledFor taskEntity = do
     copyEstimate newTaskId (Estimate _ pomos) = insert $ Estimate newTaskId pomos
 
 
-recurTask :: (MonadIO m, PersistQuery SqlPersist m) => UTCTime -> Entity Task -> SqlPersist m TaskId
-recurTask time taskEntity = do
-  newTaskId <- duplicateTask time taskEntity
+recurTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> UTCTime -> Entity Task -> SqlPersist m TaskId
+recurTask tz time taskEntity = do
+  newTaskId <- duplicateTask tz time taskEntity
   postponeTask newTaskId
   return newTaskId
 
@@ -159,7 +168,7 @@ reorderTask direction tz (taskId, task) = do
   case maybeNext of
     Nothing -> return (taskId, task)
     Just (Entity nextId next) -> do
-      update taskId [TaskOrder =. (-1)] -- temporary value
+      update taskId [TaskOrder =. minBound] -- temporary value
       update nextId [TaskOrder =. (taskOrder task)]
       update taskId [TaskOrder =. (taskOrder next)]
       return (taskId, task { taskOrder = taskOrder next })
