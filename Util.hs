@@ -3,7 +3,7 @@
 module Util where
 
 import Prelude
-import Control.Monad (foldM)
+import Control.Monad (foldM, unless)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Function (on)
 import Data.List (groupBy)
@@ -71,6 +71,12 @@ foldTimesM :: Monad m => Int -> (a -> m a) -> a -> m a
 foldTimesM n f initial = foldM f' initial (replicate n ())
   where
     f' intermediate _ = f intermediate
+
+
+untilM :: Monad m => (a -> Bool) -> (a -> m a) -> a -> m ()
+untilM predicate f a = unless (predicate a) $ do
+  a' <- f a
+  untilM predicate f a'
 
 
 maybeToEither :: String -> Maybe a -> Either String a
