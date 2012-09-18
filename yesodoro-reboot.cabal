@@ -28,6 +28,7 @@ library
                      Settings
                      Settings.StaticFiles
                      Settings.Development
+                     Forms
                      Handler.Home
                      Handler.Tasks
                      Util

@@ -8,6 +8,7 @@ import Data.Text.Read (decimal)
 import Data.Time (Day, TimeZone, getCurrentTimeZone)
 import Database.Persist.Query.Internal (Update)
 import Database.Persist.Store (deleteCascade)
+import Forms
 import Import
 import Data.Aeson.Types (toJSON)
 import Util
@@ -55,18 +56,6 @@ getTasksR = do
   estimatedRemaining :: (Entity Task, [Entity Estimate]) -> Int
   estimatedRemaining (_, []) = 0
   estimatedRemaining (Entity _ task, Entity _ estimate : _) = (estimatePomos estimate - taskPomos task) `max` 0
-
-
-newTaskForm :: Form NewTask
-newTaskForm = renderDivs $ NewTask <$> areq textField "Title" Nothing
-
-
-editTaskForm :: Form TaskEdit
-editTaskForm = renderDivs $ TaskTitleEdit <$> areq textField "Title" Nothing
-
-
-reorderTaskForm :: Form TaskEdit
-reorderTaskForm = renderDivs $ TaskOrderEdit <$> areq intField "Delta" Nothing
 
 
 postTasksR :: Handler RepHtml
