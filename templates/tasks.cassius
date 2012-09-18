@@ -1,3 +1,11 @@
+section#plans form *
+  display: inline
+section#plans form label
+  display: none
+section#plans form textarea
+  width: 50%
+  height: 1.5em
+
 .task .title
     text-align: left
 .task.done .title, .task.done .estimate, .task.done .pomos

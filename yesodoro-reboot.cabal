@@ -25,12 +25,14 @@ library
                      Foundation
                      Import
                      Model
+                     Model.Plan
                      Settings
                      Settings.StaticFiles
                      Settings.Development
                      Forms
                      Handler.Home
                      Handler.Tasks
+                     Handler.Plans
                      Util
 
     if flag(dev) || flag(library-only)

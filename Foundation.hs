@@ -11,6 +11,7 @@ module Foundation
     , putR, deleteR
     , module Settings
     , module Model
+    , module Model.Plan
     ) where
 
 import Prelude
@@ -30,6 +31,7 @@ import Settings.StaticFiles
 import Database.Persist.GenericSql
 import Settings (widgetFile, Extra (..))
 import Model
+import Model.Plan
 import Control.Monad (join)
 import Data.Maybe (isJust)
 import Text.Jasmine (minifym)

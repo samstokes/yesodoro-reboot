@@ -19,6 +19,7 @@ getTasksR :: Handler RepHtml
 getTasksR = do
   userId <- requireAuthId
   tasks <- runDB $ selectUserRecentTasks userId [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
+  plans <- runDB $ selectUserActivePlans userId [Desc PlanCreatedAt]
 
   estimates <- runDB $ mapM (taskEstimates . entityKey) tasks
   let tasksEstimates :: [(Entity Task, [Entity Estimate])]
@@ -44,10 +45,12 @@ getTasksR = do
   let doneByDay :: [(Day, [(Entity Task, [Entity Estimate])])]
       doneByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal . fst) done
 
+  (newPlanWidget, newPlanEnctype) <- generateFormPost newPlanForm
   (newTaskWidget, newTaskEnctype) <- generateFormPost newTaskForm
   (editTaskWidget, editTaskEnctype) <- generateFormPost editTaskForm
   (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
+  let planTr (Entity planId plan) = $(widgetFile "plans/plan-tr")
   let taskTr ((Entity taskId task), estimateEntities) = $(widgetFile "tasks/task-tr")
   defaultLayout $ do
       setTitle "tasks"

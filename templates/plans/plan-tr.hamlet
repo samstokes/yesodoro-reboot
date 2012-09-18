@@ -1,0 +1,4 @@
+<tr .plan #plan-#{planId}>
+  <td .body>
+    #{planBody plan}
+  <td>^{oneButton "✓" (CompletePlanR planId)}

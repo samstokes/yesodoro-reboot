@@ -20,3 +20,6 @@
 /tasks/#TaskId/estimates TaskEstimatesR POST
 
 /tasks/#TaskId/pomos TaskPomosR POST
+
+/plans PlansR POST
+/plans/#PlanId/complete CompletePlanR POST

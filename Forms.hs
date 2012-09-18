@@ -1,11 +1,16 @@
 module Forms
-  ( newTaskForm
+  ( newPlanForm
+  , newTaskForm
   , editTaskForm
   , reorderTaskForm
   ) where
 
 
 import Import
+
+
+newPlanForm :: Form NewPlan
+newPlanForm = renderDivs $ NewPlan <$> unTextarea <$> areq textareaField "Body" Nothing
 
 
 newTaskForm :: Form NewTask

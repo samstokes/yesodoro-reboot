@@ -1,5 +1,15 @@
 <h1>Pomos!
 
+<h2>Plans
+<section #plans>
+  <form method=POST action=@{PlansR} enctype=#{newPlanEnctype}>
+    ^{newPlanWidget}
+    <input type=submit value=Add>
+  $if not (null plans)
+    <table><tbody>
+      $forall plan <- plans
+        ^{planTr plan}
+
 <h2>TODO
 <section #todo>
 
