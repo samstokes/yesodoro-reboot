@@ -7,7 +7,7 @@ import Prelude
 import Yesod
 import Control.Applicative ((<$>))
 import Data.Text (Text)
-import Data.Time (Day, TimeZone, UTCTime)
+import Data.Time (Day, TimeZone, UTCTime, NominalDiffTime)
 import Database.Persist.Quasi (lowerCaseSettings)
 import Database.Persist.GenericSql (SqlPersist)
 import Database.Persist.Store (PersistValue(..), deleteCascade)
@@ -219,10 +219,10 @@ estimateOptions :: [Int]
 estimateOptions = 0 : [2 ^ x | x <- [0 .. 3] :: [Int]]
 
 
-postponeTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()
-postponeTask taskId = do
-  tomorrow <- hence $ days 1
-  update taskId [TaskScheduledFor =. tomorrow]
+postponeTask :: (MonadIO m, PersistQuery SqlPersist m) => NominalDiffTime -> TaskId -> SqlPersist m ()
+postponeTask postponement taskId = do
+  postponed <- hence postponement
+  update taskId [TaskScheduledFor =. postponed]
 
 unpostponeTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()
 unpostponeTask taskId = do

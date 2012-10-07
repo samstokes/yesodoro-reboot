@@ -171,7 +171,7 @@ postReorderTaskR taskId = do
 postPostponeTaskR :: TaskId -> Handler RepHtml
 postPostponeTaskR taskId = do
   _ <- authedTask taskId
-  runDB $ postponeTask taskId
+  runDB $ postponeTask (days 1) taskId
   redirect TasksR
 
 postUnpostponeTaskR :: TaskId -> Handler RepHtml
