@@ -14,7 +14,9 @@ newPlanForm = renderDivs $ NewPlan <$> unTextarea <$> areq textareaField "Body" 
 
 
 newTaskForm :: Form NewTask
-newTaskForm = renderDivs $ NewTask <$> areq textField "Title" Nothing
+newTaskForm = renderDivs $ NewTask
+    <$> areq textField "Title" Nothing
+    <*> pure Once
 
 
 editTaskForm :: Form TaskEdit

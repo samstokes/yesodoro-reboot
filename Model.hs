@@ -19,6 +19,11 @@ import Text.Julius (ToJavascript, toJavascript)
 import Util
 
 
+data Schedule = Once | Daily | Weekly
+  deriving (Show, Read, Eq)
+derivePersistField "Schedule"
+
+
 -- You can define all of your database entities in the entities file.
 -- You can find more information on persistent and how to declare entities
 -- at:
@@ -59,10 +64,10 @@ selectUserRecentTasks :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> [Se
 selectUserRecentTasks userId opts = liftIO (ago $ weeks 2) >>= flip (selectUserTasksSince userId) opts
 
 
-data NewTask = NewTask { newTaskTitle :: Text } deriving (Show)
+data NewTask = NewTask { newTaskTitle :: Text, newTaskSchedule :: Schedule } deriving (Show)
 
 newTask :: UserId -> UTCTime -> Int -> NewTask -> Task
-newTask uid scheduledFor order (NewTask title) = Task {
+newTask uid scheduledFor order (NewTask title schedule) = Task {
     taskUser = uid
   , taskTitle = title
   , taskPomos = 0
@@ -70,6 +75,7 @@ newTask uid scheduledFor order (NewTask title) = Task {
   , taskDoneAt = Nothing
   , taskActive = True
   , taskOrder = order
+  , taskSchedule = schedule
   }
 
 createTaskAtBottom :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> NewTask -> SqlPersist m TaskId
@@ -95,6 +101,7 @@ cloneTask order task = Task {
   , taskDoneAt = Nothing
   , taskActive = True
   , taskOrder = order
+  , taskSchedule = taskSchedule task
   }
 
 

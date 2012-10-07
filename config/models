@@ -16,6 +16,7 @@ Task
     doneAt UTCTime Maybe
     active Bool default=true
     order Int
+    schedule Schedule default='Once'
 
     UniqueTaskOrder user order
 Estimate
