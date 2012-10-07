@@ -117,7 +117,7 @@ postCompleteTaskR :: TaskId -> Handler RepHtml
 postCompleteTaskR taskId = do
   task <- authedTask taskId
   tz <- userTimeZone
-  runDB $ completeTask tz (Entity taskId task)
+  _ <- runDB $ completeTask tz (Entity taskId task)
   redirect TasksR
 
 postRestartTaskR :: TaskId -> Handler RepHtml

@@ -6,6 +6,7 @@ module Model where
 import Prelude
 import Yesod
 import Control.Applicative ((<$>))
+import Control.Monad ((>=>))
 import Data.Text (Text)
 import Data.Time (Day, TimeZone, UTCTime, NominalDiffTime)
 import Database.Persist.Quasi (lowerCaseSettings)
@@ -22,6 +23,11 @@ import Util
 data Schedule = Once | Daily | Weekly
   deriving (Show, Read, Eq, Enum, Bounded)
 derivePersistField "Schedule"
+
+scheduleRecurrence :: Num a => Schedule -> Maybe a
+scheduleRecurrence Once = Nothing
+scheduleRecurrence Daily = Just $ days 1
+scheduleRecurrence Weekly = Just $ days 7
 
 scheduleLabel :: Schedule -> Maybe Text
 scheduleLabel Once = Nothing
@@ -91,10 +97,12 @@ createTaskAtBottom userId task = do
   insert $ newTask userId time (succ lastOrder) task
 
 
-completeTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> Entity Task -> SqlPersist m ()
+completeTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> Entity Task -> SqlPersist m (Maybe TaskId)
 completeTask tz taskEntity = do
     time <- now
+    maybeNextTime <- recurTask tz time taskEntity
     update (entityKey taskEntity) [TaskDoneAt =. Just time]
+    return maybeNextTime
 
 
 cloneTask :: Int -> Task -> Task
@@ -135,11 +143,16 @@ duplicateTask tz scheduledFor taskEntity = do
     copyEstimate newTaskId (Estimate _ pomos) = insert $ Estimate newTaskId pomos
 
 
-recurTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> UTCTime -> Entity Task -> SqlPersist m TaskId
+recurTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> UTCTime -> Entity Task -> SqlPersist m (Maybe TaskId)
 recurTask tz time taskEntity = do
-  newTaskId <- duplicateTask tz time taskEntity
-  postponeTask newTaskId
-  return newTaskId
+    let recurrence = scheduleRecurrence $ taskSchedule (entityVal taskEntity)
+    maybe (return Nothing) (applyRecurrence >=> return . Just) recurrence
+  where
+    applyRecurrence :: (MonadIO m, PersistQuery SqlPersist m) => NominalDiffTime -> SqlPersist m TaskId
+    applyRecurrence recurrence = do
+      newTaskId <- duplicateTask tz time taskEntity
+      postponeTask recurrence newTaskId
+      return newTaskId
 
 
 data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
