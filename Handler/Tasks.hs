@@ -61,17 +61,6 @@ getTasksR = do
   estimatedRemaining (Entity _ task, Entity _ estimate : _) = (estimatePomos estimate - taskPomos task) `max` 0
 
 
-postCompleteAndDuplicateTaskR :: TaskId -> Handler RepHtml
-postCompleteAndDuplicateTaskR taskId = do
-  task <- authedTask taskId
-  tz <- userTimeZone
-  time <- now
-  runDB $ do
-    _ <- recurTask tz time $ Entity taskId task
-    update taskId [TaskDoneAt =. Just time]
-  redirect TasksR
-
-
 postTasksR :: Handler RepHtml
 postTasksR = do
   userId <- requireAuthId
