@@ -104,8 +104,10 @@ updateAndRedirectR route updates taskId = do
 
 postCompleteTaskR :: TaskId -> Handler RepHtml
 postCompleteTaskR taskId = do
-  time <- now
-  updateAndRedirectR TasksR [TaskDoneAt =. Just time] taskId
+  task <- authedTask taskId
+  tz <- userTimeZone
+  runDB $ completeTask tz (Entity taskId task)
+  redirect TasksR
 
 postRestartTaskR :: TaskId -> Handler RepHtml
 postRestartTaskR = updateAndRedirectR TasksR [TaskDoneAt =. Nothing]

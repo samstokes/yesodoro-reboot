@@ -79,6 +79,13 @@ createTaskAtBottom userId task = do
   insert $ newTask userId time (succ lastOrder) task
 
 
+completeTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> Entity Task -> SqlPersist m ()
+completeTask tz taskEntity = do
+    time <- now
+    update (entityKey taskEntity) [TaskDoneAt =. Just time]
+
+
+
 data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
               | TaskOrderEdit { taskOrderDelta :: Int }
               deriving (Show)
