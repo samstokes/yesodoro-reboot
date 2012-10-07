@@ -20,8 +20,13 @@ import Util
 
 
 data Schedule = Once | Daily | Weekly
-  deriving (Show, Read, Eq)
+  deriving (Show, Read, Eq, Enum, Bounded)
 derivePersistField "Schedule"
+
+scheduleLabel :: Schedule -> Maybe Text
+scheduleLabel Once = Nothing
+scheduleLabel Daily = Just "♳"
+scheduleLabel Weekly = Just "♹"
 
 
 -- You can define all of your database entities in the entities file.

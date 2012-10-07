@@ -7,6 +7,7 @@ module Forms
 
 
 import Import
+import Util (fieldListOptions)
 
 
 newPlanForm :: Form NewPlan
@@ -16,7 +17,7 @@ newPlanForm = renderDivs $ NewPlan <$> unTextarea <$> areq textareaField "Body" 
 newTaskForm :: Form NewTask
 newTaskForm = renderDivs $ NewTask
     <$> areq textField "Title" Nothing
-    <*> pure Once
+    <*> areq (radioFieldList fieldListOptions) "Schedule" (pure Once)
 
 
 editTaskForm :: Form TaskEdit

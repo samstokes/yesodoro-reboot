@@ -21,5 +21,15 @@ h2.collapsed
 .task .notes form label
   display: none
 
+.task .schedule-label
+  font-size: 150%
+
+section#todo form *
+  display: inline
+
+/* ugh hack to avoid "Title" / "Schedule" label */
+section#todo form div.required > label
+  display: none
+
 .hidden
   display: none
