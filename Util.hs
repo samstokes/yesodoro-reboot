@@ -3,11 +3,13 @@
 module Util where
 
 import Prelude
+import Control.Arrow ((&&&))
 import Control.Monad (foldM, unless)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Function (on)
 import Data.List (groupBy)
 import Data.Text (Text)
+import qualified Data.Text as Text
 import Data.Time
 import Text.Blaze (ToMarkup(..))
 
@@ -82,3 +84,7 @@ untilM predicate f a = unless (predicate a) $ do
 maybeToEither :: String -> Maybe a -> Either String a
 maybeToEither msg Nothing = Left msg
 maybeToEither _ (Just v) = Right v
+
+
+fieldListOptions :: (Show field, Enum field, Bounded field) => [(Text, field)]
+fieldListOptions = map (Text.pack . show &&& id) $ [minBound .. maxBound]
