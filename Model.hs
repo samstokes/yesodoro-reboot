@@ -20,7 +20,7 @@ import Text.Julius (ToJavascript, toJavascript)
 import Util
 
 
-data Schedule = Once | Daily | Weekly
+data Schedule = Once | Daily | Weekly | Fortnightly
   deriving (Show, Read, Eq, Enum, Bounded)
 derivePersistField "Schedule"
 
@@ -28,11 +28,13 @@ scheduleRecurrence :: Num a => Schedule -> Maybe a
 scheduleRecurrence Once = Nothing
 scheduleRecurrence Daily = Just $ days 1
 scheduleRecurrence Weekly = Just $ days 7
+scheduleRecurrence Fortnightly = Just $ days 14
 
 scheduleLabel :: Schedule -> Maybe Text
 scheduleLabel Once = Nothing
 scheduleLabel Daily = Just "♳"
 scheduleLabel Weekly = Just "♹"
+scheduleLabel Fortnightly = Just "♹♹"
 
 
 -- You can define all of your database entities in the entities file.
