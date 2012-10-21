@@ -40,7 +40,7 @@ getTasksR = do
   let (active, paused) = partition (taskActive . entityVal . fst) pending
   let (unsortedTodo, unsortedPostponed) = partition (taskTodoToday . entityVal . fst) active
   let todo = sortBy (compare `on` taskOrder . entityVal . fst) unsortedTodo
-  let postponed = sortBy (compare `on` taskOrder . entityVal . fst) unsortedPostponed
+  let postponed = sortBy (compare `on` taskScheduledFor . entityVal . fst) unsortedPostponed
 
   let doneByDay :: [(Day, [(Entity Task, [Entity Estimate])])]
       doneByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal . fst) done
