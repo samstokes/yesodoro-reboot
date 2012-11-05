@@ -17,8 +17,11 @@ $(function () {
   }
 
   function renderNote(note) {
+    function paras(str) {
+      return "<p>" + str.replace(/\n\n/g, "<\p><p>") + "<\p>";
+    }
     return template.clone().removeClass('hidden')
-      .find('.body').html(note.body).end();
+      .find('.body').html(paras(note.body)).end();
   }
 
   handle.click(function () {
