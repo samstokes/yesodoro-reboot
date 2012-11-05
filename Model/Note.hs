@@ -17,8 +17,8 @@ import Model
 import Util
 
 
-taskNotes :: PersistQuery SqlPersist m => TaskId -> SqlPersist m [Entity Note]
-taskNotes taskId = selectList [NoteTask ==. taskId] []
+taskNotes :: PersistQuery SqlPersist m => [SelectOpt Note] -> TaskId -> SqlPersist m [Entity Note]
+taskNotes opts taskId = selectList [NoteTask ==. taskId] opts
 
 
 data NewNote = NewNote { newNoteBody :: Text } deriving (Show)
