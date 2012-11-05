@@ -4,6 +4,7 @@ module Model.Plan
     ( selectUserPlansSince
     , NewPlan(..), createPlan
     , planDone
+    , planDoneDay
     ) where
 
 import Prelude
@@ -12,7 +13,7 @@ import Yesod
 import Control.Monad.IO.Class (MonadIO)
 import Data.Maybe (isJust)
 import Data.Text (Text)
-import Data.Time (UTCTime)
+import Data.Time (Day, TimeZone, UTCTime)
 import Database.Persist.GenericSql (SqlPersist)
 import Model
 import Util
@@ -44,3 +45,6 @@ createPlan uid plan = do
 
 planDone :: Plan -> Bool
 planDone = isJust . planDoneAt
+
+planDoneDay :: TimeZone -> Plan -> Maybe Day
+planDoneDay tz = fmap (utcToLocalDay tz) . planDoneAt

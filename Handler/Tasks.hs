@@ -45,8 +45,14 @@ getTasksR = do
 
   let (donePlans, activePlans) = partition (planDone . entityVal) plans
 
-  let doneByDay :: [(Day, [(Entity Task, [Entity Estimate])])]
-      doneByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal . fst) done
+  let doneTasksByDay :: [(Day, [(Entity Task, [Entity Estimate])])]
+      doneTasksByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal . fst) done
+
+  let donePlansByDay :: [(Day, [Entity Plan])]
+      donePlansByDay = groupByEq (fromJust . planDoneDay timeZone . entityVal) donePlans
+
+  let doneByDay :: [(Day, [Entity Plan], [(Entity Task, [Entity Estimate])])]
+      doneByDay = reverse $ sortBy (compare `on` fst3) $ unionBothValues donePlansByDay doneTasksByDay
 
   (newPlanWidget, newPlanEnctype) <- generateFormPost newPlanForm
   (newTaskWidget, newTaskEnctype) <- generateFormPost newTaskForm

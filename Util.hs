@@ -7,7 +7,8 @@ import Control.Arrow ((&&&))
 import Control.Monad (foldM, unless)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Data.Function (on)
-import Data.List (groupBy)
+import Data.List (groupBy, union)
+import Data.Monoid (Monoid, mempty)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Data.Time
@@ -70,6 +71,23 @@ instance ToMarkup Day where
 -- Mimic Ruby's nil.to_s == ''
 instance ToMarkup a => ToMarkup (Maybe a) where
   toMarkup = maybe "" toMarkup
+
+
+-- N.B. this is horribly inefficient (O(n^2) in the longer list)
+-- really want a nice merge algorithm or similar
+unionBothValues :: (Eq k, Monoid v1, Monoid v2) => [(k, v1)] -> [(k, v2)] -> [(k, v1, v2)]
+unionBothValues a1 a2 = map bothValues allKeys
+  where
+    bothValues k = (k, lookupCasual k a1, lookupCasual k a2)
+    allKeys = map fst a1 `union` map fst a2
+
+
+squishMaybe :: Monoid m => Maybe m -> m
+squishMaybe Nothing = mempty
+squishMaybe (Just something) = something
+
+lookupCasual :: (Eq k, Monoid v) => k -> [(k, v)] -> v
+lookupCasual k l = squishMaybe $ lookup k l
 
 
 overrideMethodR :: method -> route -> (route, [(Text, method)])

@@ -51,10 +51,16 @@ $if not (null paused)
 $if not (null doneByDay)
   <h2.collapsed>Done
   <section #done style="display: none">
-    $forall (day, taskEntitiesEstimates) <- doneByDay
+    $forall (day, plans, taskEntitiesEstimates) <- doneByDay
       <h3>
         #{day}
         \ (#{sum $ map taskPomos $ map entityVal $ map fst taskEntitiesEstimates})
-      <table><tbody>
-        $forall taskEntityAndEstimates <- taskEntitiesEstimates
-          ^{taskTr taskEntityAndEstimates}
+      $if not (null plans)
+        $forall plan <- plans
+          <h4 .plan>
+            Completed: 
+            <span .body>#{planBody (entityVal plan)}
+      $if not (null taskEntitiesEstimates)
+        <table><tbody>
+          $forall taskEntityAndEstimates <- taskEntitiesEstimates
+            ^{taskTr taskEntityAndEstimates}
