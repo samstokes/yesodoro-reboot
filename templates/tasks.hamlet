@@ -1,6 +1,8 @@
 <h1>Pomos!
 
-<h2>Plans
+<h2>
+  Plans
+  <span .indicator> ☟
 <section #plans>
   <form method=POST action=@{PlansR} enctype=#{newPlanEnctype}>
     ^{newPlanWidget}
@@ -10,7 +12,9 @@
       $forall plan <- activePlans
         ^{planTr plan}
 
-<h2>TODO
+<h2>
+  TODO
+  <span .indicator> ☟
 <section #todo>
 
   $if null todo
@@ -33,7 +37,9 @@
 
 
 $if not (null postponed)
-  <h2.collapsed>Tomorrow
+  <h2.collapsed>
+    Tomorrow
+    <span .indicator> ☞
   <section #tomorrow style="display: none">
     <table><tbody>
       $forall taskEntityAndEstimates <- postponed
@@ -41,7 +47,9 @@ $if not (null postponed)
 
 
 $if not (null paused)
-  <h2.collapsed>Paused (#{length paused})
+  <h2.collapsed>
+    Paused (#{length paused})
+    <span .indicator> ☞
   <section #paused style="display: none">
     <table><tbody>
       $forall taskEntityAndEstimates <- paused
@@ -49,7 +57,9 @@ $if not (null paused)
 
 
 $if not (null doneByDay)
-  <h2.collapsed>Done
+  <h2.collapsed>
+    Done
+    <span .indicator> ☞
   <section #done style="display: none">
     $forall (day, plans, taskEntitiesEstimates) <- doneByDay
       <h3>
