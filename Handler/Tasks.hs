@@ -20,7 +20,7 @@ getTasksR = do
   userId <- requireAuthId
   horizon <- ago $ weeks 2
   tasks <- runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
-  plans <- runDB $ selectUserActivePlans userId [Desc PlanCreatedAt]
+  plans <- runDB $ selectUserPlansSince userId horizon [Desc PlanCreatedAt, Desc PlanDoneAt]
 
   estimates <- runDB $ mapM (taskEstimates . entityKey) tasks
   let tasksEstimates :: [(Entity Task, [Entity Estimate])]
@@ -42,6 +42,8 @@ getTasksR = do
   let (unsortedTodo, unsortedPostponed) = partition (taskTodoToday . entityVal . fst) active
   let todo = sortBy (compare `on` taskOrder . entityVal . fst) unsortedTodo
   let postponed = sortBy (compare `on` taskScheduledFor . entityVal . fst) unsortedPostponed
+
+  let (donePlans, activePlans) = partition (planDone . entityVal) plans
 
   let doneByDay :: [(Day, [(Entity Task, [Entity Estimate])])]
       doneByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal . fst) done

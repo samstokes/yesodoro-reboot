@@ -1,14 +1,16 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 module Model.Plan
-    ( selectUserActivePlans
+    ( selectUserPlansSince
     , NewPlan(..), createPlan
+    , planDone
     ) where
 
 import Prelude
 import Yesod
 
 import Control.Monad.IO.Class (MonadIO)
+import Data.Maybe (isJust)
 import Data.Text (Text)
 import Data.Time (UTCTime)
 import Database.Persist.GenericSql (SqlPersist)
@@ -16,11 +18,11 @@ import Model
 import Util
 
 
-selectUserActivePlans :: PersistQuery SqlPersist m => UserId -> [SelectOpt Plan] -> SqlPersist m [Entity Plan]
-selectUserActivePlans userId = selectList (belongsToUser ++ isActive)
+selectUserPlansSince :: PersistQuery SqlPersist m => UserId -> UTCTime -> [SelectOpt Plan] -> SqlPersist m [Entity Plan]
+selectUserPlansSince userId doneSince = selectList (belongsToUser ++ doneSinceLimit)
   where
     belongsToUser = [PlanUser ==. userId]
-    isActive = [PlanDoneAt ==. Nothing]
+    doneSinceLimit = [PlanDoneAt ==. Nothing] ||. [PlanDoneAt >=. Just doneSince]
 
 
 data NewPlan = NewPlan { newPlanBody :: Text } deriving (Show)
@@ -39,3 +41,6 @@ createPlan uid plan = do
   let plan' = newPlan uid time plan
   planId <- insert plan'
   return $ Entity planId plan'
+
+planDone :: Plan -> Bool
+planDone = isJust . planDoneAt

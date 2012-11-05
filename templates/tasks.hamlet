@@ -7,7 +7,7 @@
     <input type=submit value=Add>
   $if not (null plans)
     <table><tbody>
-      $forall plan <- plans
+      $forall plan <- activePlans
         ^{planTr plan}
 
 <h2>TODO
