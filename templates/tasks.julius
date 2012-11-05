@@ -3,7 +3,7 @@ $(function () {
     var h2 = $(this),
         indicator = h2.find('.indicator');
     h2
-      .next('section').slideToggle('fast', function () {
+      .next('.content').slideToggle('fast', function () {
         var section = $(this);
         h2.toggleClass('collapsed');
         if (section.css('display') === 'none') {

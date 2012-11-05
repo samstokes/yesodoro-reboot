@@ -1,76 +1,81 @@
 <h1>Pomos!
 
-<h2>
-  Plans
-  <span .indicator> ☟
 <section #plans>
-  <form method=POST action=@{PlansR} enctype=#{newPlanEnctype}>
-    ^{newPlanWidget}
-    <input type=submit value=Add>
-  $if not (null plans)
-    <table><tbody>
-      $forall plan <- activePlans
-        ^{planTr plan}
+  <h2>
+    Plans
+    <span .indicator> ☟
+  <div .content>
+    <form method=POST action=@{PlansR} enctype=#{newPlanEnctype}>
+      ^{newPlanWidget}
+      <input type=submit value=Add>
+    $if not (null plans)
+      <table><tbody>
+        $forall plan <- activePlans
+          ^{planTr plan}
 
-<h2>
-  TODO
-  <span .indicator> ☟
 <section #todo>
+  <h2>
+    TODO
+    <span .indicator> ☟
 
-  $if null todo
-    <p>Nothing to do. Congratulations! Why not take the rest of the day off?
-  $else
-    <table><tbody>
-      $forall taskEntityAndEstimatesAndNotes <- todo
-        ^{taskTr taskEntityAndEstimatesAndNotes}
+  <div .content>
+    $if null todo
+      <p>Nothing to do. Congratulations! Why not take the rest of the day off?
+    $else
+      <table><tbody>
+        $forall taskEntityAndEstimatesAndNotes <- todo
+          ^{taskTr taskEntityAndEstimatesAndNotes}
 
-    <h3>
-      Remaining: #{sum $ map estimatedRemaining todo} of
-      $with estimateses <- map (map entityVal) $ map snd3 todo
-        $with firstEstimates <- concatMap (take 1) estimateses
-          $with totalEstimated <- sum $ map estimatePomos firstEstimates
-            \ #{totalEstimated} estimated
+      <h3>
+        Remaining: #{sum $ map estimatedRemaining todo} of
+        $with estimateses <- map (map entityVal) $ map snd3 todo
+          $with firstEstimates <- concatMap (take 1) estimateses
+            $with totalEstimated <- sum $ map estimatePomos firstEstimates
+              \ #{totalEstimated} estimated
 
-  <form method=POST action=@{TasksR} enctype=#{newTaskEnctype}>
-    ^{newTaskWidget}
-    <input type=submit value=Add>
+    <form method=POST action=@{TasksR} enctype=#{newTaskEnctype}>
+      ^{newTaskWidget}
+      <input type=submit value=Add>
 
 
 $if not (null postponed)
-  <h2.collapsed>
-    Tomorrow
-    <span .indicator> ☞
-  <section #tomorrow style="display: none">
-    <table><tbody>
-      $forall taskEntityAndEstimatesAndNotes <- postponed
-        ^{taskTr taskEntityAndEstimatesAndNotes}
+  <section #tomorrow>
+    <h2.collapsed>
+      Tomorrow
+      <span .indicator> ☞
+    <div .content style="display: none">
+      <table><tbody>
+        $forall taskEntityAndEstimatesAndNotes <- postponed
+          ^{taskTr taskEntityAndEstimatesAndNotes}
 
 
 $if not (null paused)
-  <h2.collapsed>
-    Paused (#{length paused})
-    <span .indicator> ☞
-  <section #paused style="display: none">
-    <table><tbody>
-      $forall taskEntityAndEstimatesAndNotes <- paused
-        ^{taskTr taskEntityAndEstimatesAndNotes}
+  <section #paused>
+    <h2.collapsed>
+      Paused (#{length paused})
+      <span .indicator> ☞
+    <div .content style="display: none">
+      <table><tbody>
+        $forall taskEntityAndEstimatesAndNotes <- paused
+          ^{taskTr taskEntityAndEstimatesAndNotes}
 
 
 $if not (null doneByDay)
-  <h2.collapsed>
-    Done
-    <span .indicator> ☞
-  <section #done style="display: none">
-    $forall (day, plans, taskEntitiesEstimatesNotes) <- doneByDay
-      <h3>
-        #{day}
-        \ (#{sum $ map taskPomos $ map entityVal $ map fst3 taskEntitiesEstimatesNotes})
-      $if not (null plans)
-        $forall plan <- plans
-          <h4 .plan>
-            Completed: 
-            <span .body>#{planBody (entityVal plan)}
-      $if not (null taskEntitiesEstimatesNotes)
-        <table><tbody>
-          $forall taskEntityAndEstimatesAndNotes <- taskEntitiesEstimatesNotes
-            ^{taskTr taskEntityAndEstimatesAndNotes}
+  <section #done>
+    <h2.collapsed>
+      Done
+      <span .indicator> ☞
+    <div .content style="display: none">
+      $forall (day, plans, taskEntitiesEstimatesNotes) <- doneByDay
+        <h3>
+          #{day}
+          \ (#{sum $ map taskPomos $ map entityVal $ map fst3 taskEntitiesEstimatesNotes})
+        $if not (null plans)
+          $forall plan <- plans
+            <h4 .plan>
+              Completed: 
+              <span .body>#{planBody (entityVal plan)}
+        $if not (null taskEntitiesEstimatesNotes)
+          <table><tbody>
+            $forall taskEntityAndEstimatesAndNotes <- taskEntitiesEstimatesNotes
+              ^{taskTr taskEntityAndEstimatesAndNotes}
