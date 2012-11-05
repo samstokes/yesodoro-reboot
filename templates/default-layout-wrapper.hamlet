@@ -13,10 +13,6 @@
 
         <meta name="viewport" content="width=device-width,initial-scale=1">
 
-        <script src="@{StaticR js_jquery_1_6_4_min_js}" type="text/javascript">
-        <script src="@{StaticR js_jquery_form_js}" type="text/javascript">
-        <script src="@{StaticR js_jquery_ui_1_8_17_custom_min_js}" type="text/javascript">
-
         ^{pageHead pc}
 
         \<!--[if lt IE 9]>
