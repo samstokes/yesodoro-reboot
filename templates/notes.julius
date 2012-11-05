@@ -13,6 +13,7 @@ $(function () {
     notes.append(noteLi);
     var numNotes = notes.find('li').length;
     counter.html(numNotes);
+    handle.removeClass('empty');
   }
 
   function renderNote(note) {

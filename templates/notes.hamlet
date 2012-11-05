@@ -1,5 +1,5 @@
 <div ##{widgetId}>
-  <span .notes-handle>
+  <span .notes-handle :null notes:.empty>
     ♫
     <span .counter>#{length notes}
     <span .indicator>☞

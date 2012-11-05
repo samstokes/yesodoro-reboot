@@ -15,6 +15,9 @@ h2.collapsed
 .task .title form label
   display: none
 
+.task .notes .notes-handle.empty
+  opacity: .5
+
 .task .notes form label
   display: none
 
