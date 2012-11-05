@@ -24,6 +24,9 @@ h2.collapsed
 .task .schedule-label
   font-size: 150%
 
+.plan .body
+  color: blue
+
 section#todo form *
   display: inline
 
