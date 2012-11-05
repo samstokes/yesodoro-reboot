@@ -1,11 +1,13 @@
 module Handler.Tasks where
 
+import Control.Monad.IO.Class (MonadIO)
 import Data.List (partition, sortBy)
 import Data.Maybe (listToMaybe, fromJust)
 import Data.Ord (comparing)
 import qualified Data.Text as Text
 import Data.Text.Read (decimal)
-import Data.Time (Day, TimeZone, getCurrentTimeZone)
+import Data.Time (Day, TimeZone, formatTime, getCurrentTimeZone, utcToLocalTime)
+import System.Locale (defaultTimeLocale)
 import Database.Persist.Query.Internal (Update)
 import Database.Persist.Store (deleteCascade)
 import Forms
@@ -23,7 +25,7 @@ getTasksR = do
   plans <- runDB $ selectUserPlansSince userId horizon [Desc PlanCreatedAt, Desc PlanDoneAt]
 
   estimates <- runDB $ mapM (taskEstimates . entityKey) tasks
-  notes <- runDB $ mapM (taskNotes . entityKey) tasks
+  notes <- runDB $ mapM (taskNotes [Asc NoteCreatedAt] . entityKey) tasks
   let tasksEstimatesNotes :: [(Entity Task, [Entity Estimate], [Entity Note])]
       tasksEstimatesNotes = zip3 tasks estimates notes
 
@@ -73,6 +75,8 @@ notesWidget taskId notes = do
   widgetId <- lift newIdent
   (newNoteWidget, newNoteEnctype) <- lift $ generateFormPost newNoteForm
   time <- now
+  timeZone <- userTimeZone
+  let renderTime format = formatTime defaultTimeLocale format . utcToLocalTime timeZone
   let dummyNote = Entity undefined $ Note "dummy" taskId time
   let noteWidget (Entity noteId note) = $(widgetFile "notes/note")
   $(widgetFile "notes")
@@ -139,7 +143,7 @@ authedTask taskId = do
       Nothing -> redirect TasksR
 
 
-userTimeZone :: Handler TimeZone
+userTimeZone :: MonadIO m => m TimeZone
 userTimeZone = liftIO getCurrentTimeZone
 
 

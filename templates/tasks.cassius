@@ -18,6 +18,13 @@ h2.collapsed
 .task .title form label
   display: none
 
+.task .notes ol > li
+  list-style: none
+
+.task .notes .created
+  text-align: right
+  font-size: 70%
+
 .task .notes .notes-handle.empty
   opacity: .5
 
