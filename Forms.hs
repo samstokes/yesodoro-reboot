@@ -11,7 +11,7 @@ import Util (fieldListOptions)
 
 
 newPlanForm :: Form NewPlan
-newPlanForm = renderDivs $ NewPlan <$> unTextarea <$> areq textareaField "Body" Nothing
+newPlanForm = renderDivs $ NewPlan <$> areq textField "Body" Nothing
 
 
 newTaskForm :: Form NewTask
