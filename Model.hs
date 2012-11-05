@@ -131,7 +131,7 @@ duplicateTask tz scheduledFor taskEntity = do
     dupeTaskId <- insert $ dupeTask { taskScheduledFor = scheduledFor }
 
     -- TODO can this loop infinitely?
-    untilM ((>= taskOrder task) . taskOrder . snd) (\dupeTask' -> reorderTask Down tz dupeTask') (dupeTaskId, dupeTask)
+    untilM ((>= taskOrder task) . taskOrder . snd) (reorderTask Down tz) (dupeTaskId, dupeTask)
 
     _ <- copyFirstEstimate taskId dupeTaskId
 
@@ -175,12 +175,12 @@ nextTask :: (MonadIO m, PersistQuery SqlPersist m) => Direction -> TimeZone -> T
 nextTask direction tz task = do
   endOfDay <- liftIO $ endOfToday tz
   selectFirst
-    [ TaskUser ==. (taskUser task)
-    , (orderConstraint direction) TaskOrder (taskOrder task)
+    [ TaskUser ==. taskUser task
+    , orderConstraint direction TaskOrder (taskOrder task)
     , TaskDoneAt ==. Nothing
     , scheduledForConstraint endOfDay TaskScheduledFor
     , TaskActive ==. True
-    ] [(order direction) TaskOrder]
+    ] [order direction TaskOrder]
   where
     orderConstraint Up = (<.)
     orderConstraint Down = (>.)
@@ -196,8 +196,8 @@ reorderTask direction tz (taskId, task) = do
     Nothing -> return (taskId, task)
     Just (Entity nextId next) -> do
       update taskId [TaskOrder =. minBound] -- temporary value
-      update nextId [TaskOrder =. (taskOrder task)]
-      update taskId [TaskOrder =. (taskOrder next)]
+      update nextId [TaskOrder =. taskOrder task]
+      update taskId [TaskOrder =. taskOrder next]
       return (taskId, task { taskOrder = taskOrder next })
 
 
@@ -219,7 +219,7 @@ taskHasPomos = (> 0) . taskPomos
 
 
 taskTodo :: TimeZone -> UTCTime -> Task -> Bool
-taskTodo tz moment task = (taskActive task) && taskScheduledForDay tz task <= today
+taskTodo tz moment task = taskActive task && taskScheduledForDay tz task <= today
   where today = utcToLocalDay tz moment
 
 taskOverdue :: TimeZone -> UTCTime -> Task -> Bool

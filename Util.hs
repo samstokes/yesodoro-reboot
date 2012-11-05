@@ -87,4 +87,4 @@ maybeToEither _ (Just v) = Right v
 
 
 fieldListOptions :: (Show field, Enum field, Bounded field) => [(Text, field)]
-fieldListOptions = map (Text.pack . show &&& id) $ [minBound .. maxBound]
+fieldListOptions = map (Text.pack . show &&& id) [minBound .. maxBound]

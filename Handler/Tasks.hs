@@ -51,7 +51,7 @@ getTasksR = do
   (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
   let planTr (Entity planId plan) = $(widgetFile "plans/plan-tr")
-  let taskTr ((Entity taskId task), estimateEntities) = $(widgetFile "tasks/task-tr")
+  let taskTr (Entity taskId task, estimateEntities) = $(widgetFile "tasks/task-tr")
   defaultLayout $ do
       setTitle "tasks"
       addWidget $(widgetFile "tasks") where
@@ -188,7 +188,7 @@ postTaskEstimatesR taskId = do
   _ <- authedTask taskId
   pomosParam <- lookupPostParam "pomos"
   let pomos = do
-      param <- maybeToEither "no pomos" $ pomosParam
+      param <- maybeToEither "no pomos" pomosParam
       (num, _) <- decimal param
       return num
   case pomos of
