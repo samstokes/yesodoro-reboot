@@ -1,4 +1,4 @@
-<tr .task #task-#{taskId} .#{taskState task} .#{taskDueClass task}>
+<tr .task #task-#{taskId} .#{taskState task} :taskOverdueToday task:.overdue>
   <td .reorder-handle>
     $if not (taskDone task)
       $if taskTodoToday task

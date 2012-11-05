@@ -32,9 +32,6 @@ getTasksR = do
       taskTodoToday = taskTodo timeZone time
       taskOverdueToday :: Task -> Bool
       taskOverdueToday = taskOverdue timeZone time
-      taskDueClass :: Task -> Maybe String
-      taskDueClass task | taskOverdueToday task = Just "overdue"
-                        | otherwise             = Nothing
 
   let (unsortedDone, pending) = partition (taskDone . entityVal . fst) tasksEstimates
   let done = reverse $ sortBy (compare `on` taskDoneAt . entityVal . fst) unsortedDone
