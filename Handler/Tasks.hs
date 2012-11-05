@@ -1,8 +1,8 @@
 module Handler.Tasks where
 
-import Data.Function (on)
 import Data.List (partition, sortBy)
 import Data.Maybe (listToMaybe, fromJust)
+import Data.Ord (comparing)
 import qualified Data.Text as Text
 import Data.Text.Read (decimal)
 import Data.Time (Day, TimeZone, getCurrentTimeZone)
@@ -34,11 +34,11 @@ getTasksR = do
       taskOverdueToday = taskOverdue timeZone time
 
   let (unsortedDone, pending) = partition (taskDone . entityVal . fst) tasksEstimates
-  let done = reverse $ sortBy (compare `on` taskDoneAt . entityVal . fst) unsortedDone
+  let done = reverse $ sortBy (comparing $ taskDoneAt . entityVal . fst) unsortedDone
   let (active, paused) = partition (taskActive . entityVal . fst) pending
   let (unsortedTodo, unsortedPostponed) = partition (taskTodoToday . entityVal . fst) active
-  let todo = sortBy (compare `on` taskOrder . entityVal . fst) unsortedTodo
-  let postponed = sortBy (compare `on` taskScheduledFor . entityVal . fst) unsortedPostponed
+  let todo = sortBy (comparing $ taskOrder . entityVal . fst) unsortedTodo
+  let postponed = sortBy (comparing $ taskScheduledFor . entityVal . fst) unsortedPostponed
 
   let (donePlans, activePlans) = partition (planDone . entityVal) plans
 
@@ -49,7 +49,7 @@ getTasksR = do
       donePlansByDay = groupByEq (fromJust . planDoneDay timeZone . entityVal) donePlans
 
   let doneByDay :: [(Day, [Entity Plan], [(Entity Task, [Entity Estimate])])]
-      doneByDay = reverse $ sortBy (compare `on` fst3) $ unionBothValues donePlansByDay doneTasksByDay
+      doneByDay = reverse $ sortBy (comparing fst3) $ unionBothValues donePlansByDay doneTasksByDay
 
   (newPlanWidget, newPlanEnctype) <- generateFormPost newPlanForm
   (newTaskWidget, newTaskEnctype) <- generateFormPost newTaskForm
