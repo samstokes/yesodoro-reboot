@@ -73,10 +73,6 @@ selectUserTasksSince userId doneSince = selectList (belongsToUser ++ doneSinceLi
     doneSinceLimit = [TaskDoneAt ==. Nothing] ||. [TaskDoneAt >=. Just doneSince]
 
 
-selectUserRecentTasks :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> [SelectOpt Task] -> SqlPersist m [Entity Task]
-selectUserRecentTasks userId opts = liftIO (ago $ weeks 2) >>= flip (selectUserTasksSince userId) opts
-
-
 data NewTask = NewTask { newTaskTitle :: Text, newTaskSchedule :: Schedule } deriving (Show)
 
 newTask :: UserId -> UTCTime -> Int -> NewTask -> Task
