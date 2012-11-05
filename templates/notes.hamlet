@@ -1,11 +1,16 @@
 <div ##{widgetId}>
-  <ol .notes>
-    $forall note <- notes
-      <li .note>^{noteWidget note}
+  <span .notes-handle>
+    ♫
+    <span .counter>#{length notes}
+    <span .indicator>☞
+  <div .notes-detail .hidden>
+    <ol .notes>
+      $forall note <- notes
+        <li .note>^{noteWidget note}
 
-  <div .note-template .hidden>
-    ^{noteWidget dummyNote}
+    <div .note-template .hidden>
+      ^{noteWidget dummyNote}
 
-  <form method=POST action=@{TaskNotesR taskId} enctype=#{newNoteEnctype}>
-    ^{newNoteWidget}
-    <input type=submit value=Add>
+    <form method=POST action=@{TaskNotesR taskId} enctype=#{newNoteEnctype}>
+      ^{newNoteWidget}
+      <input type=submit value=Add>

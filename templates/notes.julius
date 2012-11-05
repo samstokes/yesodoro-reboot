@@ -1,5 +1,9 @@
 $(function () {
   var container = $('##{widgetId}'),
+      handle = container.find('.notes-handle'),
+      counter = handle.find('.counter'),
+      indicator = handle.find('.indicator'),
+      detail = container.find('.notes-detail'),
       notes = container.find('ol.notes'),
       template = container.find('.note-template'),
       form = container.find('form');
@@ -7,12 +11,24 @@ $(function () {
   function localSave(data) {
     var noteLi = $('<li class="note">').html(renderNote(data[1]));
     notes.append(noteLi);
+    var numNotes = notes.find('li').length;
+    counter.html(numNotes);
   }
 
   function renderNote(note) {
     return template.clone().removeClass('hidden')
       .find('.body').html(note.body).end();
   }
+
+  handle.click(function () {
+    detail.slideToggle('fast', function () {
+      if (detail.css('display') === 'none') {
+        indicator.html('☞');
+      } else {
+        indicator.html('☟');
+      }
+    });
+  });
 
   form.ajaxForm({
     success: localSave
