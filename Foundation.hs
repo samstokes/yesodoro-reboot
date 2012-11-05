@@ -24,6 +24,7 @@ import Yesod.Auth.Email
 import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
+import Yesod.Form.Jquery (YesodJquery(..))
 import Yesod.Logger (Logger, logMsg, formatLogText, logLazyText)
 import Network.HTTP.Conduit (Manager)
 import qualified Settings
@@ -115,6 +116,9 @@ instance Yesod App where
             $(widgetFile "normalize")
             addStylesheet $ StaticR css_bootstrap_css
             $(widgetFile "default-layout")
+            addScriptEither $ urlJqueryJs master
+            addScriptEither $ urlJqueryUiJs master
+            addScript $ StaticR js_jquery_form_js
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 
     -- This is done to provide an optimization for serving static files from
@@ -137,6 +141,10 @@ instance Yesod App where
 
     -- Place Javascript at bottom of the body tag so the rest of the page loads first
     jsLoader _ = BottomOfBody
+
+instance YesodJquery App where
+  urlJqueryJs _ = Left $ StaticR js_jquery_1_6_4_min_js
+  urlJqueryUiJs _ = Left $ StaticR js_jquery_ui_1_8_17_custom_min_js
 
 -- How to run database actions.
 instance YesodPersist App where
