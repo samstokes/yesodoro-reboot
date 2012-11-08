@@ -3,7 +3,7 @@
 <section #plans>
   <h2>
     Plans
-    <span .indicator> ☟
+    ^{expandy Expanded "plans" "h2" ".content"}
   <div .content>
     <form method=POST action=@{PlansR} enctype=#{newPlanEnctype}>
       ^{newPlanWidget}
@@ -16,7 +16,7 @@
 <section #todo>
   <h2>
     TODO
-    <span .indicator> ☟
+    ^{expandy Expanded "todo" "h2" ".content"}
 
   <div .content>
     $if null todo
@@ -42,7 +42,7 @@ $if not (null postponed)
   <section #tomorrow>
     <h2.collapsed>
       Tomorrow
-      <span .indicator> ☞
+      ^{expandy Collapsed "tomorrow" "h2" ".content"}
     <div .content style="display: none">
       <table><tbody>
         $forall taskEntityAndEstimatesAndNotes <- postponed
@@ -53,7 +53,7 @@ $if not (null paused)
   <section #paused>
     <h2.collapsed>
       Paused (#{length paused})
-      <span .indicator> ☞
+      ^{expandy Collapsed "paused" "h2" ".content"}
     <div .content style="display: none">
       <table><tbody>
         $forall taskEntityAndEstimatesAndNotes <- paused
@@ -64,7 +64,7 @@ $if not (null doneByDay)
   <section #done>
     <h2.collapsed>
       Done
-      <span .indicator> ☞
+      ^{expandy Collapsed "done" "h2" ".content"}
     <div .content style="display: none">
       $forall (day, plans, taskEntitiesEstimatesNotes) <- doneByDay
         <h3>

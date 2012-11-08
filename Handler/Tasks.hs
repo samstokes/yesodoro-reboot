@@ -15,6 +15,7 @@ import Import
 import Data.Aeson.Types (toJSON)
 import Util
 import Yesod.Auth (requireAuthId)
+import Yesod.Form.Jquery (YesodJquery(..))
 
 
 getTasksR :: Handler RepHtml
@@ -232,3 +233,19 @@ postTaskNotesR taskId = do
       noteEntity <- runDB $ createNote taskId note
       jsonToRepJson noteEntity
     _ -> undefined -- TODO
+
+
+data ExpandyState = Collapsed | Expanded
+
+expandyIndicator :: ExpandyState -> Text
+expandyIndicator Collapsed = "☞"
+expandyIndicator Expanded = "☟"
+
+expandy :: YesodJquery master => ExpandyState -> Text -> Text -> Text -> GWidget sub master ()
+expandy initialState parentId handleSelector targetSelector = do
+  master <- lift getYesod
+  addScriptEither $ urlJqueryJs master
+
+  widgetId <- lift newIdent
+
+  $(widgetFile "expandy")

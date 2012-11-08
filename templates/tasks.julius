@@ -1,5 +1,5 @@
 $(function () {
-  $('h2').click(function () {
+  /*$('h2').click(function () {
     var h2 = $(this),
         indicator = h2.find('.indicator');
     h2
@@ -12,7 +12,7 @@ $(function () {
           indicator.html(' ☟');
         }
       });
-  });
+  });*/
 
   $('section#todo table tbody').sortable({
     distance: 15,
