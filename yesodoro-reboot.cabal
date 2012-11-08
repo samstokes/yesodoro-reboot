@@ -91,6 +91,7 @@ library
                  , yesod-test == 0.2.0.5
                  , HUnit == 1.2.4.2
                  , QuickCheck == 2.4.2
+                 , attoparsec == 0.10.1.1
 
 
 executable         yesodoro-reboot
