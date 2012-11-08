@@ -55,43 +55,160 @@ library
                 EmptyDataDecls
                 NoMonomorphismRestriction
 
-    build-depends: aeson == 0.6.0.2
-                 , base >= 4 && < 5
-                 , blaze-markup == 0.5.1.0
-                 , bytestring == 0.9.1.10
-                 , clientsession == 0.7.5
-                 , directory == 1.1.0.0
-                 , hamlet == 1.0.1.1
-                 , hjsmin == 0.1.1
-                 , http-conduit == 1.4.1.2
-                 , monad-control == 0.3.1.2
+    build-depends: ghc-prim
+                 , integer-gmp
+                 , base
+                 , HUnit == 1.2.4.2
+                 , extensible-exceptions == 0.1.1.2
                  , old-locale == 1.0.0.2
+                 , time == 1.2.0.3
+                 , random == 1.0.0.3
+                 , array == 0.3.0.2
+                 , containers == 0.4.0.0
+                 , pretty == 1.0.1.2
+                 , template-haskell
+                 , QuickCheck == 2.4.2
+                 , bytestring == 0.9.1.10
+                 , binary == 0.5.1.0
+                 , SHA == 1.5.0.1
+                 , deepseq == 1.3.0.0
+                 , text == 0.11.2.0
+                 , attoparsec == 0.10.1.1
+                 , blaze-builder == 0.3.1.0
+                 , hashable == 1.1.2.3
+                 , transformers == 0.3.0.0
+                 , mtl == 2.1.1
+                 , syb == 0.3.6.1
+                 , unordered-containers == 0.2.1.0
+                 , primitive == 0.4.1
+                 , vector == 0.9.1
+                 , aeson == 0.6.0.2
+                 , unix == 2.4.2.0
+                 , ansi-terminal == 0.5.5
+                 , enumerator == 0.4.19
+                 , attoparsec-enumerator == 0.3
+                 , asn1-data == 0.6.1.3
+                 , base-unicode-symbols == 0.2.2.3
+                 , transformers-base == 0.4.1
+                 , monad-control == 0.3.1.2
+                 , lifted-base == 0.1.0.4
+                 , resourcet == 0.3.2.1
+                 , semigroups == 0.8.3
+                 , void == 0.5.5.1
+                 , conduit == 0.4.1.1
+                 , attoparsec-conduit == 0.4.0
+                 , blaze-builder-conduit == 0.4.0.1
+                 , case-insensitive == 0.4.0.1
+                 , base64-bytestring == 0.1.1.1
+                 , cereal == 0.3.5.1
+                 , entropy == 0.2.1
+                 , largeword == 1.0.1
+                 , tagged == 0.4.2
+                 , crypto-api == 0.10.2
+                 , crypto-pubkey-types == 0.1.1
+                 , filepath == 1.2.0.0
+                 , old-time == 1.0.0.6
+                 , directory == 1.1.0.0
+                 , pem == 0.1.1
+                 , process == 1.0.1.5
+                 , certificate == 1.2.1
+                 , dlist == 0.5
+                 , data-default == 0.4.0
+                 , cookie == 0.4.0
+                 , cryptocipher == 0.3.0
+                 , cprng-aes == 0.2.3
+                 , failure == 0.2.0.1
+                 , http-types == 0.6.10
+                 , parsec == 3.1.2
+                 , network == 2.3.0.13
+                 , regex-base == 0.93.2
+                 , regex-posix == 0.95.1
+                 , regex-compat == 0.95.1
+                 , socks == 0.4.1
+                 , cryptohash == 0.7.5
+                 , tls == 0.9.5
+                 , tls-extra == 0.4.6
+                 , utf8-string == 0.3.7
+                 , zlib == 0.5.3.3
+                 , zlib-bindings == 0.1.0.1
+                 , zlib-conduit == 0.4.0.1
+                 , http-conduit == 1.4.1.2
+                 , tagsoup == 0.12.6
+                 , system-filepath == 0.4.6
+                 , xml-types == 0.3.1
+                 , xml-conduit == 0.7.0.1
+                 , authenticate == 1.2.1
+                 , blaze-markup == 0.5.1.0
+                 , blaze-html == 0.5.0.0
+                 , byteorder == 1.0.3
+                 , skein == 0.1.0.7
+                 , clientsession == 0.7.5
+                 , crypto-conduit == 0.3.2
+                 , css-text == 0.1.1
+                 , ranges == 0.2.4
+                 , email-validate == 0.2.8
+                 , fast-logger == 0.0.2
+                 , file-embed == 0.0.4.2
+                 , shakespeare == 1.0.0.1
+                 , hamlet == 1.0.1.1
+                 , utf8-light == 0.4.0.1
+                 , language-javascript == 0.5.4
+                 , hjsmin == 0.1.1
+                 , silently == 1.1.5
+                 , hspec == 1.0.0.1
+                 , http-date == 0.0.2
+                 , hxt-charproperties == 9.1.1
+                 , hxt-regex-xmlschema == 9.0.4
+                 , hxt-unicode == 9.0.2
+                 , hxt == 9.2.2
+                 , mime-mail == 0.4.1.1
+                 , network-conduit == 0.4.0
+                 , path-pieces == 0.1.1
+                 , stm == 2.3
+                 , resource-pool == 0.2.1.0
+                 , pool-conduit == 0.1.0.1
                  , persistent == 0.9.0.3
-                 , persistent-postgresql == 0.9.0.2
+                 , persistent-template == 0.9.0.1
+                 , pureMD5 == 2.1.0.3
+                 , pwstore-fast == 2.2
+                 , safe == 0.3.3
                  , shakespeare-css == 1.0.1.1
+                 , shakespeare-i18n == 1.0.0.1
                  , shakespeare-js == 1.0.0.1
                  , shakespeare-text == 1.0.0.1
-                 , template-haskell == 2.5.0.0
-                 , text == 0.11.2.0
-                 , time == 1.2.0.3
-                 , transformers == 0.3.0.0
+                 , simple-sendfile == 0.2.3
+                 , tagstream-conduit == 0.3.0
                  , unix-compat == 0.3.0.1
-                 , vector == 0.9.1
+                 , vault == 0.1.0.0
+                 , wai == 1.2.0.1
+                 , wai-app-static == 1.2.0.2
                  , wai-extra == 1.2.0.3
+                 , wai-logger == 0.1.4
+                 , wai-test == 1.2.0.1
                  , warp == 1.2.0.1
+                 , xml2html == 0.1.2.2
+                 , xss-sanitize == 0.3.1.1
                  , yaml == 0.7.0
-                 , yesod == 1.0.1.5
-                 , yesod-auth == 1.0.2
+                 , Cabal == 1.10.2.0
+                 , yesod-routes == 1.0.1
                  , yesod-core == 1.0.1.1
-                 , yesod-default == 1.0.1
+                 , yesod-persistent == 1.0.0
                  , yesod-form == 1.0.0.3
                  , yesod-json == 1.0.0
-                 , yesod-platform == 1.0.3.4
+                 , yesod-auth == 1.0.2
+                 , yesod == 1.0.1.5
+                 , yesod-default == 1.0.1
                  , yesod-static == 1.0.0.1
                  , yesod-test == 0.2.0.5
-                 , HUnit == 1.2.4.2
-                 , QuickCheck == 2.4.2
-                 , attoparsec == 0.10.1.1
+                 , yesod-platform == 1.0.3.4
+                 , postgresql-libpq == 0.8.1
+                 , base16-bytestring == 0.1.1.4
+                 , blaze-textual == 0.2.0.6
+                 , pcre-light == 0.4
+                 , postgresql-simple == 0.0.4
+                 , persistent-postgresql == 0.9.0.2
+                 , ffi == 1.0
+
 
 
 executable         yesodoro-reboot
