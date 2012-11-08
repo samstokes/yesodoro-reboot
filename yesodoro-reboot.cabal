@@ -90,6 +90,7 @@ library
                  , yesod-static == 1.0.0.1
                  , yesod-test == 0.2.0.5
                  , HUnit == 1.2.4.2
+                 , QuickCheck == 2.4.2
 
 
 executable         yesodoro-reboot
