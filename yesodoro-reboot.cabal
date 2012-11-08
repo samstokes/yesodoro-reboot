@@ -87,6 +87,7 @@ library
                  , aeson                         >= 0.6        && < 0.7
                  , transformers                  >= 0.3        && < 0.4
                  , old-locale                    >= 1.0        && < 1.1
+                 , vector                        == 0.9.1
 
 executable         yesodoro-reboot
     if flag(library-only)
