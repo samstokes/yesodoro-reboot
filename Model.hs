@@ -5,6 +5,7 @@ module Model where
 
 import Prelude
 import Yesod
+
 import Control.Applicative ((<$>))
 import Control.Monad ((>=>))
 import Data.Text (Text)
