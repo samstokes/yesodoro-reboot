@@ -11,6 +11,7 @@ module Import
 #if __GLASGOW_HASKELL__ < 704
     , (<>)
 #endif
+    , module Widget.Expandy
     ) where
 
 import Prelude hiding (writeFile, readFile, head, tail, init, last)
@@ -22,6 +23,7 @@ import Data.Text (Text)
 import Data.Time hiding (parseTime) -- Yesod also exports parseTime
 import Settings.StaticFiles
 import Settings.Development
+import Widget.Expandy
 
 #if __GLASGOW_HASKELL__ < 704
 infixr 5 <>
