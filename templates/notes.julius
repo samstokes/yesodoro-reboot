@@ -6,14 +6,19 @@ $(function () {
       detail = container.find('.notes-detail'),
       notes = container.find('ol.notes'),
       template = container.find('.note-template'),
-      form = container.find('form');
+      form = container.find('form'),
+      noteField = form.find('textarea');
 
   function localSave(data) {
     var noteLi = $('<li class="note">').html(renderNote(data[1]));
     notes.append(noteLi);
+    form.clearForm();
+
     var numNotes = notes.find('li').length;
     counter.html(numNotes);
     handle.removeClass('empty');
+
+    noteField.focus();
   }
 
   function renderNote(note) {
