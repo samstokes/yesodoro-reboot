@@ -1,0 +1,1 @@
+<span ##{widgetId} .expandy-indicator> #{expandyIndicator initialState}
