@@ -78,6 +78,9 @@ notesWidget taskId notes = do
   timeZone <- userTimeZone
 
   let renderTime format = formatTime defaultTimeLocale format . utcToLocalTime timeZone
+      selector = Text.concat . (["#", widgetId, " "] ++) . pure
+      handleSelector = selector ".notes-handle"
+      detailSelector = selector ".notes-detail"
       dummyNote = Entity undefined $ Note "dummy" taskId time
       noteWidget (Entity noteId note) = $(widgetFile "notes/note")
     in $(widgetFile "notes")

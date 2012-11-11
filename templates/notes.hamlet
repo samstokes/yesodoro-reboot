@@ -2,7 +2,7 @@
   <span .notes-handle :null notes:.empty>
     ♫
     <span .counter>#{length notes}
-    ^{expandy Collapsed widgetId ".notes-handle" ".notes-detail"}
+    ^{expandy Collapsed handleSelector detailSelector}
   <div .notes-detail .hidden>
     <ol .notes>
       $forall note <- notes

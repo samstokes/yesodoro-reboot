@@ -20,8 +20,8 @@ expandyIndicator Collapsed = "☞"
 expandyIndicator Expanded = "☟"
 
 
-expandy :: YesodJquery master => ExpandyState -> Text -> Text -> Text -> GWidget sub master ()
-expandy initialState parentId handleSelector targetSelector = do
+expandy :: YesodJquery master => ExpandyState -> Text -> Text -> GWidget sub master ()
+expandy initialState handleSelector targetSelector = do
   master <- lift getYesod
   addScriptEither $ urlJqueryJs master
 

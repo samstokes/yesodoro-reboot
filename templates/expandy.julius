@@ -1,8 +1,7 @@
 $(function () {
   var indicator = $('##{widgetId}'),
-      parent = $('##{parentId}'),
-      handle = parent.find('#{handleSelector}'),
-      target = parent.find('#{targetSelector}');
+      handle = $('#{handleSelector}'),
+      target = $('#{targetSelector}');
 
   handle.click(function () {
     target.slideToggle('fast', function () {
