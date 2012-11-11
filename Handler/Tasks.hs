@@ -1,17 +1,17 @@
 module Handler.Tasks where
 
+import Import
+
 import Control.Monad.IO.Class (MonadIO)
 import Data.List (partition, sortBy)
 import Data.Maybe (listToMaybe, fromJust)
 import Data.Ord (comparing)
 import qualified Data.Text as Text
 import Data.Text.Read (decimal)
-import Data.Time (Day, TimeZone, formatTime, getCurrentTimeZone, utcToLocalTime)
 import System.Locale (defaultTimeLocale)
 import Database.Persist.Query.Internal (Update)
 import Database.Persist.Store (deleteCascade)
 import Forms
-import Import
 import Data.Aeson.Types (toJSON)
 import Util
 import Yesod.Auth (requireAuthId)

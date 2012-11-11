@@ -7,6 +7,7 @@ module Import
     , module Data.Monoid
     , module Control.Applicative
     , Text
+    , module Data.Time
 #if __GLASGOW_HASKELL__ < 704
     , (<>)
 #endif
@@ -18,6 +19,7 @@ import Foundation
 import Data.Monoid (Monoid (mappend, mempty, mconcat))
 import Control.Applicative ((<$>), (<*>), pure)
 import Data.Text (Text)
+import Data.Time hiding (parseTime) -- Yesod also exports parseTime
 import Settings.StaticFiles
 import Settings.Development
 
