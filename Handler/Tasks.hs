@@ -76,10 +76,11 @@ notesWidget taskId notes = do
   (newNoteWidget, newNoteEnctype) <- lift $ generateFormPost newNoteForm
   time <- now
   timeZone <- userTimeZone
+
   let renderTime format = formatTime defaultTimeLocale format . utcToLocalTime timeZone
-  let dummyNote = Entity undefined $ Note "dummy" taskId time
-  let noteWidget (Entity noteId note) = $(widgetFile "notes/note")
-  $(widgetFile "notes")
+      dummyNote = Entity undefined $ Note "dummy" taskId time
+      noteWidget (Entity noteId note) = $(widgetFile "notes/note")
+    in $(widgetFile "notes")
 
 
 postTasksR :: Handler RepHtml
