@@ -28,6 +28,10 @@
               ^{pageBody pc}
             <footer>
                 <p>&copy; Sam Stokes 2011-2012
+                <p>
+                    Background image by 
+                    <a href="http://www.flickr.com/photos/80901381@N04/7482917058/" target="_blank">
+                        A Guy Taking Pictures
 
         $maybe analytics <- extraAnalytics $ appExtra $ settings master
             <script>
