@@ -14,7 +14,11 @@
     <h4>#{taskTitle task}
     <form .hidden method=POST action=@?{putR (TaskR taskId)} enctype=#{editTaskEnctype}>
       ^{editTaskWidget}
-  <td>^{setTaskDonenessButton taskId task}
+  <td>
+    $if (taskDone task)
+      ^{oneButton "☹" (RestartTaskR taskId)}
+    $else
+      ^{oneButton "☺" (CompleteTaskR taskId)}
   <td>
     $if not (taskDone task)
       $if taskTodoToday task

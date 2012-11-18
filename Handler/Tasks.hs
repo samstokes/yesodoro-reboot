@@ -111,15 +111,6 @@ deleteButton label route = [whamlet|
     <button>#{label}
 |]
 
-setTaskDonenessRoute :: Task -> TaskId -> Route App
-setTaskDonenessRoute task | taskDone task = RestartTaskR
-                          | otherwise     = CompleteTaskR
-
-setTaskDonenessButton :: TaskId -> Task -> Widget
-setTaskDonenessButton taskId task = oneButton action $ route taskId
-  where action = taskDonenessActionName task
-        route = setTaskDonenessRoute task
-
 
 updateAndRedirectR :: HasReps a => Route App -> [Update Task] -> TaskId -> Handler a
 updateAndRedirectR route updates taskId = do

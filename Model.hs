@@ -232,10 +232,6 @@ taskScheduledForDay tz = utcToLocalDay tz . taskScheduledFor
 taskState :: Task -> TaskState
 taskState task = if taskDone task then "done" else "pending"
 
-taskDonenessActionName :: Task -> Text
-taskDonenessActionName task | taskDone task = "☹"
-                            | otherwise     = "☺"
-
 taskEstimates :: PersistQuery SqlPersist m => TaskId -> SqlPersist m [Entity Estimate]
 taskEstimates taskId = selectList [EstimateTask ==. taskId] []
 
