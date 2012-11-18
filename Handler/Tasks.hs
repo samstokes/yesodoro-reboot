@@ -101,16 +101,16 @@ postTasksR = do
     _ -> undefined -- TODO
 
 
-oneButton :: Text -> Route App -> Widget
-oneButton label route = [whamlet|
+oneButton :: Text -> Text -> Route App -> Widget
+oneButton classes label route = [whamlet|
   <form method=POST action=@{route}>
-    <button>#{label}
+    <button .#{classes}>#{label}
 |]
 
-deleteButton :: Text -> Route App -> Widget
-deleteButton label route = [whamlet|
+deleteButton :: Text -> Text -> Route App -> Widget
+deleteButton classes label route = [whamlet|
   <form method=POST action=@?{deleteR route}>
-    <button>#{label}
+    <button .#{classes}>#{label}
 |]
 
 

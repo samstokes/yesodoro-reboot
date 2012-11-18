@@ -16,22 +16,22 @@
       ^{editTaskWidget}
   <td>
     $if (taskDone task)
-      ^{oneButton "☹" (RestartTaskR taskId)}
+      ^{oneButton "" "☹" (RestartTaskR taskId)}
     $else
-      ^{oneButton "☺" (CompleteTaskR taskId)}
+      ^{oneButton "" "☺" (CompleteTaskR taskId)}
   <td>
     $if not (taskDone task)
       $if taskTodoToday task
-        ^{oneButton "☔" (PostponeTaskR taskId)}
+        ^{oneButton "" "☔" (PostponeTaskR taskId)}
       $else
-        ^{oneButton "☀" (UnpostponeTaskR taskId)}
+        ^{oneButton "" "☀" (UnpostponeTaskR taskId)}
   <td>
     $if not (taskDone task)
       $if taskActive task
-        ^{oneButton "||" (PauseTaskR taskId)}
+        ^{oneButton "" "||" (PauseTaskR taskId)}
       $else
-        ^{oneButton "|>" (UnpauseTaskR taskId)}
-  <td>^{deleteButton "☠" (TaskR taskId)}
+        ^{oneButton "" "|>" (UnpauseTaskR taskId)}
+  <td>^{deleteButton "" "☠" (TaskR taskId)}
   $if has FeaturePomos
     <td .estimate>
       $maybe Entity _ estimate <- listToMaybe estimateEntities
@@ -47,4 +47,4 @@
       #{Text.replicate (taskPomos task) "✓"}
     <td>
       $if not (taskDone task)
-        ^{oneButton "✓" (TaskPomosR taskId)}
+        ^{oneButton "" "✓" (TaskPomosR taskId)}
