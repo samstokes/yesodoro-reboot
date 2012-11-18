@@ -13,4 +13,4 @@
 
     <form method=POST action=@{TaskNotesR taskId} enctype=#{newNoteEnctype}>
       ^{newNoteWidget}
-      <input type=submit value=Add>
+      <input .btn .btn-primary type=submit value=Add>

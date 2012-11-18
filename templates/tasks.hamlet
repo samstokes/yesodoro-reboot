@@ -8,7 +8,7 @@ $if has FeaturePlans
     <div .content>
       <form method=POST action=@{PlansR} enctype=#{newPlanEnctype}>
         ^{newPlanWidget}
-        <input type=submit value=Add>
+        <input .btn .btn-primary type=submit value=Add>
       $if not (null plans)
         <table><tbody>
           $forall plan <- activePlans
@@ -37,7 +37,7 @@ $if has FeaturePlans
 
     <form method=POST action=@{TasksR} enctype=#{newTaskEnctype}>
       ^{newTaskWidget}
-      <input type=submit value=Add>
+      <input .btn .btn-primary type=submit value=Add>
 
 
 $if not (null postponed)

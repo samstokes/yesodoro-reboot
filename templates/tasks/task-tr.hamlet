@@ -16,22 +16,22 @@
       ^{editTaskWidget}
   <td>
     $if (taskDone task)
-      ^{oneButton "" "☹" (RestartTaskR taskId)}
+      ^{oneButton "btn btn-inverse" "☹" (RestartTaskR taskId)}
     $else
-      ^{oneButton "" "☺" (CompleteTaskR taskId)}
+      ^{oneButton "btn btn-success" "☺" (CompleteTaskR taskId)}
   <td>
     $if not (taskDone task)
       $if taskTodoToday task
-        ^{oneButton "" "☔" (PostponeTaskR taskId)}
+        ^{oneButton "btn" "☔" (PostponeTaskR taskId)}
       $else
-        ^{oneButton "" "☀" (UnpostponeTaskR taskId)}
+        ^{oneButton "btn" "☀" (UnpostponeTaskR taskId)}
   <td>
     $if not (taskDone task)
       $if taskActive task
-        ^{oneButton "" "||" (PauseTaskR taskId)}
+        ^{oneButton "btn" "||" (PauseTaskR taskId)}
       $else
-        ^{oneButton "" "|>" (UnpauseTaskR taskId)}
-  <td>^{deleteButton "" "☠" (TaskR taskId)}
+        ^{oneButton "btn" "|>" (UnpauseTaskR taskId)}
+  <td>^{deleteButton "btn btn-danger" "☠" (TaskR taskId)}
   $if has FeaturePomos
     <td .estimate>
       $maybe Entity _ estimate <- listToMaybe estimateEntities
@@ -40,11 +40,11 @@
         $if not (taskDone task)
           <form method=POST action=@{TaskEstimatesR taskId}>
             $forall numPomos <- estimateOptions
-              <button name=pomos value=#{show numPomos}>
+              <button .btn name=pomos value=#{show numPomos}>
                 #{show numPomos}
       $if taskHasPomos task
         <br>
       #{Text.replicate (taskPomos task) "✓"}
     <td>
       $if not (taskDone task)
-        ^{oneButton "" "✓" (TaskPomosR taskId)}
+        ^{oneButton "btn" "✓" (TaskPomosR taskId)}
