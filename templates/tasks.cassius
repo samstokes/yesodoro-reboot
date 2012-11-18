@@ -12,7 +12,7 @@ section#plans form label
 .task.done .title, .task.done .estimate, .task.done .pomos
     text-decoration: line-through
 .task.overdue .title
-    color: red
+    color: #dd0000
 h2.collapsed
   font-style: italic
 
@@ -36,7 +36,7 @@ h2.collapsed
   font-size: 150%
 
 .plan .body
-  color: blue
+  color: #0000dd
 
 section#todo form *
   display: inline
