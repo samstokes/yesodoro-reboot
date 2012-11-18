@@ -1,7 +1,7 @@
 $(function () {
   var indicator = $('##{widgetId}'),
-      handle = $('#{handleSelector}'),
-      target = $('#{targetSelector}');
+      handle = $(#{toJSON handleSelector}),
+      target = $(#{toJSON targetSelector});
 
   handle.click(function () {
     target.slideToggle('fast', function () {
