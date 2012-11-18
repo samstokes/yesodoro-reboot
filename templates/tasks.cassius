@@ -20,6 +20,11 @@ section#plans form *
 section#plans form label
   display: none
 
+.plan .btn
+  opacity: 0.1
+.plan:hover .btn
+  opacity: inherit
+
 .task .title
     text-align: left
 .task.done .title, .task.done .estimate, .task.done .pomos
@@ -28,6 +33,11 @@ section#plans form label
     color: #dd0000
 h2.collapsed
   font-style: italic
+
+.task .btn
+  opacity: 0.1
+.task:hover .btn
+  opacity: inherit
 
 .task .title form label
   display: none
