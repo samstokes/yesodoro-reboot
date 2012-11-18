@@ -38,7 +38,7 @@
         #{Text.replicate (estimatePomos estimate) "❏"}
       $nothing
         $if not (taskDone task)
-          <form method=POST action=@{TaskEstimatesR taskId}>
+          <form .btn-group method=POST action=@{TaskEstimatesR taskId}>
             $forall numPomos <- estimateOptions
               <button .btn name=pomos value=#{show numPomos}>
                 #{show numPomos}
