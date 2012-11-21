@@ -6,7 +6,7 @@ $if has FeaturePlans
       Plans
       ^{expandy Expanded "#plans h2" "#plans .content"}
     <div .content>
-      <form method=POST action=@{PlansR} enctype=#{newPlanEnctype}>
+      <form .form-inline method=POST action=@{PlansR} enctype=#{newPlanEnctype}>
         ^{newPlanWidget}
         <input .btn .btn-primary type=submit value=Add>
       $if not (null plans)
@@ -35,7 +35,7 @@ $if has FeaturePlans
               $with totalEstimated <- sum $ map estimatePomos firstEstimates
                 \ #{totalEstimated} estimated
 
-    <form method=POST action=@{TasksR} enctype=#{newTaskEnctype}>
+    <form .form-inline method=POST action=@{TasksR} enctype=#{newTaskEnctype}>
       ^{newTaskWidget}
       <input .btn .btn-primary type=submit value=Add>
 

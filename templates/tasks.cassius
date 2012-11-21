@@ -15,8 +15,8 @@ h1
   text-align: center
 
 
-section#plans form *
-  display: inline
+/*section#plans form **/
+  /*display: inline*/
 section#plans form label
   display: none
 
@@ -61,8 +61,18 @@ h2.collapsed
 .plan .body
   color: #0000dd
 
-section#todo form *
-  display: inline
+/*section#todo form **/
+  /*display: inline*/
+
+/*
+ * think this is needed because renderDivs and renderBootstrap don't produce
+ * markup quite like Bootstrap expects (labels containing divs)
+ */
+.form-inline .control-group
+  display: inline-block
+
+.form-inline .radio input[type="radio"]
+  margin-left: 3px
 
 /* ugh hack to avoid "Title" / "Schedule" label */
 section#todo form div.required > label
