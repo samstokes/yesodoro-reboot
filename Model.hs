@@ -21,6 +21,9 @@ import Text.Julius (ToJavascript, toJavascript)
 import Util
 
 
+derivePersistField "TimeZone"
+
+
 data Schedule = Once | Daily | Weekly | Fortnightly
   deriving (Show, Read, Eq, Enum, Bounded)
 derivePersistField "Schedule"

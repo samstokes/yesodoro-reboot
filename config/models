@@ -1,6 +1,7 @@
 User
     ident Text
     password Text Maybe
+    timeZone TimeZone default='PST'
     UniqueUser ident
 Email
     email Text

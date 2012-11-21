@@ -42,6 +42,7 @@ import Web.ClientSession (getKey)
 import Text.Hamlet (hamletFile)
 import Text.Shakespeare.Text (stext)
 import Data.Text (Text)
+import Data.Time (TimeZone(..))
 import Util
 
 -- | The site argument for your application. This can be a good place to
@@ -156,6 +157,11 @@ instance YesodPersist App where
             f
             (connPool master)
 
+
+defaultTimeZone :: TimeZone
+defaultTimeZone = read "PST"
+
+
 instance YesodAuth App where
     type AuthId App = UserId
 
@@ -169,7 +175,7 @@ instance YesodAuth App where
         case x of
             Just (Entity uid _) -> return $ Just uid
             Nothing -> do
-                fmap Just $ insert $ User (credsIdent creds) Nothing
+                fmap Just $ insert $ User (credsIdent creds) Nothing defaultTimeZone
 
     -- You can add other plugins like BrowserID, email or OAuth here
     authPlugins _ = [authBrowserId, authGoogleEmail, authEmail]
@@ -213,7 +219,7 @@ Please go to #{verurl}.
                 case emailUser e of
                     Just uid -> return $ Just uid
                     Nothing -> do
-                        uid <- insert $ User email Nothing
+                        uid <- insert $ User email Nothing defaultTimeZone
                         update eid [EmailUser =. Just uid, EmailVerkey =. Nothing]
                         return $ Just uid
     getPassword = runDB . fmap (join . fmap userPassword) . get
