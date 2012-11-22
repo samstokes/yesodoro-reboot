@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module Model where
 
@@ -14,7 +15,7 @@ import Database.Persist.Quasi (lowerCaseSettings)
 import Database.Persist.GenericSql (SqlPersist)
 import Database.Persist.Store (PersistValue(..), deleteCascade)
 import Control.Monad.IO.Class (MonadIO)
-import Data.Maybe (isJust)
+import Data.Maybe (fromMaybe, isJust)
 import Data.String (IsString)
 import Text.Blaze (ToMarkup, toMarkup)
 import Text.Julius (ToJavascript, toJavascript)
@@ -22,6 +23,18 @@ import Util
 
 
 derivePersistField "TimeZone"
+
+
+type Flags a = [(a, Bool)]
+
+hasFlag :: Eq a => a -> Flags a -> Bool
+hasFlag k = fromMaybe False . lookup k
+
+noFlags :: Flags a
+noFlags = []
+
+type FlagsVoid = Flags ()
+derivePersistField "FlagsVoid"
 
 
 data Schedule = Once | Daily | Weekly | Fortnightly

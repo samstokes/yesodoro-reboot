@@ -175,7 +175,7 @@ instance YesodAuth App where
         case x of
             Just (Entity uid _) -> return $ Just uid
             Nothing -> do
-                fmap Just $ insert $ User (credsIdent creds) Nothing defaultTimeZone
+                fmap Just $ insert $ User (credsIdent creds) Nothing defaultTimeZone noFlags
 
     -- You can add other plugins like BrowserID, email or OAuth here
     authPlugins _ = [authBrowserId, authGoogleEmail, authEmail]
@@ -219,7 +219,7 @@ Please go to #{verurl}.
                 case emailUser e of
                     Just uid -> return $ Just uid
                     Nothing -> do
-                        uid <- insert $ User email Nothing defaultTimeZone
+                        uid <- insert $ User email Nothing defaultTimeZone noFlags
                         update eid [EmailUser =. Just uid, EmailVerkey =. Nothing]
                         return $ Just uid
     getPassword = runDB . fmap (join . fmap userPassword) . get
