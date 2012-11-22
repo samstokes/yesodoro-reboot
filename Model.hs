@@ -25,6 +25,9 @@ import Util
 derivePersistField "TimeZone"
 
 
+data Feature = FeaturePomos
+  deriving (Show, Read, Eq, Enum, Bounded, Ord)
+
 type Flags a = [(a, Bool)]
 
 hasFlag :: Eq a => a -> Flags a -> Bool
@@ -35,6 +38,9 @@ noFlags = []
 
 type FlagsVoid = Flags ()
 derivePersistField "FlagsVoid"
+
+type FlagsFeature = Flags Feature
+derivePersistField "FlagsFeature"
 
 
 data Schedule = Once | Daily | Weekly | Fortnightly

@@ -26,12 +26,13 @@
         $forall taskEntityAndEstimatesAndNotes <- todo
           ^{taskTr taskEntityAndEstimatesAndNotes}
 
-      <h3>
-        Remaining: #{sum $ map estimatedRemaining todo} of
-        $with estimateses <- map (map entityVal) $ map snd3 todo
-          $with firstEstimates <- concatMap (take 1) estimateses
-            $with totalEstimated <- sum $ map estimatePomos firstEstimates
-              \ #{totalEstimated} estimated
+      $if has FeaturePomos
+        <h3>
+          Remaining: #{sum $ map estimatedRemaining todo} of
+          $with estimateses <- map (map entityVal) $ map snd3 todo
+            $with firstEstimates <- concatMap (take 1) estimateses
+              $with totalEstimated <- sum $ map estimatePomos firstEstimates
+                \ #{totalEstimated} estimated
 
     <form method=POST action=@{TasksR} enctype=#{newTaskEnctype}>
       ^{newTaskWidget}
@@ -69,7 +70,8 @@ $if not (null doneByDay)
       $forall (day, plans, taskEntitiesEstimatesNotes) <- doneByDay
         <h3>
           #{day}
-          \ (#{sum $ map taskPomos $ map entityVal $ map fst3 taskEntitiesEstimatesNotes})
+          $if has FeaturePomos
+            \ (#{sum $ map taskPomos $ map entityVal $ map fst3 taskEntitiesEstimatesNotes})
         $if not (null plans)
           $forall plan <- plans
             <h4 .plan>

@@ -18,7 +18,7 @@ import Yesod.Auth (requireAuthId)
 
 getTasksR :: Handler RepHtml
 getTasksR = do
-  userId <- requireAuthId
+  Entity userId user <- requireAuth
   horizon <- ago $ weeks 2
   tasks <- runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
   plans <- runDB $ selectUserPlansSince userId horizon [Desc PlanCreatedAt, Desc PlanDoneAt]
@@ -59,6 +59,7 @@ getTasksR = do
   (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
   let
+      has feature = hasFlag feature $ userFeatures user
       planTr (Entity planId plan) = $(widgetFile "plans/plan-tr")
       taskTr (Entity taskId task, estimateEntities, noteEntities) = $(widgetFile "tasks/task-tr")
    in defaultLayout $ do
