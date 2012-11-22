@@ -1,6 +1,8 @@
 User
     ident Text
     password Text Maybe
+    timeZone TimeZone default='PST'
+    features FlagsFeature default='[]'
     UniqueUser ident
 Email
     email Text

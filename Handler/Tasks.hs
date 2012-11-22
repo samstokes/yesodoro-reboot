@@ -2,7 +2,6 @@ module Handler.Tasks where
 
 import Import
 
-import Control.Monad.IO.Class (MonadIO)
 import Data.List (partition, sortBy)
 import Data.Maybe (listToMaybe, fromJust)
 import Data.Ord (comparing)
@@ -19,7 +18,7 @@ import Yesod.Auth (requireAuthId)
 
 getTasksR :: Handler RepHtml
 getTasksR = do
-  userId <- requireAuthId
+  Entity userId user <- requireAuth
   horizon <- ago $ weeks 2
   tasks <- runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
   plans <- runDB $ selectUserPlansSince userId horizon [Desc PlanCreatedAt, Desc PlanDoneAt]
@@ -29,7 +28,7 @@ getTasksR = do
   let tasksEstimatesNotes :: [(Entity Task, [Entity Estimate], [Entity Note])]
       tasksEstimatesNotes = zip3 tasks estimates notes
 
-  timeZone <- userTimeZone
+  timeZone <- currentUserTimeZone
   time <- now
   let taskTodoToday :: Task -> Bool
       taskTodoToday = taskTodo timeZone time
@@ -60,6 +59,7 @@ getTasksR = do
   (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
   let
+      has feature = hasFlag feature $ userFeatures user
       planTr (Entity planId plan) = $(widgetFile "plans/plan-tr")
       taskTr (Entity taskId task, estimateEntities, noteEntities) = $(widgetFile "tasks/task-tr")
    in defaultLayout $ do
@@ -76,7 +76,7 @@ notesWidget taskId notes = do
   widgetId <- lift newIdent
   (newNoteWidget, newNoteEnctype) <- lift $ generateFormPost newNoteForm
   time <- now
-  timeZone <- userTimeZone
+  timeZone <- lift currentUserTimeZone
 
   let renderTime format = formatTime defaultTimeLocale format . utcToLocalTime timeZone
       selector = Text.concat . (["#", widgetId, " "] ++) . pure
@@ -122,7 +122,7 @@ updateAndRedirectR route updates taskId = do
 postCompleteTaskR :: TaskId -> Handler RepHtml
 postCompleteTaskR taskId = do
   task <- authedTask taskId
-  tz <- userTimeZone
+  tz <- currentUserTimeZone
   _ <- runDB $ completeTask tz (Entity taskId task)
   redirect TasksR
 
@@ -139,8 +139,8 @@ authedTask taskId = do
       Nothing -> redirect TasksR
 
 
-userTimeZone :: MonadIO m => m TimeZone
-userTimeZone = liftIO getCurrentTimeZone
+currentUserTimeZone :: Handler TimeZone
+currentUserTimeZone = userTimeZone <$> entityVal <$> requireAuth
 
 
 deleteTaskR :: TaskId -> Handler RepHtml
@@ -153,7 +153,7 @@ deleteTaskR taskId = do
 putTaskR :: TaskId -> Handler RepJson
 putTaskR taskId = do
   task <- authedTask taskId
-  tz <- userTimeZone
+  tz <- currentUserTimeZone
   ((result, _), _) <- runFormPost editTaskForm
   case result of
     FormSuccess edit -> do
@@ -165,7 +165,7 @@ putTaskR taskId = do
 postReorderTaskR :: TaskId -> Handler RepJson
 postReorderTaskR taskId = do
   task <- authedTask taskId
-  tz <- userTimeZone
+  tz <- currentUserTimeZone
   ((result, _), _) <- runFormPost reorderTaskForm
   case result of
     FormSuccess edit -> do

@@ -32,18 +32,19 @@
       $else
         ^{oneButton "|>" (UnpauseTaskR taskId)}
   <td>^{deleteButton "☠" (TaskR taskId)}
-  <td .estimate>
-    $maybe Entity _ estimate <- listToMaybe estimateEntities
-      #{Text.replicate (estimatePomos estimate) "❏"}
-    $nothing
-      $if not (taskDone task)
-        <form method=POST action=@{TaskEstimatesR taskId}>
-          $forall numPomos <- estimateOptions
-            <button name=pomos value=#{show numPomos}>
-              #{show numPomos}
-    $if taskHasPomos task
-      <br>
-    #{Text.replicate (taskPomos task) "✓"}
+  $if has FeaturePomos
+    <td .estimate>
+      $maybe Entity _ estimate <- listToMaybe estimateEntities
+        #{Text.replicate (estimatePomos estimate) "❏"}
+      $nothing
+        $if not (taskDone task)
+          <form method=POST action=@{TaskEstimatesR taskId}>
+            $forall numPomos <- estimateOptions
+              <button name=pomos value=#{show numPomos}>
+                #{show numPomos}
+      $if taskHasPomos task
+        <br>
+      #{Text.replicate (taskPomos task) "✓"}
   <td>
     $if not (taskDone task)
       ^{oneButton "✓" (TaskPomosR taskId)}
