@@ -59,11 +59,12 @@ getTasksR = do
   (editTaskWidget, editTaskEnctype) <- generateFormPost editTaskForm
   (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
-  let planTr (Entity planId plan) = $(widgetFile "plans/plan-tr")
-  let taskTr (Entity taskId task, estimateEntities, noteEntities) = $(widgetFile "tasks/task-tr")
-  defaultLayout $ do
-      setTitle "tasks"
-      addWidget $(widgetFile "tasks") where
+  let
+      planTr (Entity planId plan) = $(widgetFile "plans/plan-tr")
+      taskTr (Entity taskId task, estimateEntities, noteEntities) = $(widgetFile "tasks/task-tr")
+   in defaultLayout $ do
+        setTitle "tasks"
+        addWidget $(widgetFile "tasks") where
 
   estimatedRemaining :: (Entity Task, [Entity Estimate], [Entity Note]) -> Int
   estimatedRemaining (_, [], _) = 0
