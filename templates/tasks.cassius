@@ -32,6 +32,7 @@ h2.collapsed
 
 .task .btn
   opacity: 0.1
+  font-family: sans /* normalise glyph sizes */
 .task:hover .btn
   opacity: inherit
 

@@ -1,4 +1,31 @@
+@font-face {
+  font-family: 'Quattrocento';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Quattrocento Bold'), local('Quattrocento-Bold'), url(@{StaticR fonts_Quattrocento_Quattrocento_Bold_ttf});
+}
+@font-face {
+  font-family: 'Quattrocento';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Quattrocento'), url(@{StaticR fonts_Quattrocento_Quattrocento_Regular_ttf});
+}
+@font-face {
+  font-family: 'Dosis';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Dosis Bold'), local('Dosis-Bold'), url(@{StaticR fonts_Dosis_Dosis_Bold_ttf});
+}
+
 body {
   background-image: url('@{StaticR images_grass_poppies_2592x1936_jpg}');
   background-image-size: cover;
+
+  * {
+    font-family: 'Quattrocento', serif;
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Dosis', sans-serif;
 }
