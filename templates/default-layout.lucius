@@ -1,1 +1,4 @@
-/* coming soon */
+body {
+  background-image: url('@{StaticR images_grass_poppies_2592x1936_jpg}');
+  background-image-size: cover;
+}
