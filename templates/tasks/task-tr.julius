@@ -2,7 +2,7 @@ $(function () {
   var edit = false;
 
   var container = $('#task-#{taskId} .title');
-  var title = container.find('h4');
+  var title = container.find('.title');
   var form = container.find('form');
   var textBox = form.find('input[type=text]');
 

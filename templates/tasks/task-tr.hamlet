@@ -11,7 +11,7 @@
     $maybe label <- scheduleLabel (taskSchedule task)
       <span .schedule-label>#{label}
   <th .title>
-    <h4>#{taskTitle task}
+    <div .title>#{taskTitle task}
     <form .hidden method=POST action=@?{putR (TaskR taskId)} enctype=#{editTaskEnctype}>
       ^{editTaskWidget}
   <td>
