@@ -13,7 +13,7 @@ $(function () {
     form.clearForm();
 
     var numNotes = notes.find('li').length;
-    counter.html(numNotes);
+    counter.removeClass('hidden').html(numNotes);
     handle.removeClass('empty');
 
     noteField.focus();
