@@ -1,4 +1,3 @@
 <tr .plan #plan-#{planId}>
-  <td .body>
-    <h4>#{planBody plan}
+  <td .body>#{planBody plan}
   <td>^{oneButton "btn btn-success" "✓" (CompletePlanR planId)}

@@ -60,6 +60,8 @@ h2.collapsed
 
 .plan .body
   color: #0000dd
+  font-size: 120%
+  font-weight: bold
 
 /*section#todo form **/
   /*display: inline*/
