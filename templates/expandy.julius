@@ -3,6 +3,12 @@ $(function () {
       handle = $(#{toJSON handleSelector}),
       target = $(#{toJSON targetSelector});
 
+  /*
+   * Style expandy handle as we want, without requiring widget users to add
+   * our CSS classes to their markup
+   */
+  handle.addClass('#{widgetId}-expandy-handle');
+
   handle.click(function () {
     target.slideToggle('fast', function () {
       if (target.css('display') === 'none') {
