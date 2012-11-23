@@ -1,3 +1,7 @@
+h1
+  text-align: center
+
+
 section#plans form *
   display: inline
 section#plans form label

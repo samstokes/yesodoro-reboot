@@ -12,6 +12,7 @@ import Database.Persist.Query.Internal (Update)
 import Database.Persist.Store (deleteCascade)
 import Forms
 import Data.Aeson.Types (toJSON)
+import Text.Blaze (toMarkup)
 import Util
 import Yesod.Auth (requireAuthId)
 
@@ -63,7 +64,8 @@ getTasksR = do
       planTr (Entity planId plan) = $(widgetFile "plans/plan-tr")
       taskTr (Entity taskId task, estimateEntities, noteEntities) = $(widgetFile "tasks/task-tr")
    in defaultLayout $ do
-        setTitle "tasks"
+        title <- lift appTitle
+        setTitle $ toMarkup title
         addWidget $(widgetFile "tasks") where
 
   estimatedRemaining :: (Entity Task, [Entity Estimate], [Entity Note]) -> Int

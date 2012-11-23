@@ -9,6 +9,7 @@ module Foundation
     , maybeAuth
     , requireAuth
     , putR, deleteR
+    , appTitle
     , module Settings
     , module Model
     , module Model.Note
@@ -142,6 +143,11 @@ instance Yesod App where
 
     -- Place Javascript at bottom of the body tag so the rest of the page loads first
     jsLoader _ = BottomOfBody
+
+
+appTitle :: Handler Text
+appTitle = fmap (extraTitle . appExtra . settings) getYesod
+
 
 instance YesodJquery App where
   urlJqueryJs _ = Left $ StaticR js_jquery_1_6_4_min_js

@@ -58,11 +58,13 @@ widgetFile = if development then Yesod.Default.Util.widgetFileReload
                             else Yesod.Default.Util.widgetFileNoReload
 
 data Extra = Extra
-    { extraCopyright :: Text
+    { extraTitle :: Text
+    , extraCopyright :: Text
     , extraAnalytics :: Maybe Text -- ^ Google Analytics
     } deriving Show
 
 parseExtra :: DefaultEnv -> Object -> Parser Extra
 parseExtra _ o = Extra
-    <$> o .:  "copyright"
+    <$> o .:  "title"
+    <*> o .:  "copyright"
     <*> o .:? "analytics"

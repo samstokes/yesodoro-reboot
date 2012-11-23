@@ -1,4 +1,4 @@
-<h1>Yesodoro
+<h1>#{title}
 <p>
   You are not logged in. #
   <a href=@{AuthR LoginR}>Login now
