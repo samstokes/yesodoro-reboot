@@ -1,17 +1,18 @@
 <h1>Pomos!
 
-<section #plans>
-  <h2>
-    Plans
-    ^{expandy Expanded "#plans h2" "#plans .content"}
-  <div .content>
-    <form method=POST action=@{PlansR} enctype=#{newPlanEnctype}>
-      ^{newPlanWidget}
-      <input type=submit value=Add>
-    $if not (null plans)
-      <table><tbody>
-        $forall plan <- activePlans
-          ^{planTr plan}
+$if has FeaturePlans
+  <section #plans>
+    <h2>
+      Plans
+      ^{expandy Expanded "#plans h2" "#plans .content"}
+    <div .content>
+      <form method=POST action=@{PlansR} enctype=#{newPlanEnctype}>
+        ^{newPlanWidget}
+        <input type=submit value=Add>
+      $if not (null plans)
+        <table><tbody>
+          $forall plan <- activePlans
+            ^{planTr plan}
 
 <section #todo>
   <h2>

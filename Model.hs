@@ -25,7 +25,7 @@ import Util
 derivePersistField "TimeZone"
 
 
-data Feature = FeaturePomos
+data Feature = FeaturePomos | FeaturePlans
   deriving (Show, Read, Eq, Enum, Bounded, Ord)
 
 type Flags a = [(a, Bool)]
