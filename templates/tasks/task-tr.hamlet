@@ -45,6 +45,6 @@
       $if taskHasPomos task
         <br>
       #{Text.replicate (taskPomos task) "✓"}
-  <td>
-    $if not (taskDone task)
-      ^{oneButton "✓" (TaskPomosR taskId)}
+    <td>
+      $if not (taskDone task)
+        ^{oneButton "✓" (TaskPomosR taskId)}
