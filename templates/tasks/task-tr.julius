@@ -1,4 +1,39 @@
 $(function () {
+  var task = $('#task-#{taskId}');
+  function button(clazz) {
+    return task.find('button.' + clazz);
+  }
+  var btnComplete = button('complete');
+
+  function complete() {
+    var oldHtml = btnComplete.html();
+
+    $.ajax({
+      url: '@{CompleteTaskR taskId}',
+      type: 'POST',
+      success: function () {
+        task.remove();
+      },
+      error: function (xhr, state, message) {
+        task.removeClass('done');
+      },
+      complete: function () {
+        btnComplete
+          .enable()
+          .html(oldHtml);
+      }
+    });
+
+    btnComplete
+      .enable(false)
+      .html('…');
+    task.addClass('done');
+  }
+
+  btnComplete.click(complete);
+});
+
+$(function () {
   var edit = false;
 
   var container = $('#task-#{taskId} .title');
