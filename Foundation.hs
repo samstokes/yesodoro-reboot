@@ -121,6 +121,7 @@ instance Yesod App where
             addScriptEither $ urlJqueryJs master
             addScriptEither $ urlJqueryUiJs master
             addScript $ StaticR js_jquery_form_js
+            addScript $ StaticR js_util_js
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 
     -- This is done to provide an optimization for serving static files from
