@@ -15,7 +15,7 @@
     <form .hidden method=POST action=@?{putR (TaskR taskId)} enctype=#{editTaskEnctype}>
       ^{editTaskWidget}
   <td>
-    <div .btn-group>
+    <form .btn-group method=POST action=@?{putR (TaskR taskId)} enctype=#{editTaskEnctype}>
       $if (taskDone task)
         <button .uncomplete .btn .btn-inverse>☹
       $else

@@ -4,13 +4,16 @@ module Forms
   , editTaskForm
   , reorderTaskForm
   , newNoteForm
+  , spobblyForm
   ) where
 
+import Debug.Trace
 
 import Import
 import Util (fieldListOptions)
 
 import Control.Monad (unless)
+import qualified Control.Monad.Trans.RWS as RWS
 import Data.Maybe (listToMaybe)
 
 
@@ -35,6 +38,12 @@ editTaskForm = renderDivs $ TaskTitleEdit <$> areq textField "Title" Nothing
 
 reorderTaskForm :: Form TaskEdit
 reorderTaskForm = renderDivs $ TaskOrderEdit <$> areq intField "Delta" Nothing
+
+
+spobblyForm :: Form TaskEdit
+spobblyForm html = do
+  foo <- RWS.get
+  traceShow foo $ return (FormSuccess (TaskTitleEdit "foobar"), [whamlet|foo|])
 
 
 newNoteForm :: Form NewNote

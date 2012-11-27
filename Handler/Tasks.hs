@@ -156,12 +156,12 @@ putTaskR :: TaskId -> Handler RepJson
 putTaskR taskId = do
   task <- authedTask taskId
   tz <- currentUserTimeZone
-  ((result, _), _) <- runFormPost editTaskForm
+  ((result, _), _) <- runFormPost spobblyForm
   case result of
     FormSuccess edit -> do
       updated <- runDB $ updateTask tz edit (taskId, task)
       jsonToRepJson $ object [("updated", toJSON updated)]
-    _ -> undefined -- TODO
+    _ -> error "Terrible badness" -- TODO
 
 
 postReorderTaskR :: TaskId -> Handler RepJson
