@@ -124,3 +124,7 @@ splitBy p = foldr addUnlessP []
 
 fieldListOptions :: (Show field, Enum field, Bounded field) => [(Text, field)]
 fieldListOptions = map (Text.pack . show &&& id) [minBound .. maxBound]
+
+
+fieldListOptionsI :: (Show field, Enum field, Bounded field) => (field -> msg) -> [(msg, field)]
+fieldListOptionsI toMsg = map (toMsg &&& id) [minBound .. maxBound]

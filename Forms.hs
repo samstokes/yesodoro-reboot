@@ -8,7 +8,7 @@ module Forms
 
 
 import Import
-import Util (fieldListOptions)
+import Util (fieldListOptionsI)
 
 import Control.Monad (unless)
 import Data.Maybe (listToMaybe)
@@ -23,10 +23,15 @@ newPlanForm = renderBootstrap $ NewPlan <$> areq textField bodySettings Nothing
 newTaskForm :: Form NewTask
 newTaskForm = renderBootstrap $ NewTask
     <$> areq textField titleSettings Nothing
-    <*> areq (radioFieldList' fieldListOptions) scheduleSettings (pure Once)
+    <*> areq (radioFieldList' $ fieldListOptionsI scheduleMsg) scheduleSettings (pure Once)
   where
+    scheduleMsg Once = MsgScheduleOnce
+    scheduleMsg Daily = MsgScheduleDaily
+    scheduleMsg Weekly = MsgScheduleWeekly
+    scheduleMsg Fortnightly = MsgScheduleFortnightly
     titleSettings = fieldSettingsWithAttrs "Title" [("placeholder", "Add a task")]
     scheduleSettings = fieldSettingsWithAttrs "Schedule" [("class", "inline")]
+
 
 
 editTaskForm :: Form TaskEdit
