@@ -19,6 +19,7 @@ import Model
 import Util
 
 
+{-selectUserPlansSince :: PersistQuery m => UserId -> UTCTime -> [SelectOpt Plan] -> SqlPersist m [Entity Plan]-}
 selectUserPlansSince userId doneSince = selectList (belongsToUser ++ doneSinceLimit)
   where
     belongsToUser = [PlanUser ==. userId]
@@ -35,6 +36,7 @@ newPlan uid createdAt (NewPlan body) = Plan {
   , planDoneAt = Nothing
   }
 
+{-createPlan :: (MonadIO m, PersistQuery m) => UserId -> NewPlan -> SqlPersist m (Entity Plan)-}
 createPlan uid plan = do
   time <- now
   let plan' = newPlan uid time plan
