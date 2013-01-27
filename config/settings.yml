@@ -16,6 +16,5 @@ Staging:
   <<: *defaults
 
 Production:
-  port: 3080
-  approot: "http://localhost:3080"
+  approot: "https://yesodoro.herokuapp.com"
   <<: *defaults
