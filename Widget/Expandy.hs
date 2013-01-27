@@ -6,6 +6,7 @@ module Widget.Expandy
 import Prelude
 
 import Data.Aeson (toJSON)
+import Data.Default (def)
 import Data.Text (Text)
 import Yesod (GWidget, addScriptEither, getYesod, newIdent)
 import Yesod.Default.Util (widgetFileNoReload)
@@ -28,4 +29,4 @@ expandy initialState handleSelector targetSelector = do
 
   widgetId <- lift newIdent
 
-  $(widgetFileNoReload "expandy")
+  $(widgetFileNoReload def "expandy")

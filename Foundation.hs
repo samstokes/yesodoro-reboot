@@ -45,6 +45,7 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import Data.Time (TimeZone(..))
+import Data.Default (def)
 import Util
 
 -- | The site argument for your application. This can be a good place to
@@ -115,9 +116,9 @@ instance Yesod App where
         -- you to use normal widget features in default-layout.
 
         pc <- widgetToPageContent $ do
-            $(widgetFile "normalize")
+            $(widgetFile def "normalize")
             addStylesheet $ StaticR css_bootstrap_css
-            $(widgetFile "default-layout")
+            $(widgetFile def "default-layout")
             addScriptEither $ urlJqueryJs master
             addScriptEither $ urlJqueryUiJs master
             addScript $ StaticR js_jquery_form_js

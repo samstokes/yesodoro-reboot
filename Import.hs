@@ -4,6 +4,7 @@ module Import
     , module Foundation
     , module Settings.StaticFiles
     , module Settings.Development
+    , module Data.Default
     , module Data.Monoid
     , module Control.Applicative
     , Text
@@ -19,6 +20,7 @@ import Yesod   hiding (Route(..))
 import Foundation
 import Data.Monoid (Monoid (mappend, mempty, mconcat))
 import Control.Applicative ((<$>), (<*>), pure)
+import Data.Default (def)
 import Data.Text (Text)
 import Data.Time hiding (parseTime) -- Yesod also exports parseTime
 import Settings.StaticFiles

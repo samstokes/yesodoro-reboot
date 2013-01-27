@@ -61,12 +61,12 @@ getTasksR = do
 
   let
       has feature = hasFlag feature $ userFeatures user
-      planTr (Entity planId plan) = $(widgetFile "plans/plan-tr")
-      taskTr (Entity taskId task, estimateEntities, noteEntities) = $(widgetFile "tasks/task-tr")
+      planTr (Entity planId plan) = $(widgetFile def "plans/plan-tr")
+      taskTr (Entity taskId task, estimateEntities, noteEntities) = $(widgetFile def "tasks/task-tr")
    in defaultLayout $ do
         title <- lift appTitle
         setTitle $ toMarkup title
-        addWidget $(widgetFile "tasks") where
+        addWidget $(widgetFile def "tasks") where
 
   estimatedRemaining :: (Entity Task, [Entity Estimate], [Entity Note]) -> Int
   estimatedRemaining (_, [], _) = 0
@@ -85,8 +85,8 @@ notesWidget taskId notes = do
       handleSelector = selector ".notes-handle"
       detailSelector = selector ".notes-detail"
       dummyNote = Entity undefined $ Note "dummy" taskId time
-      noteWidget (Entity noteId note) = $(widgetFile "notes/note")
-    in $(widgetFile "notes")
+      noteWidget (Entity noteId note) = $(widgetFile def "notes/note")
+    in $(widgetFile def "notes")
 
 
 postTasksR :: Handler RepHtml

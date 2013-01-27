@@ -11,5 +11,5 @@ getHomeR = maybeAuthId >>= getHomeR' where
   getHomeR' Nothing = defaultLayout $ do
       title <- lift appTitle
       setTitle $ toMarkup title
-      $(widgetFile "homepage")
+      $(widgetFile def "homepage")
   getHomeR' (Just _) = redirect TasksR

@@ -53,7 +53,7 @@ staticRoot conf = [st|#{appRoot conf}/static|]
 -- The rest of this file contains settings which rarely need changing by a
 -- user.
 
-widgetFile :: String -> Q Exp
+widgetFile :: Yesod.Default.Util.WidgetFileSettings -> String -> Q Exp
 widgetFile = if development then Yesod.Default.Util.widgetFileReload
                             else Yesod.Default.Util.widgetFileNoReload
 

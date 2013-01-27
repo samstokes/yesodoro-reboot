@@ -87,6 +87,7 @@ library
                  , aeson
                  , transformers
                  , old-locale
+                 , data-default
 
 executable         yesodoro-reboot
     if flag(library-only)
