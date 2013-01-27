@@ -90,7 +90,6 @@ newtype TaskState = TaskState Text
   deriving (ToMarkup, IsString)
 
 
-selectUserTasksSince :: PersistQuery SqlPersist m => UserId -> UTCTime -> [SelectOpt Task] -> SqlPersist m [Entity Task]
 selectUserTasksSince userId doneSince = selectList (belongsToUser ++ doneSinceLimit)
   where
     belongsToUser = [TaskUser ==. userId]
@@ -111,7 +110,6 @@ newTask uid scheduledFor order (NewTask title schedule) = Task {
   , taskSchedule = schedule
   }
 
-createTaskAtBottom :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> NewTask -> SqlPersist m TaskId
 createTaskAtBottom userId task = do
   time <- now
   maybeLastTask <- selectFirst [TaskUser ==. userId] [Desc TaskOrder]
@@ -119,7 +117,6 @@ createTaskAtBottom userId task = do
   insert $ newTask userId time (succ lastOrder) task
 
 
-completeTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> Entity Task -> SqlPersist m (Maybe TaskId)
 completeTask tz taskEntity = do
     time <- now
     maybeNextTime <- recurTask tz time taskEntity
@@ -140,7 +137,6 @@ cloneTask order task = Task {
   }
 
 
-duplicateTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> UTCTime -> Entity Task -> SqlPersist m TaskId
 duplicateTask tz scheduledFor taskEntity = do
     let (taskId, task) = (entityKey taskEntity, entityVal taskEntity)
 
@@ -157,20 +153,16 @@ duplicateTask tz scheduledFor taskEntity = do
 
     return dupeTaskId
   where
-    copyFirstEstimate :: PersistQuery SqlPersist m => TaskId -> TaskId -> SqlPersist m [EstimateId]
     copyFirstEstimate taskId newTaskId = do
       firstEstimate <- take 1 <$> taskEstimates taskId
       mapM (copyEstimate newTaskId . entityVal) firstEstimate
-    copyEstimate :: PersistQuery SqlPersist m => TaskId -> Estimate -> SqlPersist m EstimateId
     copyEstimate newTaskId (Estimate _ pomos) = insert $ Estimate newTaskId pomos
 
 
-recurTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> UTCTime -> Entity Task -> SqlPersist m (Maybe TaskId)
 recurTask tz time taskEntity = do
     let recurrence = scheduleRecurrence $ taskSchedule (entityVal taskEntity)
     maybe (return Nothing) (applyRecurrence >=> return . Just) recurrence
   where
-    applyRecurrence :: (MonadIO m, PersistQuery SqlPersist m) => NominalDiffTime -> SqlPersist m TaskId
     applyRecurrence recurrence = do
       newTaskId <- duplicateTask tz time taskEntity
       postponeTask recurrence newTaskId
@@ -182,7 +174,6 @@ data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
               deriving (Show)
 
 
-updateTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> TaskEdit -> (TaskId, Task) -> SqlPersist m Bool
 updateTask _ (TaskTitleEdit title) (taskId, task)
   | taskTitle task /= title = update taskId [TaskTitle =. title] >> return True
   | otherwise               = return False
@@ -191,7 +182,6 @@ updateTask tz (TaskOrderEdit delta) task = reorderTaskN delta tz task
 
 data Direction = Up | Down deriving (Show, Enum, Bounded)
 
-nextTask :: (MonadIO m, PersistQuery SqlPersist m) => Direction -> TimeZone -> Task -> SqlPersist m (Maybe (Entity Task))
 nextTask direction tz task = do
   endOfDay <- liftIO $ endOfToday tz
   selectFirst
@@ -209,7 +199,6 @@ nextTask direction tz task = do
     scheduledForConstraint endOfDay | taskScheduledFor task <= endOfDay = (<=. endOfDay)
                                     | otherwise                           = (>. endOfDay)
 
-reorderTask :: (MonadIO m, PersistQuery SqlPersist m) => Direction -> TimeZone -> (TaskId, Task) -> SqlPersist m (TaskId, Task)
 reorderTask direction tz (taskId, task) = do
   maybeNext <- nextTask direction tz task
   case maybeNext of
@@ -221,7 +210,6 @@ reorderTask direction tz (taskId, task) = do
       return (taskId, task { taskOrder = taskOrder next })
 
 
-reorderTaskN :: (MonadIO m, PersistQuery SqlPersist m) => Int -> TimeZone -> (TaskId, Task) -> SqlPersist m Bool
 reorderTaskN delta tz task
   | delta > 0 = foldTimesM delta (reorder Down) task >> return True
   | delta < 0 = foldTimesM (-delta) (reorder Up) task >> return True
@@ -255,26 +243,21 @@ taskScheduledForDay tz = utcToLocalDay tz . taskScheduledFor
 taskState :: Task -> TaskState
 taskState task = if taskDone task then "done" else "pending"
 
-taskEstimates :: PersistQuery SqlPersist m => TaskId -> SqlPersist m [Entity Estimate]
 taskEstimates taskId = selectList [EstimateTask ==. taskId] []
 
 estimateOptions :: [Int]
 estimateOptions = 0 : [2 ^ x | x <- [0 .. 3] :: [Int]]
 
 
-postponeTask :: (MonadIO m, PersistQuery SqlPersist m) => NominalDiffTime -> TaskId -> SqlPersist m ()
 postponeTask postponement taskId = do
   postponed <- hence postponement
   update taskId [TaskScheduledFor =. postponed]
 
-unpostponeTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()
 unpostponeTask taskId = do
   time <- now
   update taskId [TaskScheduledFor =. time]
 
 
-pauseTask :: PersistQuery SqlPersist m => TaskId -> SqlPersist m ()
 pauseTask taskId = update taskId [TaskActive =. False]
 
-unpauseTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()
 unpauseTask taskId = update taskId [TaskActive =. True] >> unpostponeTask taskId

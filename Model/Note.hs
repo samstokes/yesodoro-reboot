@@ -17,7 +17,6 @@ import Model
 import Util
 
 
-taskNotes :: PersistQuery SqlPersist m => [SelectOpt Note] -> TaskId -> SqlPersist m [Entity Note]
 taskNotes opts taskId = selectList [NoteTask ==. taskId] opts
 
 
@@ -30,7 +29,6 @@ newNote taskId createdAt (NewNote body) = Note {
   , noteCreatedAt = createdAt
   }
 
-createNote :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> NewNote -> SqlPersist m (NoteId, Note)
 createNote taskId note = do
   time <- now
   let note' = newNote taskId time note
