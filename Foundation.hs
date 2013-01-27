@@ -26,6 +26,7 @@ import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
 import Yesod.Form.Jquery (YesodJquery(..))
+{-import Yesod.Logger (Logger, logMsg, formatLogText, logLazyText)-}
 import Network.HTTP.Conduit (Manager)
 import qualified Settings
 import qualified Database.Persist.Store
@@ -54,6 +55,7 @@ import Util
 -- access to the data present here.
 data App = App
     { settings :: AppConfig DefaultEnv Extra
+    {-, getLogger :: Logger-}
     , getStatic :: Static -- ^ Settings for static file serving.
     , connPool :: Database.Persist.Store.PersistConfigPool Settings.PersistConfig -- ^ Database connection pool.
     , httpManager :: Manager
@@ -132,6 +134,9 @@ instance Yesod App where
 
     -- The page to be redirected to when authentication is required.
     authRoute _ = Just $ AuthR LoginR
+
+    {-messageLogger y loc level msg =-}
+      {-formatLogText (getLogger y) loc level msg >>= logMsg (getLogger y)-}
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows

@@ -11,6 +11,7 @@ import Yesod.Auth
 import Yesod.Default.Config
 import Yesod.Default.Main
 import Yesod.Default.Handlers
+{-import Yesod.Logger (Logger, logBS, toProduction, flushLogger)-}
 import qualified Network.Wai.Middleware.Gzip as GZ
 import Network.Wai.Middleware.RequestLogger (logStdout, logStdoutDev)
 import Network.Wai.Middleware.MethodOverride (methodOverride)
@@ -53,6 +54,7 @@ makeFoundation :: AppConfig DefaultEnv Extra -> IO App
 makeFoundation conf = do
     _ <- forkIO $ forever $ do
         threadDelay $ 1000 * 1000
+        {-flushLogger setLogger-}
 
     manager <- newManager def
     s <- staticSite
