@@ -14,7 +14,6 @@ import Data.Time (Day, TimeZone, UTCTime, NominalDiffTime)
 import Database.Persist.Quasi (lowerCaseSettings)
 import Database.Persist.GenericSql (SqlPersist)
 import Database.Persist.Store (PersistValue(..), deleteCascade)
-import Database.Persist.TH (sqlOnlySettings)
 import Control.Monad.IO.Class (MonadIO)
 import Data.Maybe (fromMaybe, isJust)
 import Data.String (IsString)
@@ -65,7 +64,7 @@ scheduleLabel Fortnightly = Just "♹♹"
 -- You can find more information on persistent and how to declare entities
 -- at:
 -- http://www.yesodweb.com/book/persistent/
-share [mkPersist sqlSettings, mkMigrate "migrateAll", mkDeleteCascade sqlOnlySettings]
+share [mkPersist sqlSettings, mkMigrate "migrateAll", mkDeleteCascade]
     $(persistFileWith lowerCaseSettings "config/models")
 
 

@@ -70,7 +70,6 @@ library
                  , text
                  , persistent
                  , persistent-postgresql
-                 , persistent-template
                  , template-haskell
                  , hamlet
                  , shakespeare-css
