@@ -1,5 +1,5 @@
 $(function () {
-  var container = $('##{widgetId}'),
+  var container = $('#' + #{toJSON widgetId}),
       handle = container.find('.notes-handle'),
       counter = handle.find('.counter'),
       notes = container.find('ol.notes'),
