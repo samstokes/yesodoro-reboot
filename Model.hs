@@ -70,10 +70,10 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll", mkDeleteCascade sqlOnlySet
 
 
 
-instance ToMarkup (Key a b) where
+instance ToMarkup (KeyBackend b a) where
   toMarkup = toMarkup . unKey
 
-instance ToJavascript (Key a b) where
+instance ToJavascript (KeyBackend b a) where
   toJavascript = toJavascript . unKey
 
 
