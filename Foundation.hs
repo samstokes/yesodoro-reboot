@@ -42,6 +42,8 @@ import Web.ClientSession (getKey)
 import Text.Hamlet (hamletFile)
 import Text.Shakespeare.Text (stext)
 import Data.Text (Text)
+import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
 import Data.Time (TimeZone(..))
 import Util
 
