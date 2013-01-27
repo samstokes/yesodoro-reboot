@@ -17,6 +17,7 @@ import Database.Persist.Store (PersistValue(..), deleteCascade)
 import Control.Monad.IO.Class (MonadIO)
 import Data.Maybe (fromMaybe, isJust)
 import Data.String (IsString)
+import Data.Aeson (toJSON)
 import Text.Blaze (ToMarkup, toMarkup)
 import Text.Julius (ToJavascript, toJavascript)
 import Util
