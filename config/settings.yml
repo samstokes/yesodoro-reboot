@@ -13,6 +13,8 @@ Testing:
   <<: *defaults
 
 Staging:
+  is_heroku: true
+  approot: "https://yesodoro-test.herokuapp.com"
   <<: *defaults
 
 Production:
