@@ -6,6 +6,8 @@ import Prelude
 import Control.Arrow (Arrow, (&&&), (>>>), first, second)
 import Control.Monad (foldM, unless)
 import Control.Monad.IO.Class (MonadIO, liftIO)
+import Control.Monad.Trans.Error
+import Control.Monad.Trans.Maybe
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Base64 as B64
@@ -110,9 +112,13 @@ untilM predicate f a = unless (predicate a) $ do
   untilM predicate f a'
 
 
-maybeToEither :: String -> Maybe a -> Either String a
-maybeToEither msg Nothing = Left msg
+maybeToEither :: e -> Maybe a -> Either e a
+maybeToEither e Nothing = Left e
 maybeToEither _ (Just v) = Right v
+
+mapLeft :: (e -> e') -> Either e a -> Either e' a
+mapLeft _ (Right a) = Right a
+mapLeft f (Left e) = Left $ f e
 
 
 paras :: Text -> [Text]
@@ -132,6 +138,18 @@ fieldListOptions = map (Text.pack . show &&& id) [minBound .. maxBound]
 
 both :: Arrow a => a b c -> a (b, b) (c, c)
 both f = first f >>> second f
+
+
+maybeM :: Monad m => b -> (a -> m b) -> Maybe a -> m b
+maybeM = maybe . return
+
+
+toMaybeT :: Monad m => Maybe a -> MaybeT m a
+toMaybeT = MaybeT . return
+
+
+toErrorT :: (Error e, Monad m) => Either e a -> ErrorT e m a
+toErrorT = ErrorT . return
 
 
 type BasicAuthCredentials = (Text, Text)
