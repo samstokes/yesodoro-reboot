@@ -3,6 +3,7 @@ module Handler.Api where
 import Import
 import Util
 
+import Control.Monad.Trans.Error
 import qualified Data.Text as T
 import qualified Network.HTTP.Types as HTTP
 import Network.Wai (requestHeaders)
@@ -18,32 +19,48 @@ postApiTasksR = do
   sendResponseCreated $ TaskR taskId
 
 
+data AuthError = AuthCredentialsNotSupplied
+               | AuthMalformedCredentials String
+               | AuthCredentialsNotRecognised
+               | AuthCredentialsInvalid
+               | AuthErrorOther String
+  deriving (Show)
+
+instance Error AuthError where
+  strMsg = AuthErrorOther
+
+
 httpBasicAuth :: Handler UserId
 httpBasicAuth = do
-  request <- waiRequest
-  root <- (appRoot . settings) <$> getYesod
+    root <- (appRoot . settings) <$> getYesod
+    auth <- runErrorT handleBasicAuth
+    $logDebug $ T.pack $ "HTTP Basic auth: " ++ show auth
+    case auth of
+      Right userId -> return userId
 
-  -- TODO uck refactor this
-  case lookup "Authorization" (requestHeaders request) of
-    Just auth -> case parseAuthorizationHeader auth of
-      Right (email, clearPassword) -> do
-        memail <- runDB $ getBy $ UniqueEmail email
-        case memail of
-          Just (Entity _ email') -> do
-            let mUserId = emailUser email'
-            muser <- runDB $ fromMaybe (return Nothing) $ get <$> mUserId
-            case muser of
-              Just user ->
-                if maybe False (isValidPass clearPassword) (userPassword user)
-                  then return $ fromJust mUserId
-                  else unauthorized
-              Nothing -> unauthorized
-          Nothing -> unauthorized
-      Left err -> sendResponseStatus HTTP.badRequest400 $ RepPlain $ toContent $ T.pack err
-    _ -> do
-      setHeader "WWW-Authenticate" $ T.concat ["Basic Realm=\"", root, "\""]
-      permissionDenied "Authentication required"
+      Left AuthCredentialsNotSupplied -> do
+        setHeader "WWW-Authenticate" $ T.concat ["Basic Realm=\"", root, "\""]
+        permissionDenied "Authentication required"
+      Left (AuthMalformedCredentials err) ->
+        sendResponseStatus HTTP.badRequest400 $ RepPlain $ toContent $ T.pack err
+      Left AuthCredentialsNotRecognised -> unauthorized "credentials not recognised"
+      Left AuthCredentialsInvalid -> unauthorized "credentials not recognised"
+      Left (AuthErrorOther err) -> do
+        $logWarn $ T.pack $ "unexpected auth error: " ++ err
+        unauthorized "credentials not recognised"
+  where
+  handleBasicAuth :: ErrorT AuthError Handler UserId
+  handleBasicAuth = do
+    request <- lift waiRequest
+    auth <- toErrorT $ maybeToEither AuthCredentialsNotSupplied $ lookup "Authorization" (requestHeaders request)
+    (email, clearPassword) <- toErrorT $ mapLeft AuthMalformedCredentials $ parseAuthorizationHeader auth
+    Entity _ email' <- ErrorT $ fmap (maybeToEither AuthCredentialsNotRecognised) $ runDB $ getBy $ UniqueEmail email
+    userId <- toErrorT $ maybeToEither (AuthErrorOther "email has no associated user account!") $ emailUser email'
+    user <- ErrorT $ fmap (maybeToEither $ AuthErrorOther "user account missing!") $ runDB $ get userId
+    if maybe False (isValidPass clearPassword) (userPassword user)
+      then return userId
+      else throwError AuthCredentialsInvalid
 
 
-unauthorized :: GHandler sub master a
-unauthorized = sendResponseStatus HTTP.unauthorized401 $ RepPlain $ toContent $ T.pack "sorry"
+unauthorized :: String -> GHandler sub master a
+unauthorized err = sendResponseStatus HTTP.unauthorized401 $ RepPlain $ toContent $ T.pack err
