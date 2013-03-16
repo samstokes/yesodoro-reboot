@@ -4,6 +4,7 @@ import Import
 import Util
 
 import Control.Monad.Trans.Error
+import Control.Monad.Trans.Maybe
 import qualified Data.Text as T
 import qualified Network.HTTP.Types as HTTP
 import Network.Wai (requestHeaders)
@@ -15,15 +16,14 @@ postApiTasksR = do
   userId <- httpBasicAuth
   newTask <- parseJsonBody_ -- TODO error page is HTML, not friendly!
 
-  (extUpdated, existingTask) <- case newTaskExt newTask of
-    Just extTask -> runDB $ do
-      updated <- syncExtTask userId extTask
-      existingTask <- findTaskByExtTask userId extTask
-      return (updated, existingTask)
-    Nothing -> return (False, Nothing)
+  existingTask <- runDB $ runMaybeT $ do
+    extTask <- toMaybeT $ newTaskExt newTask
+    updated <- lift $ syncExtTask userId extTask
+    existingTask <- MaybeT $ findTaskByExtTask userId extTask
+    return (updated, existingTask)
 
   case existingTask of
-    Just (Entity taskId _) -> do
+    Just (extUpdated, Entity taskId _) -> do
       (taskUpdated, _) <- runDB $ updateTask undefined (TaskSyncEdit newTask) taskId
       setLocation $ TaskR taskId
       jsonToRepJson $ object ["updated" .= (taskUpdated || extUpdated)]
