@@ -171,12 +171,28 @@ newExtTask uid (NewExtTask extId sourceName url) = ExtTask {
   , extTaskExtUrl = url
   }
 
+
+class GetExtTask a where
+  getExtTask :: PersistUnique SqlPersist m => UserId -> a -> SqlPersist m (Maybe (Entity ExtTask))
+
+instance GetExtTask NewExtTask where
+  getExtTask userId (NewExtTask extId source _) = getBy $ UniqueExtTaskSourceId userId source extId
+
+
 createTaskAtBottom :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> NewTask -> SqlPersist m TaskId
 createTaskAtBottom userId task = do
   time <- now
   maybeLastTask <- selectFirst [TaskUser ==. userId] [Desc TaskOrder]
   let lastOrder = maybe 0 (taskOrder . entityVal) maybeLastTask
   createTask userId time (succ lastOrder) task
+
+
+findTaskByExtTask :: (PersistUnique SqlPersist m, PersistQuery SqlPersist m, GetExtTask extTask) => UserId -> extTask -> SqlPersist m (Maybe (Entity Task))
+findTaskByExtTask userId extTask = do
+  mExtTask <- getExtTask userId extTask
+  case mExtTask of
+    Just (Entity extTaskId _) -> selectFirst [TaskUser ==. userId, TaskExtTask ==. Just extTaskId] []
+    Nothing -> return Nothing
 
 
 completeTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> Entity Task -> SqlPersist m (Maybe TaskId)
