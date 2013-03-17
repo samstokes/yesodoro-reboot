@@ -153,24 +153,24 @@ deleteTaskR taskId = do
 
 putTaskR :: TaskId -> Handler RepJson
 putTaskR taskId = do
-  task <- authedTask taskId
+  _ <- authedTask taskId
   tz <- currentUserTimeZone
   ((result, _), _) <- runFormPost editTaskForm
   case result of
     FormSuccess edit -> do
-      updated <- runDB $ updateTask tz edit (taskId, task)
+      (updated, _) <- runDB $ updateTask tz edit taskId
       jsonToRepJson $ object [("updated", toJSON updated)]
     _ -> undefined -- TODO
 
 
 postReorderTaskR :: TaskId -> Handler RepJson
 postReorderTaskR taskId = do
-  task <- authedTask taskId
+  _ <- authedTask taskId
   tz <- currentUserTimeZone
   ((result, _), _) <- runFormPost reorderTaskForm
   case result of
     FormSuccess edit -> do
-      updated <- runDB $ updateTask tz edit (taskId, task)
+      (updated, _) <- runDB $ updateTask tz edit taskId
       jsonToRepJson $ object [("updated", toJSON updated)]
     _ -> undefined -- TODO
 

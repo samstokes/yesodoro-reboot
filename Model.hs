@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 
 module Model where
@@ -184,11 +185,19 @@ data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
               deriving (Show)
 
 
-updateTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> TaskEdit -> (TaskId, Task) -> SqlPersist m Bool
-updateTask _ (TaskTitleEdit title) (taskId, task)
-  | taskTitle task /= title = update taskId [TaskTitle =. title] >> return True
-  | otherwise               = return False
-updateTask tz (TaskOrderEdit delta) task = reorderTaskN delta tz task
+updateTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> TaskEdit -> TaskId -> SqlPersist m (Bool, Maybe Task)
+updateTask tz edit taskId = do
+    mtask <- get taskId
+    case mtask of
+      Just task -> do
+        updated <- updateTask' edit task
+        (updated,) <$> if updated then get taskId else return $ Just task
+      Nothing -> return (False, Nothing)
+  where
+    updateTask' (TaskTitleEdit title) task
+      | taskTitle task /= title = update taskId [TaskTitle =. title] >> return True
+      | otherwise               = return False
+    updateTask' (TaskOrderEdit delta) task = reorderTaskN delta tz (taskId, task)
 
 
 data Direction = Up | Down deriving (Show, Enum, Bounded)
