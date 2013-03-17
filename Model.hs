@@ -98,16 +98,19 @@ selectUserTasksSince userId doneSince = selectList (belongsToUser ++ doneSinceLi
 
 data NewTask = NewTask { newTaskTitle :: Text, newTaskSchedule :: Schedule } deriving (Show)
 
-newTask :: UserId -> UTCTime -> Int -> NewTask -> Task
-newTask uid scheduledFor order (NewTask title schedule) = Task {
-    taskUser = uid
-  , taskTitle = title
-  , taskPomos = 0
-  , taskScheduledFor = scheduledFor
-  , taskDoneAt = Nothing
-  , taskActive = True
-  , taskOrder = order
-  , taskSchedule = schedule
+
+
+createTask :: PersistStore SqlPersist m => UserId -> UTCTime -> Int -> NewTask -> SqlPersist m TaskId
+createTask uid scheduledFor order (NewTask title schedule) = do
+  insert Task {
+      taskUser = uid
+    , taskTitle = title
+    , taskPomos = 0
+    , taskScheduledFor = scheduledFor
+    , taskDoneAt = Nothing
+    , taskActive = True
+    , taskOrder = order
+    , taskSchedule = schedule
   }
 
 createTaskAtBottom :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> NewTask -> SqlPersist m TaskId
@@ -115,7 +118,7 @@ createTaskAtBottom userId task = do
   time <- now
   maybeLastTask <- selectFirst [TaskUser ==. userId] [Desc TaskOrder]
   let lastOrder = maybe 0 (taskOrder . entityVal) maybeLastTask
-  insert $ newTask userId time (succ lastOrder) task
+  createTask userId time (succ lastOrder) task
 
 
 completeTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> Entity Task -> SqlPersist m (Maybe TaskId)
