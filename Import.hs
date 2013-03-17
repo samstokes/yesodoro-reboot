@@ -4,6 +4,7 @@ module Import
     , module Foundation
     , module Settings.StaticFiles
     , module Settings.Development
+    , module Data.Maybe
     , module Data.Monoid
     , module Control.Applicative
     , Text
@@ -17,6 +18,7 @@ module Import
 import Prelude hiding (writeFile, readFile, head, tail, init, last)
 import Yesod   hiding (Route(..))
 import Foundation
+import Data.Maybe hiding (Maybe(..), maybe)
 import Data.Monoid (Monoid (mappend, mempty, mconcat))
 import Control.Applicative ((<$>), (<*>), pure)
 import Data.Text (Text)

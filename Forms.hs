@@ -11,7 +11,6 @@ import Import
 import Util (fieldListOptions)
 
 import Control.Monad (unless)
-import Data.Maybe (listToMaybe)
 
 
 newPlanForm :: Form NewPlan

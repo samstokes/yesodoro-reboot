@@ -3,7 +3,6 @@ module Handler.Tasks where
 import Import
 
 import Data.List (partition, sortBy)
-import Data.Maybe (listToMaybe, fromJust)
 import Data.Ord (comparing)
 import qualified Data.Text as Text
 import Data.Text.Read (decimal)
