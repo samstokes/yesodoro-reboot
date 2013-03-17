@@ -7,6 +7,7 @@ import qualified Data.Text as T
 import qualified Network.HTTP.Types as HTTP
 import Network.Wai (requestHeaders)
 import Yesod.Auth.Email (isValidPass)
+import Yesod.Default.Config (AppConfig(..))
 
 postApiTasksR :: Handler RepJson
 postApiTasksR = do
@@ -20,6 +21,8 @@ postApiTasksR = do
 httpBasicAuth :: Handler UserId
 httpBasicAuth = do
   request <- waiRequest
+  root <- (appRoot . settings) <$> getYesod
+
   -- TODO uck refactor this
   case lookup "Authorization" (requestHeaders request) of
     Just auth -> case parseAuthorizationHeader auth of
@@ -38,7 +41,7 @@ httpBasicAuth = do
           Nothing -> unauthorized
       Left err -> sendResponseStatus HTTP.badRequest400 $ RepPlain $ toContent $ T.pack err
     _ -> do
-      setHeader "WWW-Authenticate" "Basic Realm=\"My Realm\"" -- TODO
+      setHeader "WWW-Authenticate" $ T.concat ["Basic Realm=\"", root, "\""]
       permissionDenied "Authentication required"
 
 
