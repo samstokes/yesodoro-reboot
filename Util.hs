@@ -3,9 +3,13 @@
 module Util where
 
 import Prelude
-import Control.Arrow ((&&&))
+import Control.Arrow (Arrow, (&&&), (>>>), first, second)
 import Control.Monad (foldM, unless)
 import Control.Monad.IO.Class (MonadIO, liftIO)
+import Data.ByteString (ByteString)
+import qualified Data.ByteString as B
+import qualified Data.ByteString.Base64 as B64
+import qualified Data.ByteString.Char8 as B8
 import Data.Function (on)
 import Data.List (groupBy, union)
 import Data.Monoid (Monoid, mempty)
@@ -124,3 +128,19 @@ splitBy p = foldr addUnlessP []
 
 fieldListOptions :: (Show field, Enum field, Bounded field) => [(Text, field)]
 fieldListOptions = map (Text.pack . show &&& id) [minBound .. maxBound]
+
+
+both :: Arrow a => a b c -> a (b, b) (c, c)
+both f = first f >>> second f
+
+
+type BasicAuthCredentials = (Text, Text)
+parseAuthorizationHeader :: ByteString -> Either String BasicAuthCredentials
+parseAuthorizationHeader auth = case B.splitAt (B.length "Basic ") auth of
+    ("Basic ", b64creds) -> do
+      decoded <- B64.decode b64creds
+      case B.split colon decoded of
+        [username, password] -> Right $ both (Text.pack . B8.unpack) (username, password)
+        _ -> Left "malformed credentials!"
+    _ -> Left "malformed Authorization header!"
+  where colon = B.head ":" -- WTF

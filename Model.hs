@@ -8,9 +8,11 @@ module Model where
 import Prelude
 import Yesod
 
-import Control.Applicative ((<$>))
+import Control.Applicative ((<$>), (<*>), pure)
 import Control.Monad ((>=>))
-import Data.Text (Text)
+import Data.Aeson (FromJSON, parseJSON, (.:), (.:?))
+import qualified Data.Aeson as J
+import Data.Text (Text, unpack)
 import Data.Time (Day, TimeZone, UTCTime, NominalDiffTime)
 import Database.Persist.Quasi (lowerCaseSettings)
 import Database.Persist.GenericSql (SqlPersist)
@@ -47,6 +49,14 @@ derivePersistField "FlagsFeature"
 data Schedule = Once | Daily | Weekly | Fortnightly
   deriving (Show, Read, Eq, Enum, Bounded)
 derivePersistField "Schedule"
+
+instance FromJSON Schedule where
+  parseJSON (J.String s) = case reads (unpack s) of
+      [(schedule, "")] -> pure schedule
+      _ -> err "not a schedule: "
+    where err = fail . (++ unpack s)
+  parseJSON v = fail $ "can't parse as schedule: " ++ show v
+
 
 scheduleRecurrence :: Num a => Schedule -> Maybe a
 scheduleRecurrence Once = Nothing
@@ -99,6 +109,12 @@ selectUserTasksSince userId doneSince = selectList (belongsToUser ++ doneSinceLi
 
 data NewTask = NewTask { newTaskTitle :: Text, newTaskSchedule :: Schedule } deriving (Show)
 
+
+instance FromJSON NewTask where
+  parseJSON (Object o) = NewTask
+      <$> (o .: "title")
+      <*> (fromMaybe Once <$> o .:? "schedule")
+  parseJSON v = fail $ "can't parse task: " ++ show v
 
 
 createTask :: PersistStore SqlPersist m => UserId -> UTCTime -> Int -> NewTask -> SqlPersist m TaskId
