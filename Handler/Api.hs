@@ -15,8 +15,24 @@ postApiTasksR = do
   userId <- httpBasicAuth
   newTask <- parseJsonBody_ -- TODO error page is HTML, not friendly!
 
-  taskId <- runDB $ createTaskAtBottom userId newTask
-  sendResponseCreated $ TaskR taskId
+  existingTask <- case newTaskExt newTask of
+    Just extTask -> runDB $ findTaskByExtTask userId extTask
+    Nothing -> return Nothing
+
+  case existingTask of
+    Just (Entity taskId _) -> do
+      (updated, _) <- runDB $ updateTask undefined (TaskSyncEdit newTask) taskId
+      setLocation $ TaskR taskId
+      jsonToRepJson $ object ["updated" .= updated]
+    Nothing -> do
+      taskId <- runDB $ createTaskAtBottom userId newTask
+      sendResponseCreated $ TaskR taskId
+
+
+setLocation :: Route master -> GHandler sub master ()
+setLocation url = do
+  r <- getUrlRender
+  setHeader "Location" $ r url
 
 
 data AuthError = AuthCredentialsNotSupplied

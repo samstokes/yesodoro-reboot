@@ -262,6 +262,7 @@ recurTask tz time taskEntity = do
 
 data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
               | TaskOrderEdit { taskOrderDelta :: Int }
+              | TaskSyncEdit { taskSyncTask :: NewTask }
               deriving (Show)
 
 
@@ -278,6 +279,7 @@ updateTask tz edit taskId = do
       | taskTitle task /= title = update taskId [TaskTitle =. title] >> return True
       | otherwise               = return False
     updateTask' (TaskOrderEdit delta) task = reorderTaskN delta tz (taskId, task)
+    updateTask' (TaskSyncEdit (NewTask newTitle _ _)) task = updateTask' (TaskTitleEdit newTitle) task
 
 
 data Direction = Up | Down deriving (Show, Enum, Bounded)
