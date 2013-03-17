@@ -10,10 +10,17 @@
   <td .schedule>
     $maybe label <- scheduleLabel (taskSchedule task)
       <span .schedule-label>#{label}
-  <th .title>
-    <div .title>#{taskTitle task}
-    <form .hidden method=POST action=@?{putR (TaskR taskId)} enctype=#{editTaskEnctype}>
-      ^{editTaskWidget}
+  <th .title :isJust maybeExtTask:.ext-link>
+    $maybe extTask <- maybeExtTask
+      [#{extTaskExtSourceName extTask} #{extTaskExtId extTask}] 
+      <a .title
+        :isJust (extTaskExtUrl extTask):href="#{extTaskExtUrl extTask}"
+        target=_blank>
+        #{taskTitle task}
+    $nothing
+      <div .title>#{taskTitle task}
+      <form .hidden method=POST action=@?{putR (TaskR taskId)} enctype=#{editTaskEnctype}>
+        ^{editTaskWidget}
   <td>
     $if (taskDone task)
       ^{oneButton "btn btn-inverse" "☹" (RestartTaskR taskId)}

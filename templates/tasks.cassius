@@ -27,6 +27,8 @@ section#plans form label
     text-decoration: line-through
 .task.overdue .title
     color: #dd0000
+.task .title.ext-link .title
+    font-style: italic
 h2.collapsed
   font-style: italic
 

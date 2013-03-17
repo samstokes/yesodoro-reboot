@@ -1,7 +1,7 @@
 $(function () {
   var edit = false;
 
-  var container = $('#task-#{taskId} .title');
+  var container = $('#task-#{taskId} .title').not('.ext-link');
   var title = container.find('.title');
   var form = container.find('form');
   var textBox = form.find('input[type=text]');

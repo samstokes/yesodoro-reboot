@@ -71,6 +71,15 @@ scheduleLabel Weekly = Just "♹"
 scheduleLabel Fortnightly = Just "♹♹"
 
 
+newtype ExternalIdent = ExternalIdent { unExternalIdent :: Text }
+  deriving (Read, Show, FromJSON, ToMarkup)
+derivePersistField "ExternalIdent"
+
+newtype ExternalSourceName = ExternalSourceName { unExternalSourceName :: Text }
+  deriving (Read, Show, FromJSON, ToMarkup)
+derivePersistField "ExternalSourceName"
+
+
 -- You can define all of your database entities in the entities file.
 -- You can find more information on persistent and how to declare entities
 -- at:
@@ -96,6 +105,22 @@ instance ToJavascript PersistValue where
   toJavascript _ = undefined
 
 
+data NewExtTask = NewExtTask
+                   { newExtTaskExtId :: ExternalIdent
+                   , newExtTaskExtSourceName :: ExternalSourceName
+                   , newExtTaskExtUrl :: Maybe Text
+                   }
+  deriving (Show)
+
+
+instance FromJSON NewExtTask where
+  parseJSON (Object o) = NewExtTask
+      <$> (o .: "extId")
+      <*> (o .: "extSource")
+      <*> (o .:? "extUrl")
+  parseJSON v = fail $ "can't parse external task link: " ++ show v
+
+
 newtype TaskState = TaskState Text
   deriving (ToMarkup, IsString)
 
@@ -107,18 +132,25 @@ selectUserTasksSince userId doneSince = selectList (belongsToUser ++ doneSinceLi
     doneSinceLimit = [TaskDoneAt ==. Nothing] ||. [TaskDoneAt >=. Just doneSince]
 
 
-data NewTask = NewTask { newTaskTitle :: Text, newTaskSchedule :: Schedule } deriving (Show)
+data NewTask = NewTask
+                { newTaskTitle :: Text
+                , newTaskSchedule :: Schedule
+                , newTaskExt :: Maybe NewExtTask
+                }
+      deriving (Show)
 
 
 instance FromJSON NewTask where
   parseJSON (Object o) = NewTask
       <$> (o .: "title")
       <*> (fromMaybe Once <$> o .:? "schedule")
+      <*> (o .:? "extTask")
   parseJSON v = fail $ "can't parse task: " ++ show v
 
 
 createTask :: PersistStore SqlPersist m => UserId -> UTCTime -> Int -> NewTask -> SqlPersist m TaskId
-createTask uid scheduledFor order (NewTask title schedule) = do
+createTask uid scheduledFor order (NewTask title schedule mExt) = do
+  mExtId <- maybeM Nothing (fmap Just . insert) $ newExtTask uid <$> mExt
   insert Task {
       taskUser = uid
     , taskTitle = title
@@ -128,6 +160,15 @@ createTask uid scheduledFor order (NewTask title schedule) = do
     , taskActive = True
     , taskOrder = order
     , taskSchedule = schedule
+    , taskExtTask = mExtId
+    }
+
+newExtTask :: UserId -> NewExtTask -> ExtTask
+newExtTask uid (NewExtTask extId sourceName url) = ExtTask {
+    extTaskUser = uid
+  , extTaskExtId = extId
+  , extTaskExtSourceName = sourceName
+  , extTaskExtUrl = url
   }
 
 createTaskAtBottom :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> NewTask -> SqlPersist m TaskId
@@ -156,6 +197,7 @@ cloneTask order task = Task {
   , taskActive = True
   , taskOrder = order
   , taskSchedule = taskSchedule task
+  , taskExtTask = Nothing
   }
 
 
@@ -310,3 +352,7 @@ pauseTask taskId = update taskId [TaskActive =. False]
 
 unpauseTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()
 unpauseTask taskId = update taskId [TaskActive =. True] >> unpostponeTask taskId
+
+
+taskGetExtTask :: PersistStore SqlPersist m => Task -> SqlPersist m (Maybe ExtTask)
+taskGetExtTask task = maybeM Nothing get $ taskExtTask task

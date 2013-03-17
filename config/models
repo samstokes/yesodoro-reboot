@@ -10,6 +10,14 @@ Email
     verkey Text Maybe
     UniqueEmail email
 
+ExtTask
+    user UserId
+    extId ExternalIdent
+    extSourceName ExternalSourceName
+    extUrl Text Maybe
+
+    UniqueExtTaskSourceId user extSourceName extId
+
 Task
     user UserId
     title Text
@@ -19,6 +27,7 @@ Task
     active Bool default=true
     order Int
     schedule Schedule default='Once'
+    extTask ExtTaskId Maybe
 
     UniqueTaskOrder user order
 Estimate

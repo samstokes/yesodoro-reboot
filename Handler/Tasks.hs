@@ -60,7 +60,9 @@ getTasksR = do
   let
       has feature = hasFlag feature $ userFeatures user
       planTr (Entity planId plan) = $(widgetFile "plans/plan-tr")
-      taskTr (Entity taskId task, estimateEntities, noteEntities) = $(widgetFile "tasks/task-tr")
+      taskTr (Entity taskId task, estimateEntities, noteEntities) = do
+        maybeExtTask <- lift $ runDB $ taskGetExtTask task
+        $(widgetFile "tasks/task-tr")
    in defaultLayout $ do
         title <- lift appTitle
         setTitle $ toMarkup title

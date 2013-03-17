@@ -23,6 +23,7 @@ newTaskForm :: Form NewTask
 newTaskForm = renderBootstrap $ NewTask
     <$> areq textField titleSettings Nothing
     <*> areq (radioFieldList' fieldListOptions) scheduleSettings (pure Once)
+    <*> pure Nothing
   where
     titleSettings = fieldSettingsWithAttrs "Title" [("placeholder", "Add a task")]
     scheduleSettings = fieldSettingsWithAttrs "Schedule" [("class", "inline")]
