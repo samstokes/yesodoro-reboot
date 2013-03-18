@@ -15,6 +15,7 @@ ExtTask
     extId ExternalIdent
     extSourceName ExternalSourceName
     extUrl Text Maybe
+    extStatus Text Maybe
 
     UniqueExtTaskSourceId user extSourceName extId
 

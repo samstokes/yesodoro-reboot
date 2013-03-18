@@ -12,7 +12,11 @@
       <span .schedule-label>#{label}
   <th .title :isJust maybeExtTask:.ext-link>
     $maybe extTask <- maybeExtTask
-      [#{extTaskExtSourceName extTask} #{extTaskExtId extTask}] 
+      [
+        #{extTaskExtSourceName extTask} #{extTaskExtId extTask}
+        $maybe status <- extTaskExtStatus extTask
+          \ (#{status})
+      ] 
       <a .title
         :isJust (extTaskExtUrl extTask):href="#{extTaskExtUrl extTask}"
         target=_blank>

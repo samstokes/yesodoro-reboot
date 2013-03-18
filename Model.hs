@@ -109,6 +109,7 @@ data NewExtTask = NewExtTask
                    { newExtTaskExtId :: ExternalIdent
                    , newExtTaskExtSourceName :: ExternalSourceName
                    , newExtTaskExtUrl :: Maybe Text
+                   , newExtTaskExtStatus :: Maybe Text
                    }
   deriving (Show)
 
@@ -118,6 +119,7 @@ instance FromJSON NewExtTask where
       <$> (o .: "extId")
       <*> (o .: "extSource")
       <*> (o .:? "extUrl")
+      <*> (o .:? "extStatus")
   parseJSON v = fail $ "can't parse external task link: " ++ show v
 
 
@@ -164,11 +166,12 @@ createTask uid scheduledFor order (NewTask title schedule mExt) = do
     }
 
 newExtTask :: UserId -> NewExtTask -> ExtTask
-newExtTask uid (NewExtTask extId sourceName url) = ExtTask {
+newExtTask uid (NewExtTask extId sourceName url status) = ExtTask {
     extTaskUser = uid
   , extTaskExtId = extId
   , extTaskExtSourceName = sourceName
   , extTaskExtUrl = url
+  , extTaskExtStatus = status
   }
 
 
@@ -176,7 +179,7 @@ class GetExtTask a where
   getExtTask :: PersistUnique SqlPersist m => UserId -> a -> SqlPersist m (Maybe (Entity ExtTask))
 
 instance GetExtTask NewExtTask where
-  getExtTask userId (NewExtTask extId source _) = getBy $ UniqueExtTaskSourceId userId source extId
+  getExtTask userId (NewExtTask extId source _ _) = getBy $ UniqueExtTaskSourceId userId source extId
 
 
 syncExtTask :: (PersistQuery SqlPersist m, PersistUnique SqlPersist m) => UserId -> NewExtTask -> SqlPersist m Bool
@@ -194,9 +197,10 @@ updateExtTask newExt extTaskId = do
         (updated,) <$> if updated then get extTaskId else return $ Just extTask
       Nothing -> return (False, Nothing)
   where
-    updateExtTask' (NewExtTask _ _ newUrl) (ExtTask _ _ _ oldUrl)
-      | newUrl /= oldUrl = update extTaskId [
+    updateExtTask' (NewExtTask _ _ newUrl newStatus) (ExtTask _ _ _ oldUrl oldStatus)
+      | newUrl /= oldUrl || newStatus /= oldStatus = update extTaskId [
           ExtTaskExtUrl =. newUrl
+        , ExtTaskExtStatus =. newStatus
         ] >> return True
       | otherwise = return False
 
