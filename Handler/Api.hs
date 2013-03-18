@@ -15,15 +15,18 @@ postApiTasksR = do
   userId <- httpBasicAuth
   newTask <- parseJsonBody_ -- TODO error page is HTML, not friendly!
 
-  existingTask <- case newTaskExt newTask of
-    Just extTask -> runDB $ findTaskByExtTask userId extTask
-    Nothing -> return Nothing
+  (extUpdated, existingTask) <- case newTaskExt newTask of
+    Just extTask -> runDB $ do
+      updated <- syncExtTask userId extTask
+      existingTask <- findTaskByExtTask userId extTask
+      return (updated, existingTask)
+    Nothing -> return (False, Nothing)
 
   case existingTask of
     Just (Entity taskId _) -> do
-      (updated, _) <- runDB $ updateTask undefined (TaskSyncEdit newTask) taskId
+      (taskUpdated, _) <- runDB $ updateTask undefined (TaskSyncEdit newTask) taskId
       setLocation $ TaskR taskId
-      jsonToRepJson $ object ["updated" .= updated]
+      jsonToRepJson $ object ["updated" .= (taskUpdated || extUpdated)]
     Nothing -> do
       taskId <- runDB $ createTaskAtBottom userId newTask
       sendResponseCreated $ TaskR taskId

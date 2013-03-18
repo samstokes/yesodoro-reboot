@@ -179,6 +179,28 @@ instance GetExtTask NewExtTask where
   getExtTask userId (NewExtTask extId source _) = getBy $ UniqueExtTaskSourceId userId source extId
 
 
+syncExtTask :: (PersistQuery SqlPersist m, PersistUnique SqlPersist m) => UserId -> NewExtTask -> SqlPersist m Bool
+syncExtTask userId extTask = do
+  existingExtTaskId <- fmap entityKey <$> getExtTask userId extTask
+  maybeM False (fmap fst . updateExtTask extTask) existingExtTaskId
+
+
+updateExtTask :: PersistQuery SqlPersist m => NewExtTask -> ExtTaskId -> SqlPersist m (Bool, Maybe ExtTask)
+updateExtTask newExt extTaskId = do
+    mExtTask <- get extTaskId
+    case mExtTask of
+      Just extTask -> do
+        updated <- updateExtTask' newExt extTask
+        (updated,) <$> if updated then get extTaskId else return $ Just extTask
+      Nothing -> return (False, Nothing)
+  where
+    updateExtTask' (NewExtTask _ _ newUrl) (ExtTask _ _ _ oldUrl)
+      | newUrl /= oldUrl = update extTaskId [
+          ExtTaskExtUrl =. newUrl
+        ] >> return True
+      | otherwise = return False
+
+
 createTaskAtBottom :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> NewTask -> SqlPersist m TaskId
 createTaskAtBottom userId task = do
   time <- now
