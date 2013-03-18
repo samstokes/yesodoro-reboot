@@ -227,8 +227,9 @@ duplicateTask tz scheduledFor taskEntity = do
 
 
 deleteTask :: PersistQuery SqlPersist m => Entity Task -> SqlPersist m ()
-deleteTask (Entity taskId _) = do
+deleteTask (Entity taskId task) = do
   deleteCascade taskId
+  maybeM () delete $ taskExtTask task
 
 
 recurTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> UTCTime -> Entity Task -> SqlPersist m (Maybe TaskId)
