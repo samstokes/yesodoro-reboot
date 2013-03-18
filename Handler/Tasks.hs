@@ -8,7 +8,6 @@ import qualified Data.Text as Text
 import Data.Text.Read (decimal)
 import System.Locale (defaultTimeLocale)
 import Database.Persist.Query.Internal (Update)
-import Database.Persist.Store (deleteCascade)
 import Forms
 import Data.Aeson.Types (toJSON)
 import Text.Blaze (toMarkup)
@@ -146,8 +145,8 @@ currentUserTimeZone = userTimeZone <$> entityVal <$> requireAuth
 
 deleteTaskR :: TaskId -> Handler RepHtml
 deleteTaskR taskId = do
-  _ <- authedTask taskId
-  runDB $ deleteCascade taskId
+  task <- authedTask taskId
+  runDB $ deleteTask (Entity taskId task)
   redirect TasksR
 
 

@@ -184,6 +184,11 @@ duplicateTask tz scheduledFor taskEntity = do
     copyEstimate newTaskId (Estimate _ pomos) = insert $ Estimate newTaskId pomos
 
 
+deleteTask :: PersistQuery SqlPersist m => Entity Task -> SqlPersist m ()
+deleteTask (Entity taskId _) = do
+  deleteCascade taskId
+
+
 recurTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> UTCTime -> Entity Task -> SqlPersist m (Maybe TaskId)
 recurTask tz time taskEntity = do
     let recurrence = scheduleRecurrence $ taskSchedule (entityVal taskEntity)
