@@ -32,6 +32,13 @@ postApiTasksR = do
       sendResponseCreated $ TaskR taskId
 
 
+getApiExtTasksForSourceR :: ExternalSourceName -> Handler RepJson
+getApiExtTasksForSourceR source = do
+  userId <- httpBasicAuth
+  extTasks <- runDB $ allExtTasksForSource userId source
+  jsonToRepJson $ map entityVal extTasks
+
+
 setLocation :: Route master -> GHandler sub master ()
 setLocation url = do
   r <- getUrlRender

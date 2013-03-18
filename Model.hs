@@ -10,7 +10,7 @@ import Yesod
 
 import Control.Applicative ((<$>), (<*>), pure)
 import Control.Monad ((>=>))
-import Data.Aeson (FromJSON, parseJSON, (.:), (.:?))
+import Data.Aeson (FromJSON, ToJSON, parseJSON, (.:), (.:?))
 import qualified Data.Aeson as J
 import Data.Text (Text, unpack)
 import Data.Time (Day, TimeZone, UTCTime, NominalDiffTime)
@@ -72,11 +72,11 @@ scheduleLabel Fortnightly = Just "♹♹"
 
 
 newtype ExternalIdent = ExternalIdent { unExternalIdent :: Text }
-  deriving (Read, Show, FromJSON, ToMarkup)
+  deriving (Read, Show, FromJSON, ToJSON, ToMarkup)
 derivePersistField "ExternalIdent"
 
 newtype ExternalSourceName = ExternalSourceName { unExternalSourceName :: Text }
-  deriving (Read, Show, FromJSON, ToMarkup)
+  deriving (Eq, Read, Show, FromJSON, ToJSON, ToMarkup, PathPiece)
 derivePersistField "ExternalSourceName"
 
 
@@ -87,6 +87,14 @@ derivePersistField "ExternalSourceName"
 share [mkPersist sqlSettings, mkMigrate "migrateAll", mkDeleteCascade]
     $(persistFileWith lowerCaseSettings "config/models")
 
+instance ToJSON ExtTask where
+  toJSON (ExtTask user extId source url status) = object
+    [ "user_id" .= user
+    , "ext_id" .= extId
+    , "ext_source_name" .= source
+    , "ext_url" .= url
+    , "ext_status" .= status
+    ]
 
 
 instance ToMarkup (Key a b) where
@@ -401,3 +409,10 @@ unpauseTask taskId = update taskId [TaskActive =. True] >> unpostponeTask taskId
 
 taskGetExtTask :: PersistStore SqlPersist m => Task -> SqlPersist m (Maybe ExtTask)
 taskGetExtTask task = maybeM Nothing get $ taskExtTask task
+
+
+allExtTasksForSource :: PersistQuery SqlPersist m => UserId -> ExternalSourceName -> SqlPersist m [Entity ExtTask]
+allExtTasksForSource userId source = selectList [
+    ExtTaskUser ==. userId
+  , ExtTaskExtSourceName ==. source
+  ] []
