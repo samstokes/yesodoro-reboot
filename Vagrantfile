@@ -18,5 +18,6 @@ Vagrant.configure("2") do |config|
     chef.cookbooks_path = "#{CHEF_KITCHEN}/cookbooks"
     chef.add_recipe 'apt'
     chef.add_recipe 'keter'
+    chef.add_recipe 'yesodoro'
   end
 end
