@@ -3,3 +3,4 @@ config/client_session_key.aes
 dist
 static/tmp
 tags
+.vagrant/
