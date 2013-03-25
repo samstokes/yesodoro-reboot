@@ -16,8 +16,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision :chef_solo do |chef|
     chef.cookbooks_path = "#{CHEF_KITCHEN}/cookbooks"
-    chef.add_recipe 'apt'
-    chef.add_recipe 'keter'
-    chef.add_recipe 'yesodoro'
+    chef.roles_path = "#{CHEF_KITCHEN}/roles"
+    chef.add_role 'yesodoro_app'
   end
 end
