@@ -1,0 +1,4 @@
+exec: ../dist/build/yesodoro-reboot/yesodoro-reboot
+args:
+  - Staging
+host: '*'
