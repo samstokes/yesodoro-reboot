@@ -3,3 +3,7 @@ config/client_session_key.aes
 dist
 static/tmp
 tags
+.vagrant/
+keter/
+yesodoro-reboot.keter
+config/postgresql-*.yml
