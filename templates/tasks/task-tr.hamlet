@@ -5,8 +5,9 @@
         ⇳
         <form .hidden method=POST action=@{ReorderTaskR taskId} enctype=#{reorderTaskEnctype}>
           ^{reorderTaskWidget}
-  <td .notes>
-    ^{notesWidget taskId noteEntities}
+  $if has FeatureNotes
+    <td .notes>
+      ^{notesWidget taskId noteEntities}
   <td .schedule>
     $maybe label <- scheduleLabel (taskSchedule task)
       <span .schedule-label>#{label}
