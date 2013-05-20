@@ -144,7 +144,7 @@ instance Yesod App where
     addStaticContent = addStaticContentExternal minifym base64md5 Settings.staticDir (StaticR . flip StaticRoute [])
 
     -- Place Javascript at bottom of the body tag so the rest of the page loads first
-    jsLoader _ = BottomOfBody
+    jsLoader _ = BottomOfHeadBlocking
 
 
 appTitle :: Handler Text
