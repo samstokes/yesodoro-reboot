@@ -1,1 +1,6 @@
-<span ##{widgetId} .expandy-indicator> #{expandyIndicator initialState}
+<span ##{widgetId} .expandy-indicator> 
+  #{expandyIndicator initialState}
+  <script language=javascript>
+    \$(function () {
+      expandy('#{widgetId}', '#{handleSelector}', '#{targetSelector}');
+    });

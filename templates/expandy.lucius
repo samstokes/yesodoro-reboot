@@ -1,3 +1,0 @@
-.#{widgetId}-expandy-handle {
-  cursor: pointer;
-}

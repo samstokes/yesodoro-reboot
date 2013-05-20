@@ -5,7 +5,6 @@ module Widget.Expandy
 
 import Prelude
 
-import Data.Aeson (toJSON)
 import Data.Text (Text)
 import Yesod (GWidget, addScriptEither, getYesod, newIdent)
 import Yesod.Default.Util (widgetFileNoReload)
