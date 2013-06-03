@@ -20,6 +20,13 @@ postCompletePlanR planId = do
   jsonToRepJson $ Entity planId plan { planDoneAt = Just time }
 
 
+deletePlanR :: PlanId -> Handler RepJson
+deletePlanR planId = do
+  _ <- authedPlan planId
+  runDB $ delete planId
+  jsonToRepJson $ object ["deleted" .= True]
+
+
 
 authedPlan :: PlanId -> Handler (Entity Plan)
 authedPlan planId = do

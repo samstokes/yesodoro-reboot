@@ -147,4 +147,12 @@ function PlansCtrl($scope, $http) {
         self.removePlan(plan);
       });
   };
+
+  $scope.deletePlan = function (plan) {
+    var self = this;
+    $http.delete("/plans/" + plan.id)
+      .success(function (data, status, headers, config) {
+        self.removePlan(plan);
+      });
+  };
 }

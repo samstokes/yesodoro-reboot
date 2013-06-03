@@ -22,6 +22,7 @@
 /tasks/#TaskId/pomos TaskPomosR POST
 
 /plans PlansR POST
+/plans/#PlanId PlanR DELETE
 /plans/#PlanId/complete CompletePlanR POST
 
 /tasks/#TaskId/notes TaskNotesR POST

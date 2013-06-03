@@ -14,6 +14,8 @@ $if has FeaturePlans
           <td .body>{{plan.plan.body}}
           <td>
             <button .btn .btn-success ng-click="completePlan(plan)">✓
+          <td>
+            <button .btn .btn-danger ng-click="deletePlan(plan)">☠
 
 <section #todo>
   <h2>
