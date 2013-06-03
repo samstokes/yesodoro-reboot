@@ -36,6 +36,7 @@ library
                      Handler.Tasks
                      Handler.Plans
                      Util
+                     Util.Angular
                      Widget.Expandy
 
     if flag(dev) || flag(library-only)
@@ -91,6 +92,8 @@ library
                  , old-locale                    >= 1.0        && < 1.1
                  , base64-bytestring
                  , http-types
+                 , data-default
+                 , cookie
 
 executable         yesodoro-reboot
     if flag(library-only)
