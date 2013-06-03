@@ -20,6 +20,8 @@ section#plans form label
   opacity: 0.1
 .plan:hover .btn
   opacity: inherit
+.plan.broken .body
+  text-decoration: line-through
 
 .task .title
     text-align: left

@@ -127,6 +127,8 @@ function PlansCtrl($scope, $http) {
     $http.post("/plans", plan.plan)
       .success(function (data, status, headers, config) {
         plan.id = data.id;
+      }).error(function (data, status, headers, config) {
+        plan.broken = true;
       });
   };
 
