@@ -20,6 +20,16 @@ postCompletePlanR planId = do
   jsonToRepJson $ Entity planId plan { planDoneAt = Just time }
 
 
+putPlanR :: PlanId -> Handler RepJson
+putPlanR planId = do
+  _ <- authedPlan planId
+  editedPlan <- parseJsonBody_ -- TODO error page is HTML, not friendly!
+  (_, mCurrentPlan) <- runDB $ updatePlan editedPlan planId
+  case mCurrentPlan of
+    Just plan -> jsonToRepJson $ Entity planId plan
+    Nothing -> notFound
+
+
 deletePlanR :: PlanId -> Handler RepJson
 deletePlanR planId = do
   _ <- authedPlan planId

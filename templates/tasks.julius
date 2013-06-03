@@ -122,7 +122,7 @@ $(function () {
 var app = angular.module('HibiApp', []);
 
 
-app.controller('PlansCtrl', function ($scope, $http) {
+app.controller('PlansCtrl', function ($scope, $http, $log, $timeout) {
   $scope.plans = #{toJSON activePlans};
 
   $scope.addNewPlan = function () {
@@ -161,6 +161,48 @@ app.controller('PlansCtrl', function ($scope, $http) {
       .success(function (data, status, headers, config) {
         self.removePlan(plan);
       });
+  };
+
+  $scope.switchToEdit = function (event) {
+    var elem = event.target;
+    var editor = $(elem.parentNode).find('input.editor');
+    $timeout(function () { editor.focus(); });
+    this.original = this.plan.plan.body;
+    this.editing = true;
+  };
+
+  $scope.save = function (plan) {
+    var self = this;
+
+    $http.put("/plans/" + plan.id, plan.plan)
+      .success(function (data, status, headers, config) {
+        self.leaveEdit();
+      }).error(function (data, status, headers, config) {
+        $log.warn("Failed to update plan:", arguments);
+        self.leaveEdit(true);
+      });
+  };
+
+  $scope.leaveEdit = function (discard) {
+    this.editing = false;
+
+    if (discard) {
+      this.plan.plan.body = this.original;
+    }
+  };
+
+  $scope.editorBlur = function () {
+    if (this.editing) {
+      this.save(this.plan);
+    }
+  };
+
+  $scope.editorKeyup = function (event) {
+    switch (event.keyCode) {
+    case 13: this.save(this.plan); break;
+    case 27: this.leaveEdit(true); break;
+    default: /* noop */
+    }
   };
 });
 

@@ -1,10 +1,12 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 
 module Model.Plan
     ( selectUserPlansSince
     , NewPlan(..), createPlan
+    , updatePlan
     , planDone
     , planDoneDay
     ) where
@@ -67,3 +69,17 @@ planDone = isJust . planDoneAt
 
 planDoneDay :: TimeZone -> Plan -> Maybe Day
 planDoneDay tz = fmap (utcToLocalDay tz) . planDoneAt
+
+
+updatePlan :: PersistQuery SqlPersist m => NewPlan -> PlanId -> SqlPersist m (Bool, Maybe Plan)
+updatePlan editedPlan planId = do
+  mplan <- get planId
+  case mplan of
+    Just plan -> do
+      updated <- updatePlan' editedPlan plan
+      (updated,) <$> if updated then get planId else return $ Just plan
+    Nothing -> return (False, Nothing)
+  where
+    updatePlan' (NewPlan body) plan
+      | planBody plan /= body = update planId [PlanBody =. body] >> return True
+      | otherwise = return False
