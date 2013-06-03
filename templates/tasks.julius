@@ -117,19 +117,28 @@ $(function () {
 });
 
 
-function PlansCtrl($scope) {
-  $scope.plans = [];
+function PlansCtrl($scope, $http) {
+  $scope.plans = #{toJSON activePlans};
 
   $scope.addNewPlan = function () {
     var plan = {id: '_new', plan: this.newPlan};
     this.newPlan = {};
     this.plans.splice(0, 0, plan);
+    $http.post("/plans", plan.plan)
+      .success(function (data, status, headers, config) {
+        plan.id = data.id;
+      });
   };
 
-  this.completePlan = function (plan) {
-    var index = this.plans.indexOf(plan);
-    if (index > -1) {
-      this.plans.splice(index, 1);
-    }
+  $scope.completePlan = function (plan) {
+    var self = this;
+
+    $http.post("/plans/" + plan.id + "/complete")
+      .success(function (data, status, headers, config) {
+        var index = self.plans.indexOf(plan);
+        if (index > -1) {
+          self.plans.splice(index, 1);
+        }
+      });
   };
 }

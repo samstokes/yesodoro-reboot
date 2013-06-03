@@ -2,27 +2,29 @@ module Handler.Plans where
 
 import Import
 import Util
-import Yesod.Auth (requireAuthId)
+import Util.Angular
 
-postPlansR :: Handler RepHtml
+postPlansR :: Handler RepJson
 postPlansR = do
-  userId <- requireAuthId
+  userId <- requireAuthIdPreventingXsrf
+  newPlan <- parseJsonBody_ -- TODO error page is HTML, not friendly!
+  planEntity <- runDB $ createPlan userId newPlan
+  jsonToRepJson planEntity
 
-  error "Need to implement this!"
 
-postCompletePlanR :: PlanId -> Handler RepHtml
+postCompletePlanR :: PlanId -> Handler RepJson
 postCompletePlanR planId = do
-  _ <- authedPlan planId
+  Entity _ plan <- authedPlan planId
   time <- now
   runDB $ update planId [PlanDoneAt =. Just time]
-  redirect TasksR
+  jsonToRepJson $ Entity planId plan { planDoneAt = Just time }
 
 
 
-authedPlan :: PlanId -> Handler Plan
+authedPlan :: PlanId -> Handler (Entity Plan)
 authedPlan planId = do
-  userId <- requireAuthId
+  userId <- requireAuthIdPreventingXsrf
   maybeAuthedPlan <- runDB $ selectFirst [PlanId ==. planId, PlanUser ==. userId] []
   case maybeAuthedPlan of
-    Just plan -> return $ entityVal plan
-    Nothing -> redirect TasksR
+    Just plan -> return plan
+    Nothing -> notFound

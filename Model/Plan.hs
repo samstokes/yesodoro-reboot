@@ -1,4 +1,6 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module Model.Plan
     ( selectUserPlansSince
@@ -10,13 +12,26 @@ module Model.Plan
 import Prelude
 import Yesod
 
+import Control.Applicative
 import Control.Monad.IO.Class (MonadIO)
+import Data.Aeson (FromJSON, parseJSON, (.:), ToJSON, toJSON)
 import Data.Maybe (isJust)
 import Data.Text (Text)
 import Data.Time (Day, TimeZone, UTCTime)
 import Database.Persist.GenericSql (SqlPersist)
 import Model
 import Util
+
+
+instance ToJSON Plan where
+  toJSON plan = object [
+      "body" .= planBody plan
+    , "created_at" .= planCreatedAt plan
+    , "done_at" .= planDoneAt plan
+    ]
+
+instance ToJSON (Entity Plan) where
+  toJSON (Entity k p) = object ["id" .= k, "plan" .= p]
 
 
 selectUserPlansSince :: PersistQuery SqlPersist m => UserId -> UTCTime -> [SelectOpt Plan] -> SqlPersist m [Entity Plan]
@@ -27,6 +42,10 @@ selectUserPlansSince userId doneSince = selectList (belongsToUser ++ doneSinceLi
 
 
 data NewPlan = NewPlan { newPlanBody :: Text } deriving (Show)
+
+instance FromJSON NewPlan where
+  parseJSON (Object o) = NewPlan <$> (o .: "body")
+  parseJSON v = fail $ "can't parse plan: " ++ show v
 
 newPlan :: UserId -> UTCTime -> NewPlan -> Plan
 newPlan uid createdAt (NewPlan body) = Plan {
