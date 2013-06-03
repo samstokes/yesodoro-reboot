@@ -45,6 +45,7 @@ import Text.Shakespeare.Text (stext)
 import Data.Text (Text)
 import Data.Time (TimeZone(..))
 import Util
+import Util.Angular
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -105,6 +106,8 @@ instance Yesod App where
         return . Just $ clientSessionBackend key 120
 
     defaultLayout widget = do
+        setXsrfCookie
+
         master <- getYesod
         mmsg <- getMessage
 
