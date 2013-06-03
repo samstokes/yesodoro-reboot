@@ -119,7 +119,10 @@ $(function () {
 });
 
 
-function PlansCtrl($scope, $http) {
+var app = angular.module('HibiApp', []);
+
+
+app.controller('PlansCtrl', function ($scope, $http) {
   $scope.plans = #{toJSON activePlans};
 
   $scope.addNewPlan = function () {
@@ -159,4 +162,4 @@ function PlansCtrl($scope, $http) {
         self.removePlan(plan);
       });
   };
-}
+});

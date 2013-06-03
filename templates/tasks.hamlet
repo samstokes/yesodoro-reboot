@@ -10,7 +10,7 @@ $if has FeatureSettings
         ^{oneButton "btn" (featureButtonLabel featureSetting) (ToggleFeatureR (fst featureSetting))}
 
 $if has FeaturePlans
-  <section #plans ng-app>
+  <section #plans ng-app="HibiApp">
     <h2>
       Plans
       ^{expandy Expanded "#plans h2" "#plans .content"}
