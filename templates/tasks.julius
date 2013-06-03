@@ -132,15 +132,19 @@ function PlansCtrl($scope, $http) {
       });
   };
 
+  $scope.removePlan = function (plan) {
+    var index = this.plans.indexOf(plan);
+    if (index > -1) {
+      this.plans.splice(index, 1);
+    }
+  };
+
   $scope.completePlan = function (plan) {
     var self = this;
 
     $http.post("/plans/" + plan.id + "/complete")
       .success(function (data, status, headers, config) {
-        var index = self.plans.indexOf(plan);
-        if (index > -1) {
-          self.plans.splice(index, 1);
-        }
+        self.removePlan(plan);
       });
   };
 }
