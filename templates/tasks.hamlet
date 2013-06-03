@@ -1,18 +1,19 @@
 <h1>#{title}
 
 $if has FeaturePlans
-  <section #plans>
+  <section #plans ng-app>
     <h2>
       Plans
       ^{expandy Expanded "#plans h2" "#plans .content"}
-    <div .content>
-      <form .form-inline method=POST action=@{PlansR} enctype=#{newPlanEnctype}>
-        ^{newPlanWidget}
+    <div .content ng-controller="PlansCtrl">
+      <form .form-inline ng-submit="addNewPlan()">
+        <input required placeholder="Add a plan" ng-model="newPlan.body">
         <input .btn .btn-primary type=submit value=Add>
-      $if not (null plans)
-        <table><tbody>
-          $forall plan <- activePlans
-            ^{planTr plan}
+      <table ng-show="plans.length &gt; 0"><tbody>
+        <tr .plan id="plan-{{plan.id}}" ng-repeat="plan in plans">
+          <td .body>{{plan.plan.body}}
+          <td>
+            <button .btn .btn-success ng-click="completePlan(plan)">✓
 
 <section #todo>
   <h2>

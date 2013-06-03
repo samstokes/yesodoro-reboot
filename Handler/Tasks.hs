@@ -57,13 +57,11 @@ getTasksR = do
   let doneByDay :: [(Day, [Entity Plan], [(Entity Task, [Entity Estimate], [Entity Note])])]
       doneByDay = reverse $ sortBy (comparing fst3) $ unionBothValues donePlansByDay doneTasksByDay
 
-  (newPlanWidget, newPlanEnctype) <- generateFormPost newPlanForm
   (newTaskWidget, newTaskEnctype) <- generateFormPost newTaskForm
   (editTaskWidget, editTaskEnctype) <- generateFormPost editTaskForm
   (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
   let
-      planTr (Entity planId plan) = $(widgetFile "plans/plan-tr")
       taskTr (Entity taskId task, estimateEntities, noteEntities) = do
         maybeExtTask <- lift $ runDB $ taskGetExtTask task
         $(widgetFile "tasks/task-tr")

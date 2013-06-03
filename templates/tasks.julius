@@ -115,3 +115,21 @@ $(function () {
     setupNotesHandlers(notesElem.id);
   });
 });
+
+
+function PlansCtrl($scope) {
+  $scope.plans = [];
+
+  $scope.addNewPlan = function () {
+    var plan = {id: '_new', plan: this.newPlan};
+    this.newPlan = {};
+    this.plans.splice(0, 0, plan);
+  };
+
+  this.completePlan = function (plan) {
+    var index = this.plans.indexOf(plan);
+    if (index > -1) {
+      this.plans.splice(index, 1);
+    }
+  };
+}

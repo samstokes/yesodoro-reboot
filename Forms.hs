@@ -1,6 +1,5 @@
 module Forms
-  ( newPlanForm
-  , newTaskForm
+  ( newTaskForm
   , editTaskForm
   , reorderTaskForm
   , newNoteForm
@@ -11,12 +10,6 @@ import Import
 import Util (fieldListOptions)
 
 import Control.Monad (unless)
-
-
-newPlanForm :: Form NewPlan
-newPlanForm = renderBootstrap $ NewPlan <$> areq textField bodySettings Nothing
-  where
-    bodySettings = fieldSettingsWithAttrs "Body" [("placeholder", "Add a plan")]
 
 
 newTaskForm :: Form NewTask

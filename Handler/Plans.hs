@@ -1,6 +1,5 @@
 module Handler.Plans where
 
-import Forms
 import Import
 import Util
 import Yesod.Auth (requireAuthId)
@@ -9,12 +8,7 @@ postPlansR :: Handler RepHtml
 postPlansR = do
   userId <- requireAuthId
 
-  ((result, _), _) <- runFormPost newPlanForm
-  case result of
-    FormSuccess plan -> do
-      _ <- runDB $ createPlan userId plan
-      redirect TasksR
-    _ -> undefined -- TODO
+  error "Need to implement this!"
 
 postCompletePlanR :: PlanId -> Handler RepHtml
 postCompletePlanR planId = do
