@@ -10,7 +10,7 @@ $if has FeaturePlans
         <input required placeholder="Add a plan" ng-model="newPlan.body">
         <input .btn .btn-primary type=submit value=Add>
       <table ng-show="plans.length &gt; 0"><tbody>
-        <tr .plan id="plan-{{plan.id}}" ng-class="{broken: plan.broken}" ng-repeat="plan in plans">
+        <tr .plan id="plan-{{plan.id}}" ng-class="{broken: plan.broken, going: plan.going}" ng-repeat="plan in plans">
           <td .body>{{plan.plan.body}}
           <td>
             <button .btn .btn-success ng-click="completePlan(plan)">✓

@@ -140,6 +140,7 @@ function PlansCtrl($scope, $http) {
   };
 
   $scope.completePlan = function (plan) {
+    plan.going = true;
     var self = this;
 
     $http.post("/plans/" + plan.id + "/complete")
@@ -149,6 +150,7 @@ function PlansCtrl($scope, $http) {
   };
 
   $scope.deletePlan = function (plan) {
+    plan.going = true;
     var self = this;
     $http.delete("/plans/" + plan.id)
       .success(function (data, status, headers, config) {

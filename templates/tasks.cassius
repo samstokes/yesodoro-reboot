@@ -22,6 +22,8 @@ section#plans form label
   opacity: inherit
 .plan.broken .body
   text-decoration: line-through
+.plan.going .body
+  text-decoration: line-through
 
 .task .title
     text-align: left
