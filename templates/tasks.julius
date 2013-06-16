@@ -107,12 +107,14 @@ $(function () {
     setupTaskHandlers(elem.id);
 
     var notesElem = $(elem).find('td.notes > div');
-    if (notesElem.length != 1) {
+    switch (notesElem.length) {
+    case 0: break;
+    case 1:
+      setupNotesHandlers(notesElem[0].id);
+      break;
+    default:
       console.warn("Found " + notesElem.length + " notes divs for " + elem.id);
     }
-    notesElem = notesElem[0];
-
-    setupNotesHandlers(notesElem.id);
   });
 });
 
