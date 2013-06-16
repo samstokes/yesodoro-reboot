@@ -57,7 +57,7 @@ getTasksR = do
   let doneByDay :: [(Day, [Entity Plan], [(Entity Task, [Entity Estimate], [Entity Note])])]
       doneByDay = reverse $ sortBy (comparing fst3) $ unionBothValues donePlansByDay doneTasksByDay
 
-  (newTaskWidget, newTaskEnctype) <- generateFormPost newTaskForm
+  (newTaskWidget, newTaskEnctype) <- generateFormPost (newTaskForm $ has FeatureNonDailySchedules)
   (editTaskWidget, editTaskEnctype) <- generateFormPost editTaskForm
   (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
@@ -93,9 +93,10 @@ notesWidget taskId notes = do
 
 postTasksR :: Handler RepHtml
 postTasksR = do
-  userId <- requireAuthId
+  Entity userId user <- requireAuth
+  let has feature = hasFlag feature $ userFeatures user
 
-  ((result, _), _) <- runFormPost newTaskForm
+  ((result, _), _) <- runFormPost (newTaskForm $ has FeatureNonDailySchedules)
   case result of
     FormSuccess task -> do
       _ <- runDB $ createTaskAtBottom userId task

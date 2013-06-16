@@ -32,6 +32,7 @@ data Feature = FeaturePomos
              | FeaturePlans
              | FeatureNotes
              | FeatureOverdueTasks
+             | FeatureNonDailySchedules
   deriving (Show, Read, Eq, Enum, Bounded, Ord)
 
 type Flags a = [(a, Bool)]
@@ -52,6 +53,9 @@ derivePersistField "FlagsFeature"
 data Schedule = Once | Daily | Weekly | Fortnightly
   deriving (Show, Read, Eq, Enum, Bounded)
 derivePersistField "Schedule"
+
+nonDaily :: Schedule -> Bool
+nonDaily = oneOf [Weekly, Fortnightly]
 
 instance FromJSON Schedule where
   parseJSON (J.String s) = case reads (unpack s) of

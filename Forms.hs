@@ -12,13 +12,15 @@ import Util (fieldListOptions)
 import Control.Monad (unless)
 
 
-newTaskForm :: Form NewTask
-newTaskForm = renderBootstrap $ NewTask
+newTaskForm :: Bool -> Form NewTask
+newTaskForm includeNonDaily = renderBootstrap $ NewTask
     <$> areq textField titleSettings Nothing
-    <*> areq (radioFieldList' fieldListOptions) scheduleSettings (pure Once)
+    <*> areq (radioFieldList' scheduleListOptions) scheduleSettings (pure Once)
     <*> pure Nothing
   where
     titleSettings = fieldSettingsWithAttrs "Title" [("placeholder", "Add a task")]
+    scheduleListOptions | includeNonDaily = fieldListOptions
+                        | otherwise = filter (not . nonDaily . snd) fieldListOptions
     scheduleSettings = fieldSettingsWithAttrs "Schedule" [("class", "inline")]
 
 

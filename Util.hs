@@ -79,6 +79,10 @@ instance ToMarkup a => ToMarkup (Maybe a) where
   toMarkup = maybe "" toMarkup
 
 
+oneOf :: Eq a => [a] -> a -> Bool
+oneOf = flip elem
+
+
 -- N.B. this is horribly inefficient (O(n^2) in the longer list)
 -- really want a nice merge algorithm or similar
 unionBothValues :: (Eq k, Monoid v1, Monoid v2) => [(k, v1)] -> [(k, v2)] -> [(k, v1, v2)]
