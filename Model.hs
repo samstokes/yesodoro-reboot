@@ -31,6 +31,7 @@ derivePersistField "TimeZone"
 data Feature = FeaturePomos
              | FeaturePlans
              | FeatureNotes
+             | FeatureOverdueTasks
   deriving (Show, Read, Eq, Enum, Bounded, Ord)
 
 type Flags a = [(a, Bool)]
