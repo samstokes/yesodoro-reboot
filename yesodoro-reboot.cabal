@@ -35,6 +35,7 @@ library
                      Handler.Home
                      Handler.Tasks
                      Handler.Plans
+                     Handler.Settings
                      Util
                      Util.Angular
                      Widget.Expandy
@@ -94,6 +95,7 @@ library
                  , http-types
                  , data-default
                  , cookie
+                 , safe
 
 executable         yesodoro-reboot
     if flag(library-only)

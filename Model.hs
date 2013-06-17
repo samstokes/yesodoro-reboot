@@ -12,7 +12,7 @@ import Control.Applicative ((<$>), (<*>), pure)
 import Control.Monad ((>=>))
 import Data.Aeson (FromJSON, ToJSON, parseJSON, (.:), (.:?))
 import qualified Data.Aeson as J
-import Data.Text (Text, unpack)
+import Data.Text (Text, pack, unpack)
 import Data.Time (Day, TimeZone, UTCTime, NominalDiffTime)
 import Database.Persist.Quasi (lowerCaseSettings)
 import Database.Persist.GenericSql (SqlPersist)
@@ -20,6 +20,7 @@ import Database.Persist.Store (PersistValue(..), deleteCascade)
 import Control.Monad.IO.Class (MonadIO)
 import Data.Maybe (fromMaybe, isJust)
 import Data.String (IsString)
+import Safe (readMay)
 import Text.Blaze (ToMarkup, toMarkup)
 import Text.Julius (ToJavascript, toJavascript)
 import Util
@@ -44,6 +45,11 @@ hasFlag k = fromMaybe False . lookup k
 noFlags :: Flags a
 noFlags = []
 
+toggleFlag :: Eq a => a -> Flags a -> Flags a
+toggleFlag flag oldFlags = (flag, not currentFlag) : oldFlagsWithoutFlag where
+  currentFlag = hasFlag flag oldFlags
+  oldFlagsWithoutFlag = filter ((/= flag) . fst) oldFlags
+
 defaultMissing :: (Eq a, Enum a, Bounded a) => Flags a -> Flags a
 defaultMissing flags = map (, False) missing ++ flags
   where missing = filter (not . oneOf (map fst flags)) [minBound .. maxBound]
@@ -54,6 +60,11 @@ derivePersistField "FlagsVoid"
 
 type FlagsFeature = Flags Feature
 derivePersistField "FlagsFeature"
+
+
+instance PathPiece Feature where
+  toPathPiece = pack . show
+  fromPathPiece = readMay . unpack
 
 
 data Schedule = Once | Daily | Weekly | Fortnightly
@@ -433,3 +444,9 @@ allExtTasksForSource userId source = selectList [
 
 userFeatureSettings :: User -> Flags Feature
 userFeatureSettings = defaultMissing . userFeatures
+
+
+toggleUserFeature :: PersistQuery SqlPersist m => Feature -> Entity User -> SqlPersist m ()
+toggleUserFeature feature (Entity userId user) = do
+  let features = toggleFlag feature $ userFeatures user
+  update userId [UserFeatures =. features]

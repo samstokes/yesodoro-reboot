@@ -27,6 +27,7 @@ import Handler.Api
 import Handler.Home
 import Handler.Tasks
 import Handler.Plans
+import Handler.Settings
 
 -- This line actually creates our YesodSite instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see

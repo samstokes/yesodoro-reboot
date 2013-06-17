@@ -27,5 +27,7 @@
 
 /tasks/#TaskId/notes TaskNotesR POST
 
+/settings/features/#Feature/toggle ToggleFeatureR POST
+
 /api/tasks ApiTasksR POST
 /api/ext_tasks/#ExternalSourceName ApiExtTasksForSourceR GET
