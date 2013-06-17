@@ -44,6 +44,11 @@ hasFlag k = fromMaybe False . lookup k
 noFlags :: Flags a
 noFlags = []
 
+defaultMissing :: (Eq a, Enum a, Bounded a) => Flags a -> Flags a
+defaultMissing flags = map (, False) missing ++ flags
+  where missing = filter (not . oneOf (map fst flags)) [minBound .. maxBound]
+
+
 type FlagsVoid = Flags ()
 derivePersistField "FlagsVoid"
 
@@ -424,3 +429,7 @@ allExtTasksForSource userId source = selectList [
     ExtTaskUser ==. userId
   , ExtTaskExtSourceName ==. source
   ] []
+
+
+userFeatureSettings :: User -> Flags Feature
+userFeatureSettings = defaultMissing . userFeatures

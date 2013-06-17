@@ -18,7 +18,9 @@ import Yesod.Auth (requireAuthId)
 getTasksR :: Handler RepHtml
 getTasksR = do
   Entity userId user <- requireAuth
-  let has feature = hasFlag feature $ userFeatures user
+  let
+    features = userFeatureSettings user
+    has feature = hasFlag feature features
   horizon <- ago $ weeks 2
   tasks <- runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
   plans <- runDB $ selectUserPlansSince userId horizon [Desc PlanCreatedAt, Desc PlanDoneAt]
