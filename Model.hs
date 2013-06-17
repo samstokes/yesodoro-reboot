@@ -34,6 +34,7 @@ data Feature = FeaturePomos
              | FeatureNotes
              | FeatureOverdueTasks
              | FeatureNonDailySchedules
+             | FeatureSettings
   deriving (Show, Read, Eq, Enum, Bounded, Ord)
 
 type FlagSetting a = (a, Bool)
@@ -53,6 +54,15 @@ toggleFlag flag oldFlags = (flag, not currentFlag) : oldFlagsWithoutFlag where
 defaultMissing :: (Eq a, Enum a, Bounded a) => Flags a -> Flags a
 defaultMissing flags = map (, False) missing ++ flags
   where missing = filter (not . oneOf (map fst flags)) [minBound .. maxBound]
+
+
+featureDescription :: Feature -> String
+featureDescription FeaturePomos = "Pomodoro tracking"
+featureDescription FeaturePlans = "plans"
+featureDescription FeatureNotes = "task notes"
+featureDescription FeatureOverdueTasks = "warning for overdue tasks"
+featureDescription FeatureNonDailySchedules = "more task schedule options"
+featureDescription FeatureSettings = "settings panel"
 
 
 type FlagsVoid = Flags ()

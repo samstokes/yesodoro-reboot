@@ -11,6 +11,18 @@ h1
   text-align: center
 
 
+section#settings
+  float: right
+  border-radius: 3px
+  margin: 20px
+  padding: 10px
+  background-color: rgba(91, 126, 63, 0.8)
+  border: 1px solid rgba(0, 25, 0, 0.15)
+
+section#settings h2
+  font-size: 80%
+
+
 /*section#plans form **/
   /*display: inline*/
 section#plans form label

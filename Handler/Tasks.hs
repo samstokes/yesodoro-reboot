@@ -2,7 +2,7 @@ module Handler.Tasks where
 
 import Import
 
-import Data.List (partition, sortBy)
+import Data.List (partition, sort, sortBy)
 import Data.Ord (comparing)
 import qualified Data.Text as Text
 import Data.Text.Read (decimal)
@@ -64,6 +64,9 @@ getTasksR = do
   (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
   let
+      toggleableFeatures = sort $ filter ((/= FeatureSettings) . fst) features
+      featureButtonLabel (feature, False) = Text.pack $ "Enable " ++ featureDescription feature
+      featureButtonLabel (feature, True) = Text.pack $ "Disable " ++ featureDescription feature
       taskTr (Entity taskId task, estimateEntities, noteEntities) = do
         maybeExtTask <- lift $ runDB $ taskGetExtTask task
         $(widgetFile "tasks/task-tr")

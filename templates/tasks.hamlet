@@ -1,5 +1,14 @@
 <h1>#{title}
 
+$if has FeatureSettings
+  <section #settings>
+    <h2.collapsed>
+      Settings
+      ^{expandy Collapsed "#settings h2" "#settings .content"}
+    <.content style="display: none">
+      $forall featureSetting <- toggleableFeatures
+        ^{oneButton "btn" (featureButtonLabel featureSetting) (ToggleFeatureR (fst featureSetting))}
+
 $if has FeaturePlans
   <section #plans ng-app>
     <h2>
