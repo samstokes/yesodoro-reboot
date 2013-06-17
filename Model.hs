@@ -35,7 +35,8 @@ data Feature = FeaturePomos
              | FeatureNonDailySchedules
   deriving (Show, Read, Eq, Enum, Bounded, Ord)
 
-type Flags a = [(a, Bool)]
+type FlagSetting a = (a, Bool)
+type Flags a = [FlagSetting a]
 
 hasFlag :: Eq a => a -> Flags a -> Bool
 hasFlag k = fromMaybe False . lookup k
