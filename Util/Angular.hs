@@ -23,7 +23,8 @@ setXsrfCookie :: GHandler s m ()
 setXsrfCookie = do
     request <- getRequest
     let token = reqToken request
-        secure = isSecure $ reqWaiRequest request
+        -- secure = isSecure $ reqWaiRequest request
+        secure = True -- Keter terminates SSL so "isSecure request" is False
     mapM_ (setCookie . xsrfCookie secure) token
   where xsrfCookie secure token = def {
       setCookieName = "XSRF-TOKEN"
