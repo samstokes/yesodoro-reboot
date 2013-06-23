@@ -1,6 +1,7 @@
 PROJECT=yesodoro-reboot
 ENVIRONMENT=Production
 DEPLOY_DIR=/var/keter/incoming
+FIX=fix
 
 include Makefile.local
 
@@ -19,6 +20,9 @@ $(EXE):
 
 deploy: $(KETER)
 	scp $(KETER) $(DEPLOY_HOST):$(DEPLOY_DIR)/
+
+host:
+	cd $(CHEF_KITCHEN) && $(FIX) node:$(DEPLOY_HOST)
 
 clean:
 	cabal-dev clean
