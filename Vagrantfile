@@ -29,7 +29,10 @@ Vagrant.configure("2") do |config|
     chef.add_role 'yesodoro_app'
 
     chef.json = {
-      keter: {root: KETER_ROOT},
+      keter: {
+        version: '0.3.6.1',
+        root: KETER_ROOT,
+      },
     }
   end
 end
