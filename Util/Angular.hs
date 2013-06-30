@@ -24,7 +24,11 @@ setXsrfCookie = do
     request <- getRequest
     let token = reqToken request
         -- secure = isSecure $ reqWaiRequest request
+#if DEVELOPMENT
+        secure = False
+#else
         secure = True -- Keter terminates SSL so "isSecure request" is False
+#endif
     mapM_ (setCookie . xsrfCookie secure) token
   where xsrfCookie secure token = def {
       setCookieName = "XSRF-TOKEN"
