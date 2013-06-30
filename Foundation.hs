@@ -30,6 +30,7 @@ import Yesod.Logger (Logger, logMsg, formatLogText, logLazyText)
 import Network.HTTP.Conduit (Manager)
 import qualified Settings
 import qualified Database.Persist.Store
+import Settings.Development
 import Settings.StaticFiles
 import Database.Persist.GenericSql
 import Settings (widgetFile, Extra (..))
@@ -156,8 +157,8 @@ appTitle = fmap (extraTitle . appExtra . settings) getYesod
 
 
 instance YesodJquery App where
-  urlJqueryJs _ = Left $ StaticR js_jquery_1_6_4_min_js
-  urlJqueryUiJs _ = Left $ StaticR js_jquery_ui_1_8_17_custom_min_js
+  urlJqueryJs _ = eitherDev (StaticR js_jquery_1_6_4_min_js) "//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"
+  urlJqueryUiJs _ = eitherDev (StaticR js_jquery_ui_1_8_17_custom_min_js) "//ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"
 
 -- How to run database actions.
 instance YesodPersist App where
