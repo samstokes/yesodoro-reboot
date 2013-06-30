@@ -171,16 +171,17 @@ app.controller('PlansCtrl', function ($scope, $http, $log, $timeout) {
     this.editing = true;
   };
 
-  $scope.save = function (plan) {
-    var self = this;
-
-    $http.put("/plans/" + plan.id, plan.plan)
-      .success(function (data, status, headers, config) {
-        self.leaveEdit();
-      }).error(function (data, status, headers, config) {
+  $scope.updatePlan = function (plan) {
+    return $http.put("/plans/" + plan.id, plan.plan)
+      .error(function (data, status, headers, config) {
         $log.warn("Failed to update plan:", arguments);
-        self.leaveEdit(true);
       });
+  };
+
+  $scope.save = function (plan) {
+    this.updatePlan(plan).then(
+      angular.bind(this, this.leaveEdit, false),
+      angular.bind(this, this.leaveEdit, true));
   };
 
   $scope.leaveEdit = function (discard) {
