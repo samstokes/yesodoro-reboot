@@ -227,7 +227,11 @@ app.directive('ssClickToEdit', function ($timeout) {
       };
 
       scope.save = function () {
-        this.onEdit().then(
+        var onEdit = this.onEdit();
+        if ("undefined" === typeof(onEdit)) {
+          return this.leaveEdit(false);
+        }
+        onEdit.then(
           angular.bind(this, this.leaveEdit, false),
           angular.bind(this, this.leaveEdit, true));
       };
