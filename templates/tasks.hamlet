@@ -21,8 +21,8 @@ $if has FeaturePlans
       <table ng-show="plans.length &gt; 0"><tbody>
         <tr .plan id="plan-{{plan.id}}" ng-class="{broken: plan.broken, going: plan.going}" ng-repeat="plan in plans">
           <td .body>
-            <div ng-hide="editing" ng-click="switchToEdit($event)">{{plan.plan.body}}
-            <input .editor ng-show="editing" ng-model="plan.plan.body" ng-blur="editorBlur()" ng-keyup="editorKeyup($event)">
+            <ss-click-to-edit ss-model="plan.plan.body" ss-on-edit="updatePlan(plan)">
+              {{plan.plan.body}}
           <td>
             <button .btn .btn-success ng-click="completePlan(plan)">✓
           <td>

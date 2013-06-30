@@ -122,7 +122,7 @@ $(function () {
 var app = angular.module('HibiApp', []);
 
 
-app.controller('PlansCtrl', function ($scope, $http, $log, $timeout) {
+app.controller('PlansCtrl', function ($scope, $http, $log) {
   $scope.plans = #{toJSON activePlans};
 
   $scope.addNewPlan = function () {
@@ -163,47 +163,11 @@ app.controller('PlansCtrl', function ($scope, $http, $log, $timeout) {
       });
   };
 
-  $scope.switchToEdit = function (event) {
-    var elem = event.target;
-    var editor = $(elem.parentNode).find('input.editor');
-    $timeout(function () { editor.focus(); });
-    this.original = this.plan.plan.body;
-    this.editing = true;
-  };
-
   $scope.updatePlan = function (plan) {
     return $http.put("/plans/" + plan.id, plan.plan)
       .error(function (data, status, headers, config) {
         $log.warn("Failed to update plan:", arguments);
       });
-  };
-
-  $scope.save = function (plan) {
-    this.updatePlan(plan).then(
-      angular.bind(this, this.leaveEdit, false),
-      angular.bind(this, this.leaveEdit, true));
-  };
-
-  $scope.leaveEdit = function (discard) {
-    this.editing = false;
-
-    if (discard) {
-      this.plan.plan.body = this.original;
-    }
-  };
-
-  $scope.editorBlur = function () {
-    if (this.editing) {
-      this.save(this.plan);
-    }
-  };
-
-  $scope.editorKeyup = function (event) {
-    switch (event.keyCode) {
-    case 13: this.save(this.plan); break;
-    case 27: this.leaveEdit(true); break;
-    default: /* noop */
-    }
   };
 });
 
@@ -216,5 +180,72 @@ app.directive('ngBlur', function ($parse) {
         fn(scope, {$event: event});
       });
     });
+  };
+});
+
+
+app.directive('ssClickToEdit', function ($timeout) {
+  return {
+    restrict: 'E',
+
+    scope: {
+      value: '=ssModel',
+      onEdit: '&ssOnEdit'
+    },
+
+    transclude: true,
+
+
+    template: ' \
+      <div ng-hide="editing" ng-click="switchToEdit()" ng-transclude /> \
+      <input class="editor" \
+          ng-model="value" \
+          ng-show="editing" \
+          ng-blur="editorBlur()" \
+          ng-keyup="editorKeyup($event)" \
+      /> \
+    ',
+
+
+    link: function (scope, element, attrs) {
+
+      scope.editing = false;
+
+      scope.switchToEdit = function () {
+        var editor = element.find('input.editor');
+        $timeout(function () { editor.focus(); });
+        this.original = this.value;
+        this.editing = true;
+      };
+
+      scope.leaveEdit = function (discard) {
+        this.editing = false;
+
+        if (discard) {
+          this.value = this.original;
+        }
+      };
+
+      scope.save = function () {
+        this.onEdit().then(
+          angular.bind(this, this.leaveEdit, false),
+          angular.bind(this, this.leaveEdit, true));
+      };
+
+      scope.editorBlur = function () {
+        if (this.editing) {
+          this.save();
+        }
+      };
+
+      scope.editorKeyup = function (event) {
+        switch (event.keyCode) {
+        case 13: this.save(); break;
+        case 27: this.leaveEdit(true); break;
+        default: /* noop */
+        }
+      };
+
+    }
   };
 });
