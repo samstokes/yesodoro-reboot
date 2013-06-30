@@ -157,7 +157,7 @@ appTitle = fmap (extraTitle . appExtra . settings) getYesod
 
 
 instance YesodJquery App where
-  urlJqueryJs _ = eitherDev (StaticR js_jquery_1_6_4_min_js) "//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"
+  urlJqueryJs _ = eitherDev (StaticR js_jquery_1_6_4_js) "//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"
   urlJqueryUiJs _ = eitherDev (StaticR js_jquery_ui_1_8_17_custom_min_js) "//ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"
 
 -- How to run database actions.
