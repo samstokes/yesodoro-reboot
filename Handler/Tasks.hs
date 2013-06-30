@@ -21,6 +21,9 @@ getTasksR = do
   let
     features = userFeatureSettings user
     has feature = hasFlag feature features
+    scheduleOptions = if has FeatureNonDailySchedules
+      then schedules
+      else filter (not . nonDaily) schedules
   horizon <- ago $ weeks 2
   tasks <- runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
   plans <- runDB $ selectUserPlansSince userId horizon [Desc PlanCreatedAt, Desc PlanDoneAt]
@@ -59,7 +62,7 @@ getTasksR = do
   let doneByDay :: [(Day, [Entity Plan], [(Entity Task, [Entity Estimate], [Entity Note])])]
       doneByDay = reverse $ sortBy (comparing fst3) $ unionBothValues donePlansByDay doneTasksByDay
 
-  (newTaskWidget, newTaskEnctype) <- generateFormPost (newTaskForm $ has FeatureNonDailySchedules)
+  (newTaskWidget, newTaskEnctype) <- generateFormPost (newTaskForm scheduleOptions)
   (editTaskWidget, editTaskEnctype) <- generateFormPost editTaskForm
   (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
@@ -98,10 +101,9 @@ notesWidget taskId notes = do
 
 postTasksR :: Handler RepHtml
 postTasksR = do
-  Entity userId user <- requireAuth
-  let has feature = hasFlag feature $ userFeatures user
+  userId <- requireAuthId
 
-  ((result, _), _) <- runFormPost (newTaskForm $ has FeatureNonDailySchedules)
+  ((result, _), _) <- runFormPost (newTaskForm schedules)
   case result of
     FormSuccess task -> do
       _ <- runDB $ createTaskAtBottom userId task

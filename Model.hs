@@ -81,6 +81,9 @@ data Schedule = Once | Daily | Weekly | Fortnightly
   deriving (Show, Read, Eq, Enum, Bounded)
 derivePersistField "Schedule"
 
+schedules :: [Schedule]
+schedules = [minBound .. maxBound]
+
 nonDaily :: Schedule -> Bool
 nonDaily = oneOf [Weekly, Fortnightly]
 
