@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Model.Note
     ( NewNote(..), createNote
@@ -43,3 +44,6 @@ instance ToJSON (NoteGeneric b) where
     , ("body", toJSON $ noteBody note)
     , ("createdAt", toJSON $ noteCreatedAt note)
     ]
+
+instance ToJSON (Entity Note) where
+  toJSON (Entity k n) = object ["id" .= k, "note" .= n]
