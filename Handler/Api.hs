@@ -28,7 +28,7 @@ postApiTasksR = do
       setLocation $ TaskR taskId
       jsonToRepJson $ object ["updated" .= (taskUpdated || extUpdated)]
     Nothing -> do
-      taskId <- runDB $ createTaskAtBottom userId newTask
+      Entity taskId _ <- runDB $ createTaskAtBottom userId newTask
       sendResponseCreated $ TaskR taskId
 
 

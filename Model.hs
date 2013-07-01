@@ -195,10 +195,10 @@ instance FromJSON NewTask where
   parseJSON v = fail $ "can't parse task: " ++ show v
 
 
-createTask :: PersistStore SqlPersist m => UserId -> UTCTime -> Int -> NewTask -> SqlPersist m TaskId
+createTask :: PersistStore SqlPersist m => UserId -> UTCTime -> Int -> NewTask -> SqlPersist m (Entity Task)
 createTask uid scheduledFor order (NewTask title schedule mExt) = do
   mExtId <- maybeM Nothing (fmap Just . insert) $ newExtTask uid <$> mExt
-  insert Task {
+  let task = Task {
       taskUser = uid
     , taskTitle = title
     , taskPomos = 0
@@ -209,6 +209,8 @@ createTask uid scheduledFor order (NewTask title schedule mExt) = do
     , taskSchedule = schedule
     , taskExtTask = mExtId
     }
+  taskId <- insert task
+  return $ Entity taskId task
 
 newExtTask :: UserId -> NewExtTask -> ExtTask
 newExtTask uid (NewExtTask extId sourceName url status) = ExtTask {
@@ -250,7 +252,7 @@ updateExtTask newExt extTaskId = do
       | otherwise = return False
 
 
-createTaskAtBottom :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> NewTask -> SqlPersist m TaskId
+createTaskAtBottom :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> NewTask -> SqlPersist m (Entity Task)
 createTaskAtBottom userId task = do
   time <- now
   maybeLastTask <- selectFirst [TaskUser ==. userId] [Desc TaskOrder]
