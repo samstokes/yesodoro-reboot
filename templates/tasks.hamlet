@@ -1,98 +1,99 @@
-<h1>#{title}
+<div ng-app="HibiApp">
+  <h1>#{title}
 
-$if has FeatureSettings
-  <section #settings>
-    <h2.collapsed>
-      Settings
-      ^{expandy Collapsed "#settings h2" "#settings .content"}
-    <.content style="display: none">
-      $forall featureSetting <- toggleableFeatures
-        ^{oneButton "btn" (featureButtonLabel featureSetting) (ToggleFeatureR (fst featureSetting))}
+  $if has FeatureSettings
+    <section #settings>
+      <h2.collapsed>
+        Settings
+        ^{expandy Collapsed "#settings h2" "#settings .content"}
+      <.content style="display: none">
+        $forall featureSetting <- toggleableFeatures
+          ^{oneButton "btn" (featureButtonLabel featureSetting) (ToggleFeatureR (fst featureSetting))}
 
-$if has FeaturePlans
-  <section #plans ng-app="HibiApp">
+  $if has FeaturePlans
+    <section #plans>
+      <h2>
+        Plans
+        ^{expandy Expanded "#plans h2" "#plans .content"}
+      <div .content ng-controller="PlansCtrl">
+        <form .form-inline ng-submit="addNewPlan()">
+          <input required placeholder="Add a plan" ng-model="newPlan.body">
+          <input .btn .btn-primary type=submit value=Add>
+        <table ng-show="plans.length &gt; 0"><tbody>
+          <tr .plan id="plan-{{plan.id}}" ng-class="{broken: plan.broken, going: plan.going}" ng-repeat="plan in plans">
+            <td .body>
+              <ss-click-to-edit ss-model="plan.plan.body" ss-on-edit="updatePlan(plan)">
+                {{plan.plan.body}}
+            <td>
+              <button .btn .btn-success ng-click="completePlan(plan)">✓
+            <td>
+              <button .btn .btn-danger ng-click="deletePlan(plan)">☠
+
+  <section #todo>
     <h2>
-      Plans
-      ^{expandy Expanded "#plans h2" "#plans .content"}
-    <div .content ng-controller="PlansCtrl">
-      <form .form-inline ng-submit="addNewPlan()">
-        <input required placeholder="Add a plan" ng-model="newPlan.body">
+      TODO
+      ^{expandy Expanded "#todo h2" "#todo .content"}
+
+    <div .content>
+      $if null todo
+        <p>Nothing to do. Congratulations! Why not take the rest of the day off?
+      $else
+        <table><tbody>
+          $forall taskEntityAndEstimatesAndNotes <- todo
+            ^{taskTr taskEntityAndEstimatesAndNotes}
+
+        $if has FeaturePomos
+          <h3>
+            Remaining: #{sum $ map estimatedRemaining todo} of
+            $with estimateses <- map (map entityVal) $ map snd3 todo
+              $with firstEstimates <- concatMap (take 1) estimateses
+                $with totalEstimated <- sum $ map estimatePomos firstEstimates
+                  \ #{totalEstimated} estimated
+
+      <form .form-inline method=POST action=@{TasksR} enctype=#{newTaskEnctype}>
+        ^{newTaskWidget}
         <input .btn .btn-primary type=submit value=Add>
-      <table ng-show="plans.length &gt; 0"><tbody>
-        <tr .plan id="plan-{{plan.id}}" ng-class="{broken: plan.broken, going: plan.going}" ng-repeat="plan in plans">
-          <td .body>
-            <ss-click-to-edit ss-model="plan.plan.body" ss-on-edit="updatePlan(plan)">
-              {{plan.plan.body}}
-          <td>
-            <button .btn .btn-success ng-click="completePlan(plan)">✓
-          <td>
-            <button .btn .btn-danger ng-click="deletePlan(plan)">☠
-
-<section #todo>
-  <h2>
-    TODO
-    ^{expandy Expanded "#todo h2" "#todo .content"}
-
-  <div .content>
-    $if null todo
-      <p>Nothing to do. Congratulations! Why not take the rest of the day off?
-    $else
-      <table><tbody>
-        $forall taskEntityAndEstimatesAndNotes <- todo
-          ^{taskTr taskEntityAndEstimatesAndNotes}
-
-      $if has FeaturePomos
-        <h3>
-          Remaining: #{sum $ map estimatedRemaining todo} of
-          $with estimateses <- map (map entityVal) $ map snd3 todo
-            $with firstEstimates <- concatMap (take 1) estimateses
-              $with totalEstimated <- sum $ map estimatePomos firstEstimates
-                \ #{totalEstimated} estimated
-
-    <form .form-inline method=POST action=@{TasksR} enctype=#{newTaskEnctype}>
-      ^{newTaskWidget}
-      <input .btn .btn-primary type=submit value=Add>
 
 
-$if not (null postponed)
-  <section #tomorrow>
-    <h2.collapsed>
-      Tomorrow
-      ^{expandy Collapsed "#tomorrow h2" "#tomorrow .content"}
-    <div .content style="display: none">
-      <table><tbody>
-        $forall taskEntityAndEstimatesAndNotes <- postponed
-          ^{taskTr taskEntityAndEstimatesAndNotes}
+  $if not (null postponed)
+    <section #tomorrow>
+      <h2.collapsed>
+        Tomorrow
+        ^{expandy Collapsed "#tomorrow h2" "#tomorrow .content"}
+      <div .content style="display: none">
+        <table><tbody>
+          $forall taskEntityAndEstimatesAndNotes <- postponed
+            ^{taskTr taskEntityAndEstimatesAndNotes}
 
 
-$if not (null paused)
-  <section #paused>
-    <h2.collapsed>
-      Paused (#{length paused})
-      ^{expandy Collapsed "#paused h2" "#paused .content"}
-    <div .content style="display: none">
-      <table><tbody>
-        $forall taskEntityAndEstimatesAndNotes <- paused
-          ^{taskTr taskEntityAndEstimatesAndNotes}
+  $if not (null paused)
+    <section #paused>
+      <h2.collapsed>
+        Paused (#{length paused})
+        ^{expandy Collapsed "#paused h2" "#paused .content"}
+      <div .content style="display: none">
+        <table><tbody>
+          $forall taskEntityAndEstimatesAndNotes <- paused
+            ^{taskTr taskEntityAndEstimatesAndNotes}
 
 
-$if not (null doneByDay)
-  <section #done>
-    <h2.collapsed>
-      Done
-      ^{expandy Collapsed "#done h2" "#done .content"}
-    <div .content style="display: none">
-      $forall (day, plans, taskEntitiesEstimatesNotes) <- doneByDay
-        <h3>
-          #{day}
-          $if has FeaturePomos
-            \ (#{sum $ map taskPomos $ map entityVal $ map fst3 taskEntitiesEstimatesNotes})
-        $if not (null plans)
-          $forall plan <- plans
-            <h4 .plan>
-              Completed: 
-              <span .body>#{planBody (entityVal plan)}
-        $if not (null taskEntitiesEstimatesNotes)
-          <table><tbody>
-            $forall taskEntityAndEstimatesAndNotes <- taskEntitiesEstimatesNotes
-              ^{taskTr taskEntityAndEstimatesAndNotes}
+  $if not (null doneByDay)
+    <section #done>
+      <h2.collapsed>
+        Done
+        ^{expandy Collapsed "#done h2" "#done .content"}
+      <div .content style="display: none">
+        $forall (day, plans, taskEntitiesEstimatesNotes) <- doneByDay
+          <h3>
+            #{day}
+            $if has FeaturePomos
+              \ (#{sum $ map taskPomos $ map entityVal $ map fst3 taskEntitiesEstimatesNotes})
+          $if not (null plans)
+            $forall plan <- plans
+              <h4 .plan>
+                Completed: 
+                <span .body>#{planBody (entityVal plan)}
+          $if not (null taskEntitiesEstimatesNotes)
+            <table><tbody>
+              $forall taskEntityAndEstimatesAndNotes <- taskEntitiesEstimatesNotes
+                ^{taskTr taskEntityAndEstimatesAndNotes}
