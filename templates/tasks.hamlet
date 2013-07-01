@@ -29,12 +29,46 @@
             <td>
               <button .btn .btn-danger ng-click="deletePlan(plan)">☠
 
-  <section #todo>
+  <section #newtodo>
     <h2>
-      TODO
-      ^{expandy Expanded "#todo h2" "#todo .content"}
+      NEWTODO
+      ^{expandy Expanded "#newtodo h2" "#newtodo .content"}
 
-    <div .content>
+    <div .content ng-controller="TasksCtrl">
+      <p ng-show="tasks.length == 0">
+        Nothing to do. Congratulations! Why not take the rest of the day off?
+      <table ng-hide="tasks.length == 0"><tbody>
+        <tr .task ng-repeat="task in tasks" ng-class="{broken: task.broken, going: task.going}">
+          <td .schedule>
+            <.schedule-label>{{task.task.schedule | scheduleLabel}}
+          <th .title ng-class="{'ext-link': task.task.ext_task}">
+            <ss-click-to-edit ss-model="task.task.title">
+              {{task.task.title}}
+          <td>
+            <button .btn .btn-success ng-click="completeTask(task)">☺
+          <td>
+            <button .btn ng-click="postponeTask(task)">☔
+          <td>
+            <button .btn ng-click="pauseTask(task)">||
+          <td>
+            <button .btn .btn-danger ng-click="deleteTask(task)">☠
+      <form .form-inline ng-submit="addNewTask()">
+        <.control-group>
+          <.controls>
+            <input required name="title" placeholder="Add a task" ng-model="newTask.title">
+        <.control-group>
+          <.controls>
+            $forall schedule <- scheduleOptions
+              <input type="radio" ng-model="newTask.schedule" value="#{schedule}" .inline>
+              #{schedule}
+        <input .btn .btn-primary type=submit value=Add>
+
+  <section #todo>
+    <h2.collapsed>
+      TODO
+      ^{expandy Collapsed "#todo h2" "#todo .content"}
+
+    <div .content style="display: none">
       $if null todo
         <p>Nothing to do. Congratulations! Why not take the rest of the day off?
       $else

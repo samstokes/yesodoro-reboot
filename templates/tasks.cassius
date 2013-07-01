@@ -45,6 +45,10 @@ section#plans form label
     color: #dd0000
 .task .title.ext-link .title
     font-style: italic
+.task.broken .title
+    text-decoration: line-through
+.task.going .title
+    text-decoration: line-through
 h2.collapsed
   font-style: italic
 

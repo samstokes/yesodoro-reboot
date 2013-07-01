@@ -103,19 +103,19 @@ $(function () {
     }
   });
 
-  $('tr.task').each(function (_, elem) {
-    setupTaskHandlers(elem.id);
+  //$('tr.task').each(function (_, elem) {
+  //  setupTaskHandlers(elem.id);
 
-    var notesElem = $(elem).find('td.notes > div');
-    switch (notesElem.length) {
-    case 0: break;
-    case 1:
-      setupNotesHandlers(notesElem[0].id);
-      break;
-    default:
-      console.warn("Found " + notesElem.length + " notes divs for " + elem.id);
-    }
-  });
+  //  var notesElem = $(elem).find('td.notes > div');
+  //  switch (notesElem.length) {
+  //  case 0: break;
+  //  case 1:
+  //    setupNotesHandlers(notesElem[0].id);
+  //    break;
+  //  default:
+  //    console.warn("Found " + notesElem.length + " notes divs for " + elem.id);
+  //  }
+  //});
 });
 
 
@@ -168,6 +168,91 @@ app.controller('PlansCtrl', function ($scope, $http, $log) {
       .error(function (data, status, headers, config) {
         $log.warn("Failed to update plan:", arguments);
       });
+  };
+});
+
+
+app.controller('TasksCtrl', function ($scope, $http, $log) {
+  function makeNewTask() {
+    return {
+      schedule: #{toJSON Once}
+    };
+  }
+
+  $scope.tasks = #{toJSON todo};
+  $scope.newTask = makeNewTask();
+
+  $scope.addNewTask = function () {
+    var task = {id: '_new', task: this.newTask};
+    this.newTask = makeNewTask();
+    this.tasks.splice(this.tasks.length, 0, task);
+    $http.post("/tasks", task.task)
+      .success(function (data, status, headers, config) {
+        task.id = data.id;
+        task.task = data.task;
+      }).error(function (data, status, headers, config) {
+        task.broken = true;
+      });
+  };
+
+  $scope.removeTask = function (task) {
+    var index = this.tasks.indexOf(task);
+    if (index > -1) {
+      this.tasks.splice(index, 1);
+    }
+  };
+
+  $scope.completeTask = function (task) {
+    task.going = true;
+    var self = this;
+
+    $http.post("/tasks/" + task.id + "/complete")
+      .success(function (data, status, headers, config) {
+        self.removeTask(task);
+      });
+  };
+
+  $scope.postponeTask = function (task) {
+    task.going = true;
+    var self = this;
+
+    $http.post("/tasks/" + task.id + "/postpone")
+      .success(function (data, status, headers, config) {
+        self.removeTask(task);
+      });
+  };
+
+  $scope.pauseTask = function (task) {
+    task.going = true;
+    var self = this;
+
+    $http.post("/tasks/" + task.id + "/pause")
+      .success(function (data, status, headers, config) {
+        self.removeTask(task);
+      });
+  };
+
+  $scope.deleteTask = function (task) {
+    task.going = true;
+    var self = this;
+
+    $http.delete("/tasks/" + task.id)
+      .success(function (data, status, headers, config) {
+        self.removeTask(task);
+      });
+  };
+});
+
+
+app.filter('scheduleLabel', function () {
+  var labels = {
+    #{toJSON Once}: '',
+    #{toJSON Daily}: '♳',
+    #{toJSON Weekly}: '♹',
+    #{toJSON Fortnightly}: '♹♹'
+  };
+  return function (schedule) {
+    return labels[schedule];
   };
 });
 

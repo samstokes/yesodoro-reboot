@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module Handler.Tasks where
 
 import Import
@@ -9,10 +12,18 @@ import Data.Text.Read (decimal)
 import System.Locale (defaultTimeLocale)
 import Database.Persist.Query.Internal (Update)
 import Forms
-import Data.Aeson.Types (toJSON)
+import Data.Aeson.Types (ToJSON, toJSON)
 import Text.Blaze (toMarkup)
 import Util
+import Util.Angular
 import Yesod.Auth (requireAuthId)
+
+
+instance ToJSON (Entity Task, [Entity Estimate], [Entity Note]) where
+  toJSON (Entity taskId task, estimates, notes) = object
+    [ "id" .= taskId
+    , "task" .= task
+    , "estimates" .= estimates, "notes" .= notes]
 
 
 getTasksR :: Handler RepHtml
@@ -99,16 +110,13 @@ notesWidget taskId notes = do
     in $(widgetFile "notes")
 
 
-postTasksR :: Handler RepHtml
+postTasksR :: Handler RepJson
 postTasksR = do
-  userId <- requireAuthId
+  userId <- requireAuthIdPreventingXsrf
 
-  ((result, _), _) <- runFormPost (newTaskForm schedules)
-  case result of
-    FormSuccess task -> do
-      _ <- runDB $ createTaskAtBottom userId task
-      redirect TasksR
-    _ -> undefined -- TODO
+  newTask <- parseJsonBody_ -- TODO error page is HTML, not friendly!
+  taskEntity <- runDB $ createTaskAtBottom userId newTask
+  jsonToRepJson taskEntity
 
 
 oneButton :: Text -> Text -> Route App -> Widget
@@ -131,12 +139,12 @@ updateAndRedirectR route updates taskId = do
   redirect route
 
 
-postCompleteTaskR :: TaskId -> Handler RepHtml
+postCompleteTaskR :: TaskId -> Handler RepJson
 postCompleteTaskR taskId = do
-  task <- authedTask taskId
+  taskEntity <- authedTaskPreventingXsrf taskId
   tz <- currentUserTimeZone
-  _ <- runDB $ completeTask tz (Entity taskId task)
-  redirect TasksR
+  maybeNextTime <- runDB $ completeTask tz taskEntity
+  jsonToRepJson maybeNextTime
 
 postRestartTaskR :: TaskId -> Handler RepHtml
 postRestartTaskR = updateAndRedirectR TasksR [TaskDoneAt =. Nothing]
@@ -151,15 +159,24 @@ authedTask taskId = do
       Nothing -> redirect TasksR
 
 
+authedTaskPreventingXsrf :: TaskId -> Handler (Entity Task)
+authedTaskPreventingXsrf taskId = do
+  userId <- requireAuthIdPreventingXsrf
+  maybeAuthedTask <- runDB $ selectFirst [TaskId ==. taskId, TaskUser ==. userId] []
+  case maybeAuthedTask of
+    Just task -> return task
+    Nothing -> notFound
+
+
 currentUserTimeZone :: Handler TimeZone
 currentUserTimeZone = userTimeZone <$> entityVal <$> requireAuth
 
 
-deleteTaskR :: TaskId -> Handler RepHtml
+deleteTaskR :: TaskId -> Handler RepJson
 deleteTaskR taskId = do
-  task <- authedTask taskId
-  runDB $ deleteTask (Entity taskId task)
-  redirect TasksR
+  taskEntity <- authedTaskPreventingXsrf taskId
+  runDB $ deleteTask taskEntity
+  jsonToRepJson True
 
 
 putTaskR :: TaskId -> Handler RepJson
@@ -186,11 +203,11 @@ postReorderTaskR taskId = do
     _ -> undefined -- TODO
 
 
-postPostponeTaskR :: TaskId -> Handler RepHtml
+postPostponeTaskR :: TaskId -> Handler RepJson
 postPostponeTaskR taskId = do
-  _ <- authedTask taskId
+  _ <- authedTaskPreventingXsrf taskId
   runDB $ postponeTask (days 1) taskId
-  redirect TasksR
+  jsonToRepJson True
 
 postUnpostponeTaskR :: TaskId -> Handler RepHtml
 postUnpostponeTaskR taskId = do
@@ -199,11 +216,11 @@ postUnpostponeTaskR taskId = do
   redirect TasksR
 
 
-postPauseTaskR :: TaskId -> Handler RepHtml
+postPauseTaskR :: TaskId -> Handler RepJson
 postPauseTaskR taskId = do
-  _ <- authedTask taskId
+  _ <- authedTaskPreventingXsrf taskId
   runDB $ pauseTask taskId
-  redirect TasksR
+  jsonToRepJson True
 
 postUnpauseTaskR :: TaskId -> Handler RepHtml
 postUnpauseTaskR taskId = do
