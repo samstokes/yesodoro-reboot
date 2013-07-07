@@ -269,6 +269,20 @@ app.directive('ngBlur', function ($parse) {
 });
 
 
+app.directive('ssEscape', function ($parse) {
+  return function (scope, element, attrs) {
+    var fn = $parse(attrs['ssEscape']);
+    element.bind('keydown', function (event) {
+      if (event.keyCode == 27) {
+        scope.$apply(function () {
+          fn(scope, {$event: event});
+        });
+      }
+    });
+  };
+});
+
+
 app.directive('ssClickToEdit', function ($timeout) {
   return {
     restrict: 'E',
@@ -283,12 +297,13 @@ app.directive('ssClickToEdit', function ($timeout) {
 
     template: ' \
       <div ng-hide="editing" ng-click="switchToEdit()" ng-transclude /> \
-      <input class="editor" \
-          ng-model="value" \
-          ng-show="editing" \
-          ng-blur="editorBlur()" \
-          ng-keyup="editorKeyup($event)" \
-      /> \
+      <form ng-submit="save()"> \
+        <input class="editor" \
+            ng-model="value" \
+            ng-show="editing" \
+            ng-blur="editorBlur()" \
+            ss-escape="leaveEdit(true)" \
+        /> \
     ',
 
 
@@ -324,14 +339,6 @@ app.directive('ssClickToEdit', function ($timeout) {
       scope.editorBlur = function () {
         if (this.editing) {
           this.save();
-        }
-      };
-
-      scope.editorKeyup = function (event) {
-        switch (event.keyCode) {
-        case 13: this.save(); break;
-        case 27: this.leaveEdit(true); break;
-        default: /* noop */
         }
       };
 
