@@ -31,12 +31,12 @@ newNote taskId createdAt (NewNote body) = Note {
   , noteCreatedAt = createdAt
   }
 
-createNote :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> NewNote -> SqlPersist m (NoteId, Note)
+createNote :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> NewNote -> SqlPersist m (Entity Note)
 createNote taskId note = do
   time <- now
   let note' = newNote taskId time note
   noteId <- insert note'
-  return (noteId, note')
+  return $ Entity noteId note'
 
 instance ToJSON (NoteGeneric b) where
   toJSON note = object [

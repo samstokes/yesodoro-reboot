@@ -59,7 +59,7 @@ function setupNotesHandlers(widgetId) {
       noteField = form.find('textarea');
 
   function localSave(data) {
-    var noteLi = $('<li class="note">').html(renderNote(data[1]));
+    var noteLi = $('<li class="note">').html(renderNote(data.note));
     notes.append(noteLi);
     form.clearForm();
 
