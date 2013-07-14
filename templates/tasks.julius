@@ -119,7 +119,7 @@ $(function () {
 });
 
 
-var app = angular.module('HibiApp', []);
+var app = angular.module('HibiApp', ['angular.markdown']);
 
 
 app.controller('PlansCtrl', function ($scope, $http, $log) {

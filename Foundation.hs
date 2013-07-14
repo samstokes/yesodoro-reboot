@@ -126,6 +126,8 @@ instance Yesod App where
             addScriptEither $ urlJqueryUiJs master
             addScript $ StaticR js_jquery_form_js
             addScriptEither $ eitherDev (StaticR js_angular_1_1_5_js) "//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"
+            addScript $ StaticR js_showdown_js
+            addScript $ StaticR js_angular_markdown_js
             addScript $ StaticR js_expandy_js
             addStylesheet $ StaticR css_expandy_css
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")

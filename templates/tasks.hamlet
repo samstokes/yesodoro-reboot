@@ -61,8 +61,7 @@
               <.notes-detail ng-show="notes.isVisible">
                 <ol .notes>
                   <li .note ng-repeat="note in notes">
-                    <.body>
-                      {{note.note.body}}
+                    <markdown .body ng-model="note.note.body">
                     <.created>
                       {{note.note.createdAt}}
       <form .form-inline ng-submit="addNewTask()">
