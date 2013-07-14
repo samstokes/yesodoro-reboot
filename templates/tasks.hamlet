@@ -58,7 +58,7 @@
                 ♫
                 <span .counter ng-show="notes.length &gt; 0">
                   {{notes.length}}
-              <.notes-detail ng-show="notes.isVisible">
+              <ss-editable-popup .notes-detail ss-show="notes.isVisible">
                 <ol .notes>
                   <li .note ng-repeat="note in notes" ng-class="{broken: note.broken}">
                     <markdown .body ng-model="note.note.body">
