@@ -363,6 +363,10 @@ app.directive('ssEditablePopup', function () {
         scope.$apply(function () { scope.inputsFocused += 1; });
       }).bind('blur', function (event) {
         scope.$apply(function () { scope.inputsFocused -= 1; });
+      }).bind('keydown', function (event) {
+        if (event.keyCode == 27) {
+          this.blur();
+        }
       });
     }
   };
