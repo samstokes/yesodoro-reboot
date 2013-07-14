@@ -179,8 +179,20 @@ app.controller('TasksCtrl', function ($scope, $http, $log) {
     };
   }
 
-  $scope.tasks = #{toJSON todo};
+  $scope.tasks = #{toJSON tasksEstimatesNotes};
   $scope.newTask = makeNewTask();
+
+  $scope.taskTodoToday = function (task) {
+    var today = new Date();
+    today.setHours(23);
+    today.setMinutes(59);
+    today.setSeconds(59);
+    var scheduledFor = new Date(task.task.scheduled_for);
+    return task.task.active && !task.task.done_at && scheduledFor <= today;
+  };
+  $scope.taskOrder = function (task) {
+    return task.task.order;
+  };
 
   $scope.addNewTask = function () {
     var task = {id: '_new', task: this.newTask};
