@@ -38,7 +38,7 @@
       <p ng-show="tasks.length == 0">
         Nothing to do. Congratulations! Why not take the rest of the day off?
       <table ng-hide="tasks.length == 0"><tbody>
-        <tr .task ng-repeat="task in tasks | filter:taskTodoToday | orderBy:taskOrder" ng-class="{broken: task.broken, going: task.going}">
+        <tr .task ng-repeat="task in tasks | filter:taskTodoToday | orderBy:taskOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
           <td .schedule>
             <.schedule-label>{{task.task.schedule | scheduleLabel}}
           <th .title ng-class="{'ext-link': task.task.ext_task}">
@@ -52,6 +52,19 @@
             <button .btn ng-click="pauseTask(task)">||
           <td>
             <button .btn .btn-danger ng-click="deleteTask(task)">☠
+          $if has FeatureNotes
+            <td .notes ng-controller="NotesCtrl">
+              <span .notes-handle ng-class="{empty: notes.length == 0}">
+                ♫
+                <span .counter ng-show="notes.length &gt; 0">
+                  {{notes.length}}
+              <.notes-detail ng-show="notes.isVisible">
+                <ol .notes>
+                  <li .note ng-repeat="note in notes">
+                    <.body>
+                      {{note.note.body}}
+                    <.created>
+                      {{note.note.createdAt}}
       <form .form-inline ng-submit="addNewTask()">
         <.control-group>
           <.controls>

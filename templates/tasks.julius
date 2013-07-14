@@ -172,7 +172,7 @@ app.controller('PlansCtrl', function ($scope, $http, $log) {
 });
 
 
-app.controller('TasksCtrl', function ($scope, $http, $log) {
+app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
   function makeNewTask() {
     return {
       schedule: #{toJSON Once}
@@ -253,6 +253,17 @@ app.controller('TasksCtrl', function ($scope, $http, $log) {
         self.removeTask(task);
       });
   };
+
+
+  $scope.showNotes = function (task) {
+    task.notes.isVisible = true;
+  };
+
+  $scope.hideNotes = function (task) {
+    $timeout(function () {
+      task.notes.isVisible = false;
+    }, 0);
+  };
 });
 
 
@@ -266,6 +277,11 @@ app.filter('scheduleLabel', function () {
   return function (schedule) {
     return labels[schedule];
   };
+});
+
+
+app.controller('NotesCtrl', function ($scope) {
+  $scope.notes = $scope.task.notes;
 });
 
 
