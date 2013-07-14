@@ -26,6 +26,7 @@ import Control.Monad (forever)
 import Handler.Api
 import Handler.Home
 import Handler.Tasks
+import Handler.Notes
 import Handler.Plans
 import Handler.Settings
 

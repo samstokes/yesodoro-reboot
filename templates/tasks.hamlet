@@ -60,10 +60,13 @@
                   {{notes.length}}
               <.notes-detail ng-show="notes.isVisible">
                 <ol .notes>
-                  <li .note ng-repeat="note in notes">
+                  <li .note ng-repeat="note in notes" ng-class="{broken: note.broken}">
                     <markdown .body ng-model="note.note.body">
                     <.created>
                       {{note.note.createdAt}}
+                <form ng-submit="addNewNote()">
+                  <textarea ng-model="newNote.body" />
+                  <input .btn .btn-primary type=submit value=Add />
       <form .form-inline ng-submit="addNewTask()">
         <.control-group>
           <.controls>

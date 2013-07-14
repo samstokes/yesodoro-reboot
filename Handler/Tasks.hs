@@ -246,14 +246,3 @@ postTaskEstimatesR taskId = do
 
 postTaskPomosR :: TaskId -> Handler RepHtml
 postTaskPomosR = updateAndRedirectR TasksR [TaskPomos +=. 1]
-
-
-postTaskNotesR :: TaskId -> Handler RepJson
-postTaskNotesR taskId = do
-  _ <- authedTask taskId
-  ((result, _), _) <- runFormPost newNoteForm
-  case result of
-    FormSuccess note -> do
-      noteEntity <- runDB $ createNote taskId note
-      jsonToRepJson noteEntity
-    _ -> undefined -- TODO

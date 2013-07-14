@@ -34,6 +34,7 @@ library
                      Handler.Api
                      Handler.Home
                      Handler.Tasks
+                     Handler.Notes
                      Handler.Plans
                      Handler.Settings
                      Util

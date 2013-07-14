@@ -9,8 +9,9 @@ module Model.Note
 import Prelude
 import Yesod
 
+import Control.Applicative
 import Control.Monad.IO.Class (MonadIO)
-import Data.Aeson.Types (ToJSON, toJSON)
+import Data.Aeson.Types (FromJSON, ToJSON, (.:), parseJSON, toJSON)
 import Data.Text (Text)
 import Data.Time (UTCTime)
 import Database.Persist.GenericSql (SqlPersist)
@@ -44,6 +45,10 @@ instance ToJSON (NoteGeneric b) where
     , ("body", toJSON $ noteBody note)
     , ("createdAt", toJSON $ noteCreatedAt note)
     ]
+
+instance FromJSON NewNote where
+  parseJSON (Object o) = NewNote <$> (o .: "body")
+  parseJSON v = fail $ "can't parse note: " ++ show v
 
 instance ToJSON (Entity Note) where
   toJSON (Entity k n) = object ["id" .= k, "note" .= n]

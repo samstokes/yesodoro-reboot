@@ -74,6 +74,9 @@ h2.collapsed
 .task .notes form label
   display: none
 
+.task .notes .note.broken .body
+  text-decoration: line-through
+
 .task .schedule-label
   font-size: 150%
 
