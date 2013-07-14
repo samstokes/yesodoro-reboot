@@ -182,7 +182,7 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
   $scope.tasks = #{toJSON tasksEstimatesNotes};
   $scope.newTask = makeNewTask();
 
-  $scope.taskTodoToday = function (task) {
+  $scope.isTodoToday = function (task) {
     var today = new Date();
     today.setHours(23);
     today.setMinutes(59);
