@@ -325,6 +325,20 @@ app.directive('ssEscape', function ($parse) {
 });
 
 
+app.directive('ssCtrlEnter', function ($parse) {
+  return function (scope, element, attrs) {
+    var fn = $parse(attrs['ssCtrlEnter']);
+    element.bind('keydown', function (event) {
+      if ((event.keyCode == 10 || event.keyCode == 13) && event.ctrlKey) {
+        scope.$apply(function () {
+          fn(scope, {$event: event});
+        });
+      }
+    });
+  };
+});
+
+
 app.directive('ssEditablePopup', function () {
   return {
     restrict: 'EA',

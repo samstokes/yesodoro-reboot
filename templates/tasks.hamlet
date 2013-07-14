@@ -65,7 +65,7 @@
                     <.created>
                       {{note.note.createdAt}}
                 <form ng-submit="addNewNote()">
-                  <textarea ng-model="newNote.body" />
+                  <textarea ng-model="newNote.body" ss-ctrl-enter="addNewNote()" />
                   <input .btn .btn-primary type=submit value=Add />
       <form .form-inline ng-submit="addNewTask()">
         <.control-group>
