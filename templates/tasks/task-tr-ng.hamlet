@@ -1,0 +1,28 @@
+<td .schedule>
+  <.schedule-label>{{task.task.schedule | scheduleLabel}}
+<th .title ng-class="{'ext-link': task.task.ext_task}">
+  <ss-click-to-edit ss-model="task.task.title">
+    {{task.task.title}}
+<td>
+  <button .btn .btn-success ng-click="completeTask(task)">☺
+<td>
+  <button .btn ng-click="postponeTask(task)">☔
+<td>
+  <button .btn ng-click="pauseTask(task)">||
+<td>
+  <button .btn .btn-danger ng-click="deleteTask(task)">☠
+$if has FeatureNotes
+  <td .notes ng-controller="NotesCtrl">
+    <span .notes-handle ng-class="{empty: notes.length == 0}">
+      ♫
+      <span .counter ng-show="notes.length &gt; 0">
+        {{notes.length}}
+    <ss-editable-popup .notes-detail ss-show="notes.isVisible">
+      <ol .notes>
+        <li .note ng-repeat="note in notes" ng-class="{broken: note.broken}">
+          <markdown .body ng-model="note.note.body">
+          <.created>
+            {{note.note.createdAt}}
+      <form ng-submit="addNewNote()">
+        <textarea ng-model="newNote.body" ss-ctrl-enter="addNewNote()" />
+        <input .btn .btn-primary type=submit value=Add />

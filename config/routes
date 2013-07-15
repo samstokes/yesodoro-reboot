@@ -31,3 +31,5 @@
 
 /api/tasks ApiTasksR POST
 /api/ext_tasks/#ExternalSourceName ApiExtTasksForSourceR GET
+
+/templates/taskTr TemplateTaskTrR GET

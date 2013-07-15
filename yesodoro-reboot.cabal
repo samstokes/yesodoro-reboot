@@ -37,6 +37,7 @@ library
                      Handler.Notes
                      Handler.Plans
                      Handler.Settings
+                     Handler.Templates
                      Util
                      Util.Angular
                      Widget.Expandy
