@@ -1,4 +1,4 @@
-<div ng-app="HibiApp">
+<div ng-app="HibiApp" ng-controller="TasksCtrl">
   <h1>#{title}
 
   $if has FeatureSettings
@@ -34,7 +34,7 @@
       NEWTODO
       ^{expandy Expanded "#newtodo h2" "#newtodo .content"}
 
-    <div .content ng-controller="TasksCtrl">
+    <div .content>
       <p ng-show="tasks.length == 0">
         Nothing to do. Congratulations! Why not take the rest of the day off?
       <table ng-hide="tasks.length == 0"><tbody>
