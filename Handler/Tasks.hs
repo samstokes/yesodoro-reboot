@@ -207,13 +207,17 @@ postPostponeTaskR :: TaskId -> Handler RepJson
 postPostponeTaskR taskId = do
   _ <- authedTaskPreventingXsrf taskId
   postponed <- runDB $ postponeTask (days 1) taskId
-  maybe (error "Task disappeared out from under me!") jsonToRepJson postponed
+  maybeJson taskId postponed
 
 postUnpostponeTaskR :: TaskId -> Handler RepHtml
 postUnpostponeTaskR taskId = do
   _ <- authedTask taskId
   runDB $ unpostponeTask taskId
   redirect TasksR
+
+
+maybeJson :: ToJSON (Entity val) => Key b val -> Maybe (Entity val) -> Handler RepJson
+maybeJson entityId = maybe (error $ "Disappeared out from under me: " ++ show entityId) jsonToRepJson
 
 
 postPauseTaskR :: TaskId -> Handler RepJson
