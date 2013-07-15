@@ -209,11 +209,11 @@ postPostponeTaskR taskId = do
   postponed <- runDB $ postponeTask (days 1) taskId
   maybeJson taskId postponed
 
-postUnpostponeTaskR :: TaskId -> Handler RepHtml
+postUnpostponeTaskR :: TaskId -> Handler RepJson
 postUnpostponeTaskR taskId = do
-  _ <- authedTask taskId
-  runDB $ unpostponeTask taskId
-  redirect TasksR
+  _ <- authedTaskPreventingXsrf taskId
+  unpostponed <- runDB $ unpostponeTask taskId
+  maybeJson taskId unpostponed
 
 
 maybeJson :: ToJSON (Entity val) => Key b val -> Maybe (Entity val) -> Handler RepJson
@@ -229,7 +229,7 @@ postPauseTaskR taskId = do
 postUnpauseTaskR :: TaskId -> Handler RepHtml
 postUnpauseTaskR taskId = do
   _ <- authedTask taskId
-  runDB $ unpauseTask taskId
+  _ <- runDB $ unpauseTask taskId
   redirect TasksR
 
 
