@@ -206,8 +206,8 @@ postReorderTaskR taskId = do
 postPostponeTaskR :: TaskId -> Handler RepJson
 postPostponeTaskR taskId = do
   _ <- authedTaskPreventingXsrf taskId
-  runDB $ postponeTask (days 1) taskId
-  jsonToRepJson True
+  postponed <- runDB $ postponeTask (days 1) taskId
+  maybe (error "Task disappeared out from under me!") jsonToRepJson postponed
 
 postUnpostponeTaskR :: TaskId -> Handler RepHtml
 postUnpostponeTaskR taskId = do

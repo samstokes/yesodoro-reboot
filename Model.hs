@@ -370,7 +370,7 @@ recurTask tz time taskEntity = do
     applyRecurrence :: (MonadIO m, PersistQuery SqlPersist m) => NominalDiffTime -> SqlPersist m TaskId
     applyRecurrence recurrence = do
       newTaskId <- duplicateTask tz time taskEntity
-      postponeTask recurrence newTaskId
+      _ <- postponeTask recurrence newTaskId
       return newTaskId
 
 
@@ -469,10 +469,11 @@ estimateOptions :: [Int]
 estimateOptions = 0 : [2 ^ x | x <- [0 .. 3] :: [Int]]
 
 
-postponeTask :: (MonadIO m, PersistQuery SqlPersist m) => NominalDiffTime -> TaskId -> SqlPersist m ()
+postponeTask :: (MonadIO m, PersistQuery SqlPersist m) => NominalDiffTime -> TaskId -> SqlPersist m (Maybe (Entity Task))
 postponeTask postponement taskId = do
   postponed <- hence postponement
-  update taskId [TaskScheduledFor =. postponed]
+  updateReturningNew taskId [TaskScheduledFor =. postponed]
+
 
 unpostponeTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m ()
 unpostponeTask taskId = do
