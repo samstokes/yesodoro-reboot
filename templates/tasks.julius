@@ -182,13 +182,21 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
   $scope.tasks = #{toJSON tasksEstimatesNotes};
   $scope.newTask = makeNewTask();
 
-  $scope.isTodoToday = function (task) {
-    var today = new Date();
-    today.setHours(23);
-    today.setMinutes(59);
-    today.setSeconds(59);
+  function endOfDay(date) {
+    date.setHours(23);
+    date.setMinutes(59);
+    date.setSeconds(59);
+    return date;
+  }
+
+  function isScheduledForToday(task) {
+    var today = endOfDay(new Date());
     var scheduledFor = new Date(task.task.scheduled_for);
-    return task.task.active && !task.task.done_at && scheduledFor <= today;
+    return scheduledFor <= today;
+  }
+
+  $scope.isTodoToday = function (task) {
+    return task.task.active && !task.task.done_at && isScheduledForToday(task);
   };
   $scope.taskOrder = function (task) {
     return task.task.order;
