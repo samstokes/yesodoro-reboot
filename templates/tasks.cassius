@@ -86,10 +86,10 @@ h2.collapsed
   font-weight: bold
 
 
-#newtodo td.notes
+#newtodo td.notes, #newpostponed td.notes
   position: relative
 
-#newtodo .notes-detail
+#newtodo .notes-detail, #newpostponed .notes-detail
   position: absolute
   top: 0
   z-index: 10

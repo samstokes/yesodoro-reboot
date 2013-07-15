@@ -50,6 +50,16 @@
               #{schedule}
         <input .btn .btn-primary type=submit value=Add>
 
+  <section #newpostponed>
+    <h2.collapsed>
+      Newtomorrow
+      ^{expandy Collapsed "#newpostponed h2" "#newpostponed .content"}
+
+    <.content style="display: none">
+      <table ng-hide="tasks.length == 0"><tbody>
+        <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filter:isPostponed | orderBy:postponedOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
+
+
   <section #todo>
     <h2.collapsed>
       TODO

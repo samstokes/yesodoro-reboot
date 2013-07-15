@@ -5,7 +5,7 @@
     {{task.task.title}}
 <td>
   <button .btn .btn-success ng-click="completeTask(task)">☺
-<td>
+<td ng-show="isTodoToday(task)">
   <button .btn ng-click="postponeTask(task)">☔
 <td>
   <button .btn ng-click="pauseTask(task)">||
