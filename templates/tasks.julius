@@ -241,7 +241,6 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
 
   $scope.postponeTask = function (task) {
     task.going = true;
-    var self = this;
 
     $http.post("/tasks/" + task.id + "/postpone")
       .success(function (data, status, headers, config) {
