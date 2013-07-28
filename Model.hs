@@ -309,7 +309,7 @@ findTaskByExtTask userId extTask = do
     Nothing -> return Nothing
 
 
-completeTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> Entity Task -> SqlPersist m (Maybe TaskId)
+completeTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> Entity Task -> SqlPersist m (Maybe (Entity Task))
 completeTask tz taskEntity = do
     time <- now
     maybeNextTime <- recurTask tz time taskEntity
@@ -362,16 +362,16 @@ deleteTask (Entity taskId task) = do
   maybeM () delete $ taskExtTask task
 
 
-recurTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> UTCTime -> Entity Task -> SqlPersist m (Maybe TaskId)
+recurTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> UTCTime -> Entity Task -> SqlPersist m (Maybe (Entity Task))
 recurTask tz time taskEntity = do
     let recurrence = scheduleRecurrence $ taskSchedule (entityVal taskEntity)
     maybe (return Nothing) (applyRecurrence >=> return . Just) recurrence
   where
-    applyRecurrence :: (MonadIO m, PersistQuery SqlPersist m) => NominalDiffTime -> SqlPersist m TaskId
+    applyRecurrence :: (MonadIO m, PersistQuery SqlPersist m) => NominalDiffTime -> SqlPersist m (Entity Task)
     applyRecurrence recurrence = do
       newTaskId <- duplicateTask tz time taskEntity
-      _ <- postponeTask recurrence newTaskId
-      return newTaskId
+      mNewRecurrence <- postponeTask recurrence newTaskId
+      maybeM (error "should never happen") return mNewRecurrence
 
 
 data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
