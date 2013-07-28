@@ -316,6 +316,9 @@ completeTask tz taskEntity = do
     completed <- updateReturningNew (entityKey taskEntity) [TaskDoneAt =. Just time]
     return (completed, maybeNextTime)
 
+restartTask :: TaskId -> PersistQuery SqlPersist m => SqlPersist m (Maybe (Entity Task))
+restartTask = flip updateReturningNew [TaskDoneAt =. Nothing]
+
 
 cloneTask :: Int -> Task -> Task
 cloneTask order task = Task {
@@ -481,8 +484,8 @@ unpostponeTask taskId = do
   updateReturningNew taskId [TaskScheduledFor =. time]
 
 
-pauseTask :: PersistQuery SqlPersist m => TaskId -> SqlPersist m ()
-pauseTask taskId = update taskId [TaskActive =. False]
+pauseTask :: PersistQuery SqlPersist m => TaskId -> SqlPersist m (Maybe (Entity Task))
+pauseTask taskId = updateReturningNew taskId [TaskActive =. False]
 
 unpauseTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m (Maybe (Entity Task))
 unpauseTask taskId = update taskId [TaskActive =. True] >> unpostponeTask taskId

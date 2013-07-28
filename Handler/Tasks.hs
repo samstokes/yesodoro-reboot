@@ -143,11 +143,14 @@ postCompleteTaskR :: TaskId -> Handler RepJson
 postCompleteTaskR taskId = do
   taskEntity <- authedTaskPreventingXsrf taskId
   tz <- currentUserTimeZone
-  (_, maybeNextTime) <- runDB $ completeTask tz taskEntity
-  jsonToRepJson maybeNextTime
+  (completed, recurred) <- runDB $ completeTask tz taskEntity
+  jsonToRepJson $ object ["completed" .= completed, "recurred" .= recurred]
 
-postRestartTaskR :: TaskId -> Handler RepHtml
-postRestartTaskR = updateAndRedirectR TasksR [TaskDoneAt =. Nothing]
+postRestartTaskR :: TaskId -> Handler RepJson
+postRestartTaskR taskId = do
+  _ <- authedTaskPreventingXsrf taskId
+  restarted <- runDB $ restartTask taskId
+  maybeJson taskId restarted
 
 
 authedTask :: TaskId -> Handler Task
@@ -223,14 +226,14 @@ maybeJson entityId = maybe (error $ "Disappeared out from under me: " ++ show en
 postPauseTaskR :: TaskId -> Handler RepJson
 postPauseTaskR taskId = do
   _ <- authedTaskPreventingXsrf taskId
-  runDB $ pauseTask taskId
-  jsonToRepJson True
+  paused <- runDB $ pauseTask taskId
+  maybeJson taskId paused
 
-postUnpauseTaskR :: TaskId -> Handler RepHtml
+postUnpauseTaskR :: TaskId -> Handler RepJson
 postUnpauseTaskR taskId = do
-  _ <- authedTask taskId
-  _ <- runDB $ unpauseTask taskId
-  redirect TasksR
+  _ <- authedTaskPreventingXsrf taskId
+  unpaused <- runDB $ unpauseTask taskId
+  maybeJson taskId unpaused
 
 
 postTaskEstimatesR :: TaskId -> Handler RepHtml

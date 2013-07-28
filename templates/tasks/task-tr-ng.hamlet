@@ -4,12 +4,14 @@
   <ss-click-to-edit ss-model="task.task.title">
     {{task.task.title}}
 <td>
-  <button .btn .btn-success ng-click="completeTask(task)">☺
-<td>
+  <button .btn .btn-success ng-hide="isDone(task)" ng-click="completeTask(task)">☺
+  <button .btn .btn-inverse ng-show="isDone(task)" ng-click="restartTask(task)">☹
+<td ng-hide="isDone(task) || isPaused(task)">
   <button .btn ng-show="isTodoToday(task)" ng-click="postponeTask(task)">☔
   <button .btn ng-show="isPostponed(task)" ng-click="unpostponeTask(task)">☀
-<td>
-  <button .btn ng-click="pauseTask(task)">||
+<td ng-hide="isDone(task)">
+  <button .btn ng-hide="isPaused(task)" ng-click="pauseTask(task)">||
+  <button .btn ng-show="isPaused(task)" ng-click="unpauseTask(task)">|>
 <td>
   <button .btn .btn-danger ng-click="deleteTask(task)">☠
 $if has FeatureNotes

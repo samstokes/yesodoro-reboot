@@ -59,6 +59,25 @@
       <table ng-hide="tasks.length == 0"><tbody>
         <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filter:isPostponed | orderBy:postponedOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
 
+  <section #newpaused>
+    <h2.collapsed>
+      Newpaused
+      ^{expandy Collapsed "#newpaused h2" "#newpaused .content"}
+
+    <.content style="display: none">
+      <table ng-hide="tasks.length == 0"><tbody>
+        <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filter:isPaused | orderBy:pausedOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
+
+  <section #newdone>
+    <h2.collapsed>
+      Newdone
+      ^{expandy Collapsed "#newdone h2" "#newdone .content"}
+
+    <.content style="display: none">
+      <table ng-hide="tasks.length == 0"><tbody>
+        <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filter:isDone | orderBy:doneOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
+
+  <hr>
 
   <section #todo>
     <h2.collapsed>

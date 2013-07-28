@@ -201,11 +201,22 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
   $scope.isPostponed = function (task) {
     return task.task.active && !task.task.done_at && !isScheduledForToday(task);
   };
+  $scope.isPaused = function (task) {
+    return !task.task.active && !task.task.done_at;
+  };
+  $scope.isDone = function (task) {
+    return !!task.task.done_at;
+  };
+
   $scope.taskOrder = function (task) {
     return task.task.order;
   };
   $scope.postponedOrder = function (task) {
     return new Date(task.task.scheduled_for);
+  };
+  $scope.pausedOrder = $scope.postponedOrder;
+  $scope.doneOrder = function (task) {
+    return new Date(task.task.done_at);
   };
 
   $scope.addNewTask = function () {
@@ -234,7 +245,27 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
 
     $http.post("/tasks/" + task.id + "/complete")
       .success(function (data, status, headers, config) {
-        self.removeTask(task);
+        if (data.completed) {
+          task.going = false;
+          task.task = data.completed.task;
+        } else {
+          self.removeTask(task);
+        }
+
+        if (data.recurred) {
+          data.recurred.notes = [];
+          self.tasks.push(data.recurred);
+        }
+      });
+  };
+
+  $scope.restartTask = function (task) {
+    task.going = true;
+
+    $http.post("/tasks/" + task.id + "/restart")
+      .success(function (data, status, headers, config) {
+        task.going = false;
+        task.task = data.task;
       });
   };
 
@@ -260,11 +291,21 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
 
   $scope.pauseTask = function (task) {
     task.going = true;
-    var self = this;
 
     $http.post("/tasks/" + task.id + "/pause")
       .success(function (data, status, headers, config) {
-        self.removeTask(task);
+        task.going = false;
+        task.task = data.task;
+      });
+  };
+
+  $scope.unpauseTask = function (task) {
+    task.going = true;
+
+    $http.post("/tasks/" + task.id + "/unpause")
+      .success(function (data, status, headers, config) {
+        task.going = false;
+        task.task = data.task;
       });
   };
 
