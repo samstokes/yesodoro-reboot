@@ -309,12 +309,12 @@ findTaskByExtTask userId extTask = do
     Nothing -> return Nothing
 
 
-completeTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> Entity Task -> SqlPersist m (Maybe (Entity Task))
+completeTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> Entity Task -> SqlPersist m (Maybe (Entity Task), Maybe (Entity Task))
 completeTask tz taskEntity = do
     time <- now
     maybeNextTime <- recurTask tz time taskEntity
-    update (entityKey taskEntity) [TaskDoneAt =. Just time]
-    return maybeNextTime
+    completed <- updateReturningNew (entityKey taskEntity) [TaskDoneAt =. Just time]
+    return (completed, maybeNextTime)
 
 
 cloneTask :: Int -> Task -> Task

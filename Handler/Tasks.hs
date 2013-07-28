@@ -143,7 +143,7 @@ postCompleteTaskR :: TaskId -> Handler RepJson
 postCompleteTaskR taskId = do
   taskEntity <- authedTaskPreventingXsrf taskId
   tz <- currentUserTimeZone
-  maybeNextTime <- runDB $ completeTask tz taskEntity
+  (_, maybeNextTime) <- runDB $ completeTask tz taskEntity
   jsonToRepJson maybeNextTime
 
 postRestartTaskR :: TaskId -> Handler RepHtml
