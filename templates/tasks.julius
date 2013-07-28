@@ -205,8 +205,7 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
     return task.task.order;
   };
   $scope.postponedOrder = function (task) {
-    var scheduledForDay = endOfDay(new Date(task.task.scheduled_for));
-    return [scheduledForDay, task.task.order];
+    return new Date(task.task.scheduled_for);
   };
 
   $scope.addNewTask = function () {
