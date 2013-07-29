@@ -245,20 +245,20 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
     var self = this;
 
     $http.post("/tasks/" + task.id + "/complete")
-      .success(function (data, status, headers, config) {
-        if (data.completed) {
+      .then(function (response) {
+        if (response.data.completed) {
           task.going = false;
-          task.task = data.completed.task;
+          task.task = response.data.completed.task;
         } else {
           task.going = false;
           task.broken = true;
         }
 
-        if (data.recurred) {
-          data.recurred.notes = [];
-          self.tasks.push(data.recurred);
+        if (response.data.recurred) {
+          response.data.recurred.notes = [];
+          self.tasks.push(response.data.recurred);
         }
-      }).error(function () {
+      }, function () {
         task.going = false;
         task.broken = true;
       });
@@ -268,10 +268,10 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
     task.going = true;
 
     $http.post("/tasks/" + task.id + "/restart")
-      .success(function (data, status, headers, config) {
+      .then(function (response) {
         task.going = false;
-        task.task = data.task;
-      }).error(function () {
+        task.task = response.data.task;
+      }, function () {
         task.going = false;
         task.broken = true;
       });
@@ -281,10 +281,10 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
     task.going = true;
 
     $http.post("/tasks/" + task.id + "/postpone")
-      .success(function (data, status, headers, config) {
+      .then(function (response) {
         task.going = false;
-        task.task = data.task;
-      }).error(function () {
+        task.task = response.data.task;
+      }, function () {
         task.going = false;
         task.broken = true;
       });
@@ -294,10 +294,10 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
     task.going = true;
 
     $http.post("/tasks/" + task.id + "/unpostpone")
-      .success(function (data, status, headers, config) {
+      .then(function (response) {
         task.going = false;
-        task.task = data.task;
-      }).error(function () {
+        task.task = response.data.task;
+      }, function () {
         task.going = false;
         task.broken = true;
       });
@@ -307,10 +307,10 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
     task.going = true;
 
     $http.post("/tasks/" + task.id + "/pause")
-      .success(function (data, status, headers, config) {
+      .then(function (response) {
         task.going = false;
-        task.task = data.task;
-      }).error(function () {
+        task.task = response.data.task;
+      }, function () {
         task.going = false;
         task.broken = true;
       });
@@ -320,10 +320,10 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
     task.going = true;
 
     $http.post("/tasks/" + task.id + "/unpause")
-      .success(function (data, status, headers, config) {
+      .then(function (response) {
         task.going = false;
-        task.task = data.task;
-      }).error(function () {
+        task.task = response.data.task;
+      }, function () {
         task.going = false;
         task.broken = true;
       });
@@ -334,9 +334,9 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
     var self = this;
 
     $http.delete("/tasks/" + task.id)
-      .success(function (data, status, headers, config) {
+      .then(function (response) {
         self.removeTask(task);
-      }).error(function () {
+      }, function () {
         task.going = false;
         task.broken = true;
       });
