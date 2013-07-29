@@ -301,6 +301,9 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
       .success(function (data, status, headers, config) {
         task.going = false;
         task.task = data.task;
+      }).error(function () {
+        task.going = false;
+        task.broken = true;
       });
   };
 
@@ -311,6 +314,9 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
       .success(function (data, status, headers, config) {
         task.going = false;
         task.task = data.task;
+      }).error(function () {
+        task.going = false;
+        task.broken = true;
       });
   };
 
