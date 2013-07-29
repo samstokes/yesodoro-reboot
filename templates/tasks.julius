@@ -224,11 +224,11 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
     this.newTask = makeNewTask();
     this.tasks.splice(this.tasks.length, 0, task);
     $http.post("/tasks", task.task)
-      .success(function (data, status, headers, config) {
-        task.id = data.id;
-        task.task = data.task;
+      .then(function (response) {
+        task.id = response.data.id;
+        task.task = response.data.task;
         task.notes = [];
-      }).error(function (data, status, headers, config) {
+      }, function () {
         task.broken = true;
       });
   };
