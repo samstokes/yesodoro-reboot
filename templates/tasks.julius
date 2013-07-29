@@ -332,6 +332,47 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
 });
 
 
+app.controller('DoneTasksCtrl', function ($scope) {
+  var tasksByDay = {};
+
+  function dateYMD(date) {
+    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+  }
+
+  $scope.dayDone = function (task) {
+    if (!task.task.done_at) return null;
+    return dateYMD(new Date(task.task.done_at))
+  };
+  $scope.doneSameDay = function (otherTask) {
+    var otherDay = $scope.dayDone(otherTask);
+    return function (task) {
+      return $scope.dayDone(task) === otherDay;
+    };
+  };
+
+  $scope.dayOrder = function (task) {
+    return $scope.dayDone(task);
+  };
+
+  $scope.tasksToFilter = function () {
+    // reset day index each time list is rendered
+    tasksByDay = {};
+    return $scope.tasks;
+  };
+
+  $scope.uniqueDay = function (task) {
+    var day = $scope.dayDone(task);
+    if (!day) return false;
+    if (!tasksByDay.hasOwnProperty(day)) {
+      tasksByDay[day] = task;
+      return true;
+    } else {
+      return false;
+    }
+  };
+});
+
+
 app.filter('scheduleLabel', function () {
   var labels = {
     #{toJSON Once}: '',

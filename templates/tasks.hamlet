@@ -68,14 +68,16 @@
       <table ng-hide="tasks.length == 0"><tbody>
         <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filter:isPaused | orderBy:pausedOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
 
-  <section #newdone>
+  <section #newdone ng-controller="DoneTasksCtrl">
     <h2.collapsed>
       Newdone
       ^{expandy Collapsed "#newdone h2" "#newdone .content"}
 
     <.content style="display: none">
-      <table ng-hide="tasks.length == 0"><tbody>
-        <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filter:isDone | orderBy:doneOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
+      <div ng-repeat="taskPerDay in tasksToFilter() | filter:isDone | filter:uniqueDay | orderBy:dayOrder:true">
+        <h3>{{dayDone(taskPerDay)}}
+        <table ng-hide="tasks.length == 0"><tbody>
+          <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filter:isDone | filter:doneSameDay(taskPerDay) | orderBy:doneOrder:true" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
 
   <hr>
 
