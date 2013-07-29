@@ -334,7 +334,7 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
     var self = this;
 
     $http.delete("/tasks/" + task.id)
-      .then(function (response) {
+      .then(function () {
         self.removeTask(task);
       }, function () {
         task.going = false;
