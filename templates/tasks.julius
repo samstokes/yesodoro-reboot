@@ -227,6 +227,7 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
       .success(function (data, status, headers, config) {
         task.id = data.id;
         task.task = data.task;
+        task.notes = [];
       }).error(function (data, status, headers, config) {
         task.broken = true;
       });
