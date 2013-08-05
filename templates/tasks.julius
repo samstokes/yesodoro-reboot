@@ -172,14 +172,58 @@ app.controller('PlansCtrl', function ($scope, $http, $log) {
 });
 
 
-app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
+app.factory('Tasks', function ($http) {
+  function extractData(response) {
+    return response.data;
+  }
+
+  function taskAction(action) {
+    return function (taskId) {
+      return $http.post("/tasks/" + taskId + "/" + action)
+        .then(extractData);
+    };
+  }
+
+  var Tasks = {};
+
+  Tasks.all = function () {
+    return #{toJSON tasksEstimatesNotes};
+  };
+
+  Tasks.create = function (task) {
+    return $http.post("/tasks", task)
+      .then(extractData)
+      .then(function (task) {
+        task.notes = [];
+        return task;
+      });
+  };
+
+  Tasks.delete = function (task) {
+    return $http.delete("/tasks/" + task.id)
+      .then(extractData);
+  };
+
+  [
+    'complete', 'restart',
+    'postpone', 'unpostpone',
+    'pause', 'unpause'
+  ].forEach(function (action) {
+    Tasks[action] = taskAction(action);
+  });
+
+  return Tasks;
+});
+
+
+app.controller('TasksCtrl', function ($scope, Tasks, $timeout, $log) {
   function makeNewTask() {
     return {
       schedule: #{toJSON Once}
     };
   }
 
-  $scope.tasks = #{toJSON tasksEstimatesNotes};
+  $scope.tasks = Tasks.all();
   $scope.newTask = makeNewTask();
 
   function endOfDay(date) {
@@ -223,11 +267,11 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
     var task = {id: '_new', task: this.newTask};
     this.newTask = makeNewTask();
     this.tasks.splice(this.tasks.length, 0, task);
-    $http.post("/tasks", task.task)
-      .then(function (response) {
-        task.id = response.data.id;
-        task.task = response.data.task;
-        task.notes = [];
+    Tasks.create(task.task)
+      .then(function (created) {
+        task.id = created.id;
+        task.task = created.task;
+        task.notes = created.notes;
       }, function () {
         task.broken = true;
       });
@@ -244,19 +288,19 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
     task.going = true;
     var self = this;
 
-    $http.post("/tasks/" + task.id + "/complete")
-      .then(function (response) {
-        if (response.data.completed) {
+    Tasks.complete(task.id)
+      .then(function (data) {
+        if (data.completed) {
           task.going = false;
-          task.task = response.data.completed.task;
+          task.task = data.completed.task;
         } else {
           task.going = false;
           task.broken = true;
         }
 
-        if (response.data.recurred) {
-          response.data.recurred.notes = [];
-          self.tasks.push(response.data.recurred);
+        if (data.recurred) {
+          data.recurred.notes = [];
+          self.tasks.push(data.recurred);
         }
       }, function () {
         task.going = false;
@@ -267,10 +311,10 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
   $scope.restartTask = function (task) {
     task.going = true;
 
-    $http.post("/tasks/" + task.id + "/restart")
-      .then(function (response) {
+    Tasks.restart(task.id)
+      .then(function (restarted) {
         task.going = false;
-        task.task = response.data.task;
+        task.task = restarted.task;
       }, function () {
         task.going = false;
         task.broken = true;
@@ -280,10 +324,10 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
   $scope.postponeTask = function (task) {
     task.going = true;
 
-    $http.post("/tasks/" + task.id + "/postpone")
-      .then(function (response) {
+    Tasks.postpone(task.id)
+      .then(function (postponed) {
         task.going = false;
-        task.task = response.data.task;
+        task.task = postponed.task;
       }, function () {
         task.going = false;
         task.broken = true;
@@ -293,10 +337,10 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
   $scope.unpostponeTask = function (task) {
     task.going = true;
 
-    $http.post("/tasks/" + task.id + "/unpostpone")
-      .then(function (response) {
+    Tasks.unpostpone(task.id)
+      .then(function (unpostponed) {
         task.going = false;
-        task.task = response.data.task;
+        task.task = unpostponed.task;
       }, function () {
         task.going = false;
         task.broken = true;
@@ -306,10 +350,10 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
   $scope.pauseTask = function (task) {
     task.going = true;
 
-    $http.post("/tasks/" + task.id + "/pause")
-      .then(function (response) {
+    Tasks.pause(task.id)
+      .then(function (paused) {
         task.going = false;
-        task.task = response.data.task;
+        task.task = paused.task;
       }, function () {
         task.going = false;
         task.broken = true;
@@ -319,10 +363,10 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
   $scope.unpauseTask = function (task) {
     task.going = true;
 
-    $http.post("/tasks/" + task.id + "/unpause")
-      .then(function (response) {
+    Tasks.unpause(task.id)
+      .then(function (unpaused) {
         task.going = false;
-        task.task = response.data.task;
+        task.task = unpaused.task;
       }, function () {
         task.going = false;
         task.broken = true;
@@ -333,7 +377,7 @@ app.controller('TasksCtrl', function ($scope, $http, $timeout, $log) {
     task.going = true;
     var self = this;
 
-    $http.delete("/tasks/" + task.id)
+    Tasks.delete(task.id)
       .then(function () {
         self.removeTask(task);
       }, function () {
