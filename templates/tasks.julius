@@ -173,6 +173,8 @@ app.controller('PlansCtrl', function ($scope, $http, $log) {
 
 
 app.factory('Tasks', function ($http) {
+  var tasksFromServer = #{toJSON tasksEstimatesNotes};
+
   function extractData(response) {
     return response.data;
   }
@@ -187,7 +189,7 @@ app.factory('Tasks', function ($http) {
   var Tasks = {};
 
   Tasks.all = function () {
-    return #{toJSON tasksEstimatesNotes};
+    return tasksFromServer;
   };
 
   Tasks.create = function (task) {
