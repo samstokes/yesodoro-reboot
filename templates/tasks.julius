@@ -216,7 +216,7 @@ app.factory('Tasks', function ($http) {
 });
 
 
-app.controller('TasksCtrl', function ($scope, Tasks, $timeout, $log) {
+app.controller('TasksCtrl', function ($scope, Tasks, $timeout) {
   function makeNewTask() {
     return {
       schedule: #{toJSON Once}
