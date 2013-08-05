@@ -33,7 +33,7 @@ section#plans form label
 .plan:hover .btn
   opacity: inherit
 .plan.broken .body
-  text-decoration: line-through
+  background: red
 .plan.going .body
   text-decoration: line-through
 
@@ -46,7 +46,7 @@ section#plans form label
 .task .title.ext-link .title
     font-style: italic
 .task.broken .title
-    text-decoration: line-through
+    background: red
 .task.going .title
     text-decoration: line-through
 h2.collapsed
@@ -75,7 +75,7 @@ h2.collapsed
   display: none
 
 .task .notes .note.broken .body
-  text-decoration: line-through
+  background: red
 
 .task .schedule-label
   font-size: 150%
