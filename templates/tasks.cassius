@@ -33,7 +33,7 @@ section#plans form label
 .plan:hover .btn
   opacity: inherit
 .plan.broken .body
-  text-decoration: line-through
+  background: red
 .plan.going .body
   text-decoration: line-through
 
