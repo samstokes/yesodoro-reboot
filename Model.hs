@@ -383,13 +383,13 @@ data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
               deriving (Show)
 
 
-updateTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> TaskEdit -> TaskId -> SqlPersist m (Bool, Maybe Task)
+updateTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> TaskEdit -> TaskId -> SqlPersist m (Bool, Maybe (Entity Task))
 updateTask tz edit taskId = do
     mtask <- get taskId
     case mtask of
       Just task -> do
         updated <- updateTask' edit task
-        (updated,) <$> if updated then get taskId else return $ Just task
+        (updated,) . fmap (Entity taskId) <$> if updated then get taskId else return $ Just task
       Nothing -> return (False, Nothing)
   where
     updateTask' (TaskTitleEdit title) task
