@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module Model.Note
     ( NewNote(..), createNote
@@ -39,11 +40,11 @@ createNote taskId note = do
   noteId <- insert note'
   return $ Entity noteId note'
 
-instance ToJSON (NoteGeneric b) where
+instance ToJSON Note where
   toJSON note = object [
-      ("taskId", toJSON $ noteTask note)
-    , ("body", toJSON $ noteBody note)
-    , ("createdAt", toJSON $ noteCreatedAt note)
+      "taskId" .= noteTask note
+    , "body" .= noteBody note
+    , "createdAt" .= noteCreatedAt note
     ]
 
 instance FromJSON NewNote where
