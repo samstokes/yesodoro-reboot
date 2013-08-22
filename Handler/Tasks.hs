@@ -184,14 +184,13 @@ deleteTaskR taskId = do
 
 putTaskR :: TaskId -> Handler RepJson
 putTaskR taskId = do
-  _ <- authedTask taskId
+  existingTask <- authedTaskPreventingXsrf taskId
   tz <- currentUserTimeZone
-  ((result, _), _) <- runFormPost editTaskForm
-  case result of
-    FormSuccess edit -> do
-      (updated, _) <- runDB $ updateTask tz edit taskId
-      jsonToRepJson $ object [("updated", toJSON updated)]
-    _ -> undefined -- TODO
+  updatedTask <- ownedTask (taskUser $ entityVal existingTask) <$> parseJsonBody_ -- TODO error page is HTML, not friendly!
+  let edit = existingTask `taskDiff` updatedTask
+  (_, updatedTask') <- runDB $ updateTask tz edit taskId
+  maybeJson taskId updatedTask'
+  where taskDiff _ (Task { taskTitle = newTitle }) = TaskTitleEdit newTitle
 
 
 postReorderTaskR :: TaskId -> Handler RepJson

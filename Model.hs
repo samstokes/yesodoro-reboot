@@ -236,6 +236,54 @@ instance FromJSON NewTask where
   parseJSON v = fail $ "can't parse task: " ++ show v
 
 
+data OwnedTask = OwnedTask
+  { ownedTaskTitle :: Text
+  , ownedTaskPomos :: Int
+  , ownedTaskScheduledFor :: UTCTime
+  , ownedTaskDoneAt :: Maybe UTCTime
+  , ownedTaskActive :: Bool
+  , ownedTaskOrder :: Int
+  , ownedTaskSchedule :: Schedule
+  , ownedTaskExtTask :: Maybe ExtTaskId
+  }
+
+
+instance FromJSON OwnedTask where
+  parseJSON (Object o) = OwnedTask
+    <$> (o .: "title")
+    <*> (fromMaybe 0 <$> o .:? "pomos")
+    <*> (o .: "scheduled_for")
+    <*> (o .:? "done_at")
+    <*> (o .: "active")
+    <*> (o .: "order")
+    <*> (o .: "schedule")
+    <*> (o .:? "ext_task")
+  parseJSON v = fail $ "can't parse task: " ++ show v
+
+
+ownedTask :: UserId -> OwnedTask -> Task
+ownedTask userId (OwnedTask
+  { ownedTaskTitle = title
+  , ownedTaskPomos = pomos
+  , ownedTaskScheduledFor = scheduledFor
+  , ownedTaskDoneAt = doneAt
+  , ownedTaskActive = active
+  , ownedTaskOrder = order
+  , ownedTaskSchedule = schedule
+  , ownedTaskExtTask = extTask
+  }) = Task
+  { taskUser = userId
+  , taskTitle = title
+  , taskPomos = pomos
+  , taskScheduledFor = scheduledFor
+  , taskDoneAt = doneAt
+  , taskActive = active
+  , taskOrder = order
+  , taskSchedule = schedule
+  , taskExtTask = extTask
+  }
+
+
 createTask :: PersistStore SqlPersist m => UserId -> UTCTime -> Int -> NewTask -> SqlPersist m (Entity Task)
 createTask uid scheduledFor order (NewTask title schedule mExt) = do
   mExtId <- maybeM Nothing (fmap Just . insert) $ newExtTask uid <$> mExt
