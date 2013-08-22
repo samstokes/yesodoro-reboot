@@ -131,11 +131,12 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll", mkDeleteCascade]
     $(persistFileWith lowerCaseSettings "config/models")
 
 
+instance ToJSON e => ToJSON (Entity e) where
+  toJSON (Entity k e) = toJSON e `mergeJSON` object ["id" .= k]
+
+
 instance ToJSON Estimate where
   toJSON (Estimate taskId pomos) = object ["task_id" .= taskId, "pomos" .= pomos]
-
-instance ToJSON (Entity Estimate) where
-  toJSON (Entity k e) = object ["id" .= k, "estimate" .= e]
 
 
 instance ToJSON Task where
@@ -160,9 +161,6 @@ instance ToJSON Task where
     , "schedule" .= schedule
     , "ext_task" .= extTask
     ]
-
-instance ToJSON (Entity Task) where
-  toJSON (Entity k t) = object ["id" .= k, "task" .= t]
 
 
 instance ToJSON ExtTask where

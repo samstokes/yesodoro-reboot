@@ -9,13 +9,14 @@ import Control.Monad (foldM, unless)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Trans.Error
 import Control.Monad.Trans.Maybe
+import Data.Aeson (Value(..))
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Char8 as B8
 import Data.Function (on)
 import Data.List (groupBy, union)
-import Data.Monoid (Monoid, mempty)
+import Data.Monoid (Monoid, mappend, mempty)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Data.Time
@@ -173,3 +174,21 @@ parseAuthorizationHeader auth = case B.splitAt (B.length "Basic ") auth of
 
 updateReturningNew :: (PersistQuery b m, PersistEntity val, b ~ PersistEntityBackend val) => Key b val -> [Update val] -> b m (Maybe (Entity val))
 updateReturningNew key updates = update key updates >> fmap (Entity key) <$> get key
+
+
+mergeJSON :: Value -> Value -> Value
+-- unmergeables
+mergeJSON _ Null = error "can't merge null"
+mergeJSON Null _ = error "can't merge null"
+mergeJSON _ (String _) = error "can't merge string"
+mergeJSON (String _) _ = error "can't merge string"
+mergeJSON _ (Number _) = error "can't merge number"
+mergeJSON (Number _) _ = error "can't merge number"
+mergeJSON _ (Bool _) = error "can't merge boolean"
+mergeJSON (Bool _) _ = error "can't merge boolean"
+-- mismatches
+mergeJSON (Object _) (Array _) = error "can't merge object with array"
+mergeJSON (Array _) (Object _) = error "can't merge object with array"
+-- things we can actually merge
+mergeJSON (Array a1) (Array a2) = Array (a1 `mappend` a2)
+mergeJSON (Object o1) (Object o2) = Object (o1 `mappend` o2)

@@ -32,9 +32,6 @@ instance ToJSON Plan where
     , "done_at" .= planDoneAt plan
     ]
 
-instance ToJSON (Entity Plan) where
-  toJSON (Entity k p) = object ["id" .= k, "plan" .= p]
-
 
 selectUserPlansSince :: PersistQuery SqlPersist m => UserId -> UTCTime -> [SelectOpt Plan] -> SqlPersist m [Entity Plan]
 selectUserPlansSince userId doneSince = selectList (belongsToUser ++ doneSinceLimit)

@@ -50,6 +50,3 @@ instance ToJSON Note where
 instance FromJSON NewNote where
   parseJSON (Object o) = NewNote <$> (o .: "body")
   parseJSON v = fail $ "can't parse note: " ++ show v
-
-instance ToJSON (Entity Note) where
-  toJSON (Entity k n) = object ["id" .= k, "note" .= n]
