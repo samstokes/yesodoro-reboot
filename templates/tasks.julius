@@ -217,8 +217,8 @@ app.factory('Tasks', function ($q, $http) {
       .then(newTask);
   };
 
-  Tasks.delete = function (task) {
-    return $http.delete("/tasks/" + task.id)
+  Tasks.delete = function (taskId) {
+    return $http.delete("/tasks/" + taskId)
       .then(extractData);
   };
 
