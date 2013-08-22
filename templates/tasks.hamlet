@@ -42,11 +42,11 @@
       <form .form-inline ng-submit="addNewTask()">
         <.control-group>
           <.controls>
-            <input required name="title" placeholder="Add a task" ng-model="newTask.title">
+            <input required name="title" placeholder="Add a task" ng-model="newTask.task.title">
         <.control-group>
           <.controls>
             $forall schedule <- scheduleOptions
-              <input type="radio" ng-model="newTask.schedule" value="#{schedule}" .inline>
+              <input type="radio" ng-model="newTask.task.schedule" value="#{schedule}" .inline>
               #{schedule}
         <input .btn .btn-primary type=submit value=Add>
 

@@ -257,7 +257,7 @@ app.controller('TasksCtrl', function ($scope, Tasks, $timeout) {
   }
 
   $scope.tasks = Tasks.all();
-  $scope.newTask = makeNewTask();
+  $scope.newTask = new Task();
 
   function endOfDay(date) {
     date.setHours(23);
@@ -297,8 +297,8 @@ app.controller('TasksCtrl', function ($scope, Tasks, $timeout) {
   };
 
   $scope.addNewTask = function () {
-    var task = {id: '_new', task: this.newTask};
-    this.newTask = makeNewTask();
+    var task = this.newTask;
+    this.newTask = new Task();
     this.tasks.splice(this.tasks.length, 0, task);
     Tasks.create(task.task)
       .then(function (created) {
