@@ -20,10 +20,10 @@ import Yesod.Auth (requireAuthId)
 
 
 instance ToJSON (Entity Task, [Entity Estimate], [Entity Note]) where
-  toJSON (Entity taskId task, estimates, notes) = object
-    [ "id" .= taskId
-    , "task" .= task
-    , "estimates" .= estimates, "notes" .= notes]
+  toJSON (task, estimates, notes) = toJSON task `mergeJSON` object
+    [ "estimates" .= estimates
+    , "notes" .= notes
+    ]
 
 
 getTasksR :: Handler RepHtml
