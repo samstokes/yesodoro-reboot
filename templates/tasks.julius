@@ -172,8 +172,26 @@ app.controller('PlansCtrl', function ($scope, $http, $log) {
 });
 
 
-app.factory('Tasks', function ($http) {
-  var tasksFromServer = #{toJSON tasksEstimatesNotes};
+function Task(taskData) {
+  if (undefined === taskData) {
+    taskData = {};
+  }
+
+  this.id = taskData.id || '_new';
+  this.task = taskData.task || {
+    schedule: #{toJSON Once}
+  };
+  this.notes = taskData.notes || [];
+  this.estimates = taskData.estimates || [];
+}
+
+
+app.factory('Tasks', function ($q, $http) {
+  function newTask(taskData) {
+    return new Task(taskData);
+  }
+
+  var tasksFromServer = #{toJSON tasksEstimatesNotes}.map(newTask);
 
   function extractData(response) {
     return response.data;
@@ -182,7 +200,8 @@ app.factory('Tasks', function ($http) {
   function taskAction(action) {
     return function (taskId) {
       return $http.post("/tasks/" + taskId + "/" + action)
-        .then(extractData);
+        .then(extractData)
+        .then(newTask);
     };
   }
 
@@ -195,10 +214,7 @@ app.factory('Tasks', function ($http) {
   Tasks.create = function (task) {
     return $http.post("/tasks", task)
       .then(extractData)
-      .then(function (task) {
-        task.notes = [];
-        return task;
-      });
+      .then(newTask);
   };
 
   Tasks.delete = function (task) {
@@ -206,8 +222,23 @@ app.factory('Tasks', function ($http) {
       .then(extractData);
   };
 
+  Tasks.complete = function (taskId) {
+    return $http.post("/tasks/" + taskId + "/complete")
+      .then(extractData)
+      .then(function (data) {
+        var tasks = {};
+        if (data.completed) {
+          tasks.completed = new Task(data.completed);
+        }
+        if (data.recurred) {
+          tasks.recurred = new Task(data.recurred);
+        }
+        return tasks;
+      });
+  };
+
   [
-    'complete', 'restart',
+    'restart',
     'postpone', 'unpostpone',
     'pause', 'unpause'
   ].forEach(function (action) {
