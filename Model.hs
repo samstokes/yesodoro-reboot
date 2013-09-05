@@ -35,6 +35,7 @@ data Feature = FeaturePomos
              | FeatureOverdueTasks
              | FeatureNonDailySchedules
              | FeatureSettings
+             | FeatureExtTasks
   deriving (Show, Read, Eq, Enum, Bounded, Ord)
 
 type FlagSetting a = (a, Bool)
@@ -63,6 +64,7 @@ featureDescription FeatureNotes = "task notes"
 featureDescription FeatureOverdueTasks = "warning for overdue tasks"
 featureDescription FeatureNonDailySchedules = "more task schedule options"
 featureDescription FeatureSettings = "settings panel"
+featureDescription FeatureExtTasks = "external task links"
 
 
 type FlagsVoid = Flags ()
