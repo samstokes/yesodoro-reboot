@@ -19,8 +19,15 @@ import Util.Angular
 import Yesod.Auth (requireAuthId)
 
 
-instance ToJSON (Entity Task, [Entity Estimate], [Entity Note]) where
-  toJSON (Entity taskId task, estimates, notes) = object
+data TaskWithChildren = TaskWithChildren
+  { twcTask :: Entity Task
+  , twcEstimates :: [Entity Estimate]
+  , twcNotes :: [Entity Note]
+  }
+
+
+instance ToJSON TaskWithChildren where
+  toJSON (TaskWithChildren (Entity taskId task) estimates notes) = object
     [ "id" .= taskId
     , "task" .= task
     , "estimates" .= estimates, "notes" .= notes]
@@ -45,8 +52,8 @@ getTasksR = do
   notes <- if has FeatureNotes
            then runDB $ mapM (taskNotes [Asc NoteCreatedAt] . entityKey) tasks
            else return $ map (const []) tasks
-  let tasksEstimatesNotes :: [(Entity Task, [Entity Estimate], [Entity Note])]
-      tasksEstimatesNotes = zip3 tasks estimates notes
+  let tasksWithChildren :: [TaskWithChildren]
+      tasksWithChildren = zipWith3 TaskWithChildren tasks estimates notes
 
   timeZone <- currentUserTimeZone
   time <- now
@@ -55,22 +62,22 @@ getTasksR = do
       taskOverdueToday :: Task -> Bool
       taskOverdueToday task = has FeatureOverdueTasks && taskOverdue timeZone time task
 
-  let (unsortedDone, pending) = partition (taskDone . entityVal . fst3) tasksEstimatesNotes
-  let done = reverse $ sortBy (comparing $ taskDoneAt . entityVal . fst3) unsortedDone
-  let (active, paused) = partition (taskActive . entityVal . fst3) pending
-  let (unsortedTodo, unsortedPostponed) = partition (taskTodoToday . entityVal . fst3) active
-  let todo = sortBy (comparing $ taskOrder . entityVal . fst3) unsortedTodo
-  let postponed = sortBy (comparing $ taskScheduledFor . entityVal . fst3) unsortedPostponed
+  let (unsortedDone, pending) = partition (taskDone . entityVal . twcTask) tasksWithChildren
+  let done = reverse $ sortBy (comparing $ taskDoneAt . entityVal . twcTask) unsortedDone
+  let (active, paused) = partition (taskActive . entityVal . twcTask) pending
+  let (unsortedTodo, unsortedPostponed) = partition (taskTodoToday . entityVal . twcTask) active
+  let todo = sortBy (comparing $ taskOrder . entityVal . twcTask) unsortedTodo
+  let postponed = sortBy (comparing $ taskScheduledFor . entityVal . twcTask) unsortedPostponed
 
   let (donePlans, activePlans) = partition (planDone . entityVal) plans
 
-  let doneTasksByDay :: [(Day, [(Entity Task, [Entity Estimate], [Entity Note])])]
-      doneTasksByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal . fst3) done
+  let doneTasksByDay :: [(Day, [TaskWithChildren])]
+      doneTasksByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal . twcTask) done
 
   let donePlansByDay :: [(Day, [Entity Plan])]
       donePlansByDay = groupByEq (fromJust . planDoneDay timeZone . entityVal) donePlans
 
-  let doneByDay :: [(Day, [Entity Plan], [(Entity Task, [Entity Estimate], [Entity Note])])]
+  let doneByDay :: [(Day, [Entity Plan], [TaskWithChildren])]
       doneByDay = reverse $ sortBy (comparing fst3) $ unionBothValues donePlansByDay doneTasksByDay
 
   (newTaskWidget, newTaskEnctype) <- generateFormPost (newTaskForm scheduleOptions)
@@ -81,7 +88,11 @@ getTasksR = do
       toggleableFeatures = sort $ filter ((/= FeatureSettings) . fst) features
       featureButtonLabel (feature, False) = Text.pack $ "Enable " ++ featureDescription feature
       featureButtonLabel (feature, True) = Text.pack $ "Disable " ++ featureDescription feature
-      taskTr (Entity taskId task, estimateEntities, noteEntities) = do
+      taskTr (TaskWithChildren {
+                twcTask = Entity taskId task
+              , twcEstimates = estimateEntities
+              , twcNotes = noteEntities
+              }) = do
         maybeExtTask <- lift $ runDB $ taskGetExtTask task
         $(widgetFile "tasks/task-tr")
    in defaultLayout $ do
@@ -89,9 +100,9 @@ getTasksR = do
         setTitle $ toMarkup title
         addWidget $(widgetFile "tasks") where
 
-  estimatedRemaining :: (Entity Task, [Entity Estimate], [Entity Note]) -> Int
-  estimatedRemaining (_, [], _) = 0
-  estimatedRemaining (Entity _ task, Entity _ estimate : _, _) = (estimatePomos estimate - taskPomos task) `max` 0
+  estimatedRemaining :: TaskWithChildren -> Int
+  estimatedRemaining (TaskWithChildren _ [] _) = 0
+  estimatedRemaining (TaskWithChildren (Entity _ task) (Entity _ estimate : _) _) = (estimatePomos estimate - taskPomos task) `max` 0
 
 
 notesWidget :: TaskId -> [Entity Note] -> Widget

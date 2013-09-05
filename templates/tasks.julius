@@ -193,7 +193,7 @@ app.factory('Tasks', function ($q, $http) {
     return new Task(taskData);
   }
 
-  var tasksFromServer = #{toJSON tasksEstimatesNotes}.map(newTask);
+  var tasksFromServer = #{toJSON tasksWithChildren}.map(newTask);
 
   function extractData(response) {
     return response.data;

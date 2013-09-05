@@ -97,7 +97,7 @@
         $if has FeaturePomos
           <h3>
             Remaining: #{sum $ map estimatedRemaining todo} of
-            $with estimateses <- map (map entityVal) $ map snd3 todo
+            $with estimateses <- map (map entityVal) $ map twcEstimates todo
               $with firstEstimates <- concatMap (take 1) estimateses
                 $with totalEstimated <- sum $ map estimatePomos firstEstimates
                   \ #{totalEstimated} estimated
@@ -139,7 +139,7 @@
           <h3>
             #{day}
             $if has FeaturePomos
-              \ (#{sum $ map taskPomos $ map entityVal $ map fst3 taskEntitiesEstimatesNotes})
+              \ (#{sum $ map taskPomos $ map entityVal $ map twcTask taskEntitiesEstimatesNotes})
           $if not (null plans)
             $forall plan <- plans
               <h4 .plan>
