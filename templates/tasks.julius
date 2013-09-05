@@ -183,6 +183,7 @@ function Task(taskData) {
   this.task = taskData.task || {
     schedule: #{toJSON Once}
   };
+  this.ext_task = taskData.ext_task;
   this.notes = taskData.notes || [];
   this.estimates = taskData.estimates || [];
 }

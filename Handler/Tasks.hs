@@ -5,7 +5,7 @@ module Handler.Tasks where
 
 import Import
 
-import Data.List (partition, sort, sortBy)
+import Data.List (partition, sort, sortBy, zipWith4)
 import Data.Ord (comparing)
 import qualified Data.Text as Text
 import Data.Text.Read (decimal)
@@ -21,15 +21,17 @@ import Yesod.Auth (requireAuthId)
 
 data TaskWithChildren = TaskWithChildren
   { twcTask :: Entity Task
+  , twcExtTask :: Maybe ExtTask
   , twcEstimates :: [Entity Estimate]
   , twcNotes :: [Entity Note]
   }
 
 
 instance ToJSON TaskWithChildren where
-  toJSON (TaskWithChildren (Entity taskId task) estimates notes) = object
+  toJSON (TaskWithChildren (Entity taskId task) extTask estimates notes) = object
     [ "id" .= taskId
     , "task" .= task
+    , "ext_task" .= extTask
     , "estimates" .= estimates, "notes" .= notes]
 
 
@@ -46,6 +48,9 @@ getTasksR = do
   tasks <- runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
   plans <- runDB $ selectUserPlansSince userId horizon [Desc PlanCreatedAt, Desc PlanDoneAt]
 
+  extTasks <- if has FeatureExtTasks
+              then runDB $ mapM (taskGetExtTask . entityVal) tasks
+              else return $ map (const Nothing) tasks
   estimates <- if has FeaturePomos
                then runDB $ mapM (taskEstimates . entityKey) tasks
                else return $ map (const []) tasks
@@ -53,7 +58,7 @@ getTasksR = do
            then runDB $ mapM (taskNotes [Asc NoteCreatedAt] . entityKey) tasks
            else return $ map (const []) tasks
   let tasksWithChildren :: [TaskWithChildren]
-      tasksWithChildren = zipWith3 TaskWithChildren tasks estimates notes
+      tasksWithChildren = zipWith4 TaskWithChildren tasks extTasks estimates notes
 
   timeZone <- currentUserTimeZone
   time <- now
@@ -90,19 +95,18 @@ getTasksR = do
       featureButtonLabel (feature, True) = Text.pack $ "Disable " ++ featureDescription feature
       taskTr (TaskWithChildren {
                 twcTask = Entity taskId task
+              , twcExtTask = maybeExtTask
               , twcEstimates = estimateEntities
               , twcNotes = noteEntities
-              }) = do
-        maybeExtTask <- lift $ runDB $ taskGetExtTask task
-        $(widgetFile "tasks/task-tr")
+              }) = $(widgetFile "tasks/task-tr")
    in defaultLayout $ do
         title <- lift appTitle
         setTitle $ toMarkup title
         addWidget $(widgetFile "tasks") where
 
   estimatedRemaining :: TaskWithChildren -> Int
-  estimatedRemaining (TaskWithChildren _ [] _) = 0
-  estimatedRemaining (TaskWithChildren (Entity _ task) (Entity _ estimate : _) _) = (estimatePomos estimate - taskPomos task) `max` 0
+  estimatedRemaining (TaskWithChildren _ _ [] _) = 0
+  estimatedRemaining (TaskWithChildren (Entity _ task) _ (Entity _ estimate : _) _) = (estimatePomos estimate - taskPomos task) `max` 0
 
 
 notesWidget :: TaskId -> [Entity Note] -> Widget
