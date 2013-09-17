@@ -1,3 +1,5 @@
+<td .reorder-handle ng-show="isTodoToday(task)">
+  ⇳
 <td .schedule>
   <.schedule-label>{{task.task.schedule | scheduleLabel}}
 <th .title ng-class="{'ext-link': task.ext_task}">

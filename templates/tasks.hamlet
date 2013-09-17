@@ -37,8 +37,8 @@
     <div .content>
       <p ng-show="tasks.length == 0">
         Nothing to do. Congratulations! Why not take the rest of the day off?
-      <table ng-hide="tasks.length == 0"><tbody>
-        <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filter:isTodoToday | orderBy:taskOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
+      <table ng-hide="tasks.length == 0"><tbody ui-sortable="sortableOptions" ng-model="tasks">
+        <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks" ng-show="isTodoToday(task)" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
       <form .form-inline ng-submit="addNewTask()">
         <.control-group>
           <.controls>
