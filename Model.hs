@@ -10,7 +10,7 @@ import Yesod
 
 import Control.Applicative ((<$>), (<*>), pure)
 import Control.Monad ((>=>))
-import Data.Aeson (FromJSON, ToJSON, parseJSON, (.:), (.:?))
+import Data.Aeson (FromJSON, ToJSON, parseJSON, toJSON, (.:), (.:?))
 import qualified Data.Aeson as J
 import Data.Text (Text, pack, unpack)
 import Data.Time (Day, TimeZone, UTCTime, NominalDiffTime)
@@ -81,6 +81,12 @@ data Schedule = Once | Daily | Weekly | Fortnightly
   deriving (Show, Read, Eq, Enum, Bounded)
 derivePersistField "Schedule"
 
+instance ToJSON Schedule where
+  toJSON = toJSON . show
+
+instance ToMarkup Schedule where
+  toMarkup = toMarkup . show
+
 nonDaily :: Schedule -> Bool
 nonDaily = oneOf [Weekly, Fortnightly]
 
@@ -120,6 +126,34 @@ derivePersistField "ExternalSourceName"
 -- http://www.yesodweb.com/book/persistent/
 share [mkPersist sqlSettings, mkMigrate "migrateAll", mkDeleteCascade]
     $(persistFileWith lowerCaseSettings "config/models")
+
+
+instance ToJSON Task where
+  toJSON (Task
+    { taskUser = user
+    , taskTitle = title
+    , taskPomos = pomos
+    , taskScheduledFor = scheduledFor
+    , taskDoneAt = doneAt
+    , taskActive = active
+    , taskOrder = order
+    , taskSchedule = schedule
+    , taskExtTask = extTask
+    }) = object
+    [ "user_id" .= user
+    , "title" .= title
+    , "pomos" .= pomos
+    , "scheduled_for" .= scheduledFor
+    , "done_at" .= doneAt
+    , "active" .= active
+    , "order" .= order
+    , "schedule" .= schedule
+    , "ext_task" .= extTask
+    ]
+
+instance ToJSON (Entity Task) where
+  toJSON (Entity k t) = object ["id" .= k, "task" .= t]
+
 
 instance ToJSON ExtTask where
   toJSON (ExtTask user extId source url status) = object

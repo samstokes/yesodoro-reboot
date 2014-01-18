@@ -11,6 +11,14 @@ import Network.Wai (requestHeaders)
 import Yesod.Auth.Email (isValidPass)
 import Yesod.Default.Config (AppConfig(..))
 
+getApiTasksR :: Handler RepJson
+getApiTasksR = do
+  userId <- httpBasicAuth
+  horizon <- ago $ weeks 2
+  tasks <- runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
+
+  jsonToRepJson tasks
+
 postApiTasksR :: Handler RepJson
 postApiTasksR = do
   userId <- httpBasicAuth

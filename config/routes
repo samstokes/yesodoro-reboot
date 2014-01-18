@@ -29,5 +29,5 @@
 
 /settings/features/#Feature/toggle ToggleFeatureR POST
 
-/api/tasks ApiTasksR POST
+/api/tasks ApiTasksR GET POST
 /api/ext_tasks/#ExternalSourceName ApiExtTasksForSourceR GET
