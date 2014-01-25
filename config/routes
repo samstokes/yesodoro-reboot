@@ -31,3 +31,5 @@
 
 /api/tasks ApiTasksR GET POST
 /api/ext_tasks/#ExternalSourceName ApiExtTasksForSourceR GET
+/api/tasks/#TaskId/complete ApiCompleteTaskR POST
+/api/tasks/#TaskId/postpone ApiPostponeTaskR POST

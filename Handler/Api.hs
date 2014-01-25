@@ -47,6 +47,29 @@ getApiExtTasksForSourceR source = do
   jsonToRepJson $ map entityVal extTasks
 
 
+postApiCompleteTaskR :: TaskId -> Handler RepJson
+postApiCompleteTaskR taskId = do
+  Entity userId user <- httpBasicAuth
+  maybeAuthedTask <- runDB $ selectFirst [TaskId ==. taskId, TaskUser ==. userId] []
+  task <- case maybeAuthedTask of
+    Just task -> return task
+    Nothing -> notFound
+  let tz = userTimeZone user
+  _ <- runDB $ completeTask tz task
+  jsonToRepJson $ object ["completed" .= True]
+
+
+postApiPostponeTaskR :: TaskId -> Handler RepJson
+postApiPostponeTaskR taskId = do
+  Entity userId _ <- httpBasicAuth
+  maybeAuthedTask <- runDB $ selectFirst [TaskId ==. taskId, TaskUser ==. userId] []
+  _ <- case maybeAuthedTask of
+    Just task -> return task
+    Nothing -> notFound
+  _ <- runDB $ postponeTask (days 1) taskId
+  jsonToRepJson $ object ["postponed" .= True]
+
+
 setLocation :: Route master -> GHandler sub master ()
 setLocation url = do
   r <- getUrlRender
