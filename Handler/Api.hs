@@ -13,7 +13,7 @@ import Yesod.Default.Config (AppConfig(..))
 
 getApiTasksR :: Handler RepJson
 getApiTasksR = do
-  userId <- httpBasicAuth
+  Entity userId _ <- httpBasicAuth
   horizon <- ago $ weeks 2
   tasks <- runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
 
@@ -21,7 +21,7 @@ getApiTasksR = do
 
 postApiTasksR :: Handler RepJson
 postApiTasksR = do
-  userId <- httpBasicAuth
+  Entity userId _ <- httpBasicAuth
   newTask <- parseJsonBody_ -- TODO error page is HTML, not friendly!
 
   existingTask <- runDB $ runMaybeT $ do
@@ -42,7 +42,7 @@ postApiTasksR = do
 
 getApiExtTasksForSourceR :: ExternalSourceName -> Handler RepJson
 getApiExtTasksForSourceR source = do
-  userId <- httpBasicAuth
+  Entity userId _ <- httpBasicAuth
   extTasks <- runDB $ allExtTasksForSource userId source
   jsonToRepJson $ map entityVal extTasks
 
@@ -64,13 +64,13 @@ instance Error AuthError where
   strMsg = AuthErrorOther
 
 
-httpBasicAuth :: Handler UserId
+httpBasicAuth :: Handler (Entity User)
 httpBasicAuth = do
     root <- (appRoot . settings) <$> getYesod
     auth <- runErrorT handleBasicAuth
-    $logDebug $ T.pack $ "HTTP Basic auth: " ++ show auth
+    $logDebug $ T.pack $ "HTTP Basic auth: " ++ show (entityKey <$> auth)
     case auth of
-      Right userId -> return userId
+      Right user -> return user
 
       Left AuthCredentialsNotSupplied -> do
         setHeader "WWW-Authenticate" $ T.concat ["Basic Realm=\"", root, "\""]
@@ -83,7 +83,7 @@ httpBasicAuth = do
         $logWarn $ T.pack $ "unexpected auth error: " ++ err
         unauthorized "credentials not recognised"
   where
-  handleBasicAuth :: ErrorT AuthError Handler UserId
+  handleBasicAuth :: ErrorT AuthError Handler (Entity User)
   handleBasicAuth = do
     request <- lift waiRequest
     auth <- toErrorT $ maybeToEither AuthCredentialsNotSupplied $ lookup "Authorization" (requestHeaders request)
@@ -92,7 +92,7 @@ httpBasicAuth = do
     userId <- toErrorT $ maybeToEither (AuthErrorOther "email has no associated user account!") $ emailUser email'
     user <- ErrorT $ fmap (maybeToEither $ AuthErrorOther "user account missing!") $ runDB $ get userId
     if maybe False (isValidPass clearPassword) (userPassword user)
-      then return userId
+      then return $ Entity userId user
       else throwError AuthCredentialsInvalid
 
 
