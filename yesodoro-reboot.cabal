@@ -65,6 +65,7 @@ library
 
     build-depends: base
                  , template-haskell
+                 , yesod-platform
                  , yesod
                  , yesod-auth
                  , yesod-core
@@ -109,6 +110,7 @@ executable         yesodoro-reboot
     hs-source-dirs:    dist
     build-depends:     base
                      , yesodoro-reboot
+                     , yesod
 
 test-suite test
     type:              exitcode-stdio-1.0
