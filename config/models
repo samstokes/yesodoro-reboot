@@ -4,6 +4,7 @@ User
     timeZone TimeZone default='PST'
     features FlagsFeature default='[]'
     UniqueUser ident
+    deriving Typeable
 Email
     email Text
     user UserId Maybe

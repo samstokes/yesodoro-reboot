@@ -11,15 +11,16 @@ import Yesod.Auth
 import Yesod.Default.Config
 import Yesod.Default.Main
 import Yesod.Default.Handlers
-import Yesod.Logger (Logger, logBS, toProduction, flushLogger)
 import qualified Network.Wai.Middleware.Gzip as GZ
-import Network.Wai.Middleware.RequestLogger (logCallback, logCallbackDev)
+import Network.Wai.Middleware.RequestLogger
 import Network.Wai.Middleware.MethodOverride (methodOverride)
-import qualified Database.Persist.Store
-import Database.Persist.GenericSql (runMigration)
+import qualified Database.Persist
+import Database.Persist.Sql (runMigration)
 import Network.HTTP.Conduit (newManager, def)
-import Control.Concurrent (forkIO, threadDelay)
-import Control.Monad (forever)
+import Control.Monad (foldM)
+import Control.Monad.Logger (runLoggingT)
+import System.IO (stdout)
+import System.Log.FastLogger (mkLogger)
 
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
@@ -38,41 +39,50 @@ mkYesodDispatch "App" resourcesApp
 -- performs initialization and creates a WAI application. This is also the
 -- place to put your migrate statements to have automatic database
 -- migrations handled by Yesod.
-makeApplication :: AppConfig DefaultEnv Extra -> Logger -> IO Application
-makeApplication conf logger = do
-    foundation <- makeFoundation conf setLogger
+makeApplication :: AppConfig DefaultEnv Extra -> IO Application
+makeApplication conf = do
+    foundation <- makeFoundation conf
     app <- toWaiAppPlain foundation
+
+    logWare <- mkRequestLogger def
+        { outputFormat =
+            if development
+                then Detailed True
+                else Apache FromSocket
+        , destination = Logger $ appLogger foundation
+        }
+
+    let middlewares = [
+            methodOverride
+          , logWare
+          , GZ.gzip GZ.def
+          ]
+
     return $ foldr ($) app middlewares
-  where
-    middlewares = [
-        methodOverride
-      , logWare
-      , GZ.gzip GZ.def
-      ]
-    setLogger = if development then logger else toProduction logger
-    logWare   = if development then logCallbackDev (logBS setLogger)
-                               else logCallback    (logBS setLogger)
 
-makeFoundation :: AppConfig DefaultEnv Extra -> Logger -> IO App
-makeFoundation conf setLogger = do
-    _ <- forkIO $ forever $ do
-        threadDelay $ 1000 * 1000
-        flushLogger setLogger
-
+makeFoundation :: AppConfig DefaultEnv Extra -> IO App
+makeFoundation conf = do
     manager <- newManager def
     s <- staticSite
     dbconf <- withYamlEnvironment "config/postgresql.yml" (appEnv conf)
-              Database.Persist.Store.loadConfig >>=
-              Database.Persist.Store.applyEnv
-    p <- Database.Persist.Store.createPoolConfig (dbconf :: Settings.PersistConfig)
-    Database.Persist.Store.runPool dbconf (runMigration migrateAll) p
-    return $ App conf setLogger s p manager dbconf
+              Database.Persist.loadConfig >>=
+              Database.Persist.applyEnv
+    p <- Database.Persist.createPoolConfig (dbconf :: Settings.PersistConfig)
+    logger <- mkLogger True stdout
+    let foundation = App conf s p manager dbconf logger
+
+    -- Perform database migration using our application's logging settings.
+    runLoggingT
+        (Database.Persist.runPool dbconf (runMigration migrateAll) p)
+        (messageLoggerSource foundation logger)
+
+    return foundation
 
 -- for yesod devel
 getApplicationDev :: IO (Int, Application)
 getApplicationDev =
     defaultDevelApp loader makeApplication
   where
-    loader = loadConfig (configSettings Development)
+    loader = Yesod.Default.Config.loadConfig (configSettings Development)
         { csParseExtra = parseExtra
         }

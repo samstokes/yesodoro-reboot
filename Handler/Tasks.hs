@@ -7,15 +7,16 @@ import Data.Ord (comparing)
 import qualified Data.Text as Text
 import Data.Text.Read (decimal)
 import System.Locale (defaultTimeLocale)
-import Database.Persist.Query.Internal (Update)
+import Database.Persist (Update)
 import Forms
 import Data.Aeson.Types (toJSON)
 import Text.Blaze (toMarkup)
 import Util
 import Yesod.Auth (requireAuthId)
+import Yesod (handlerToWidget)
 
 
-getTasksR :: Handler RepHtml
+{-getTasksR :: Handler RepHtml-}
 getTasksR = do
   Entity userId user <- requireAuth
   let
@@ -68,12 +69,12 @@ getTasksR = do
       featureButtonLabel (feature, False) = Text.pack $ "Enable " ++ featureDescription feature
       featureButtonLabel (feature, True) = Text.pack $ "Disable " ++ featureDescription feature
       taskTr (Entity taskId task, estimateEntities, noteEntities) = do
-        maybeExtTask <- lift $ runDB $ taskGetExtTask task
+        maybeExtTask <- handlerToWidget $ runDB $ taskGetExtTask task
         $(widgetFile "tasks/task-tr")
    in defaultLayout $ do
-        title <- lift appTitle
+        title <- handlerToWidget appTitle
         setTitle $ toMarkup title
-        addWidget $(widgetFile "tasks") where
+        $(widgetFile "tasks") where
 
   estimatedRemaining :: (Entity Task, [Entity Estimate], [Entity Note]) -> Int
   estimatedRemaining (_, [], _) = 0
@@ -82,10 +83,10 @@ getTasksR = do
 
 notesWidget :: TaskId -> [Entity Note] -> Widget
 notesWidget taskId notes = do
-  widgetId <- lift newIdent
-  (newNoteWidget, newNoteEnctype) <- lift $ generateFormPost newNoteForm
+  widgetId <- handlerToWidget newIdent
+  (newNoteWidget, newNoteEnctype) <- handlerToWidget $ generateFormPost newNoteForm
   time <- now
-  timeZone <- lift currentUserTimeZone
+  timeZone <- handlerToWidget currentUserTimeZone
 
   let renderTime format = formatTime defaultTimeLocale format . utcToLocalTime timeZone
       selector = Text.concat . (["#", widgetId, " "] ++) . pure
@@ -122,7 +123,7 @@ deleteButton classes label route = [whamlet|
 |]
 
 
-updateAndRedirectR :: HasReps a => Route App -> [Update Task] -> TaskId -> Handler a
+{-updateAndRedirectR :: HasReps a => Route App -> [Update Task] -> TaskId -> Handler a-}
 updateAndRedirectR route updates taskId = do
   _ <- authedTask taskId
   runDB $ update taskId updates
@@ -160,7 +161,7 @@ deleteTaskR taskId = do
   redirect TasksR
 
 
-putTaskR :: TaskId -> Handler RepJson
+putTaskR :: TaskId -> Handler Value
 putTaskR taskId = do
   _ <- authedTask taskId
   tz <- currentUserTimeZone
@@ -172,7 +173,7 @@ putTaskR taskId = do
     _ -> undefined -- TODO
 
 
-postReorderTaskR :: TaskId -> Handler RepJson
+postReorderTaskR :: TaskId -> Handler Value
 postReorderTaskR taskId = do
   _ <- authedTask taskId
   tz <- currentUserTimeZone
@@ -229,7 +230,7 @@ postTaskPomosR :: TaskId -> Handler RepHtml
 postTaskPomosR = updateAndRedirectR TasksR [TaskPomos +=. 1]
 
 
-postTaskNotesR :: TaskId -> Handler RepJson
+postTaskNotesR :: TaskId -> Handler Value
 postTaskNotesR taskId = do
   _ <- authedTask taskId
   ((result, _), _) <- runFormPost newNoteForm

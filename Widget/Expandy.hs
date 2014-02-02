@@ -6,10 +6,10 @@ module Widget.Expandy
 import Prelude
 
 import Data.Text (Text)
-import Yesod (GWidget, addScriptEither, getYesod, newIdent)
+import Yesod
 import Yesod.Default.Util (widgetFileNoReload)
 import Yesod.Form.Jquery (YesodJquery (..))
-import Yesod.Handler (lift)
+import Data.Default (def)
 
 
 data ExpandyState = Collapsed | Expanded
@@ -20,11 +20,13 @@ expandyIndicator Collapsed = "☞"
 expandyIndicator Expanded = "☟"
 
 
-expandy :: YesodJquery master => ExpandyState -> Text -> Text -> GWidget sub master ()
-expandy initialState handleSelector targetSelector = do
-  master <- lift getYesod
+{-expandy :: (YesodJquery master, MonadHandler m, MonadBaseControl IO m, master ~ HandlerSite m) => ExpandyState -> Text -> Text -> WidgetT master m ()-}
+expandy initialState handleSelector' targetSelector' = do
+  master <- handlerToWidget getYesod
   addScriptEither $ urlJqueryJs master
 
-  widgetId <- lift newIdent
+  widgetId <- handlerToWidget newIdent
 
-  $(widgetFileNoReload "expandy")
+  let handleSelector :: Text; handleSelector = handleSelector'
+      targetSelector :: Text; targetSelector = targetSelector'
+    in $(widgetFileNoReload def "expandy")

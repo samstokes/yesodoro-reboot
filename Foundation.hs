@@ -12,6 +12,7 @@ module Foundation
     , appTitle
     , module Settings
     , module Model
+    , module Model.Types
     , module Model.Note
     , module Model.Plan
     ) where
@@ -26,14 +27,14 @@ import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
 import Yesod.Form.Jquery (YesodJquery(..))
-import Yesod.Logger (Logger, logMsg, formatLogText, logLazyText)
 import Network.HTTP.Conduit (Manager)
 import qualified Settings
-import qualified Database.Persist.Store
 import Settings.Development
+import qualified Database.Persist
+import Database.Persist.Sql (SqlPersistT)
 import Settings.StaticFiles
-import Database.Persist.GenericSql
 import Settings (widgetFile, Extra (..))
+import Model.Types
 import Model
 import Model.Note
 import Model.Plan
@@ -43,7 +44,9 @@ import Text.Jasmine (minifym)
 import Web.ClientSession (getKey)
 import Text.Hamlet (hamletFile)
 import Text.Shakespeare.Text (stext)
+import System.Log.FastLogger (Logger)
 import Data.Text (Text)
+import qualified Data.Text as Text
 import Data.Time (TimeZone(..))
 import Util
 import Util.Angular
@@ -54,11 +57,11 @@ import Util.Angular
 -- access to the data present here.
 data App = App
     { settings :: AppConfig DefaultEnv Extra
-    , getLogger :: Logger
     , getStatic :: Static -- ^ Settings for static file serving.
-    , connPool :: Database.Persist.Store.PersistConfigPool Settings.PersistConfig -- ^ Database connection pool.
+    , connPool :: Database.Persist.PersistConfigPool Settings.PersistConfig -- ^ Database connection pool.
     , httpManager :: Manager
     , persistConfig :: Settings.PersistConfig
+    , appLogger :: Logger
     }
 
 -- Set up i18n messages. See the message folder.
@@ -93,7 +96,7 @@ deleteR :: Route App -> (Route App, [(Text, Text)])
 deleteR = overrideMethodR "DELETE"
 
 
-type Form x = Html -> MForm App App (FormResult x, Widget)
+type Form x = Html -> MForm (HandlerT App IO) (FormResult x, Widget)
 
 -- Please see the documentation for the Yesod typeclass. There are a number
 -- of settings which can be configured by overriding methods here.
@@ -102,9 +105,9 @@ instance Yesod App where
 
     -- Store session data on the client in encrypted cookies,
     -- default session idle timeout is 120 minutes
-    makeSessionBackend _ = do
-        key <- getKey "config/client_session_key.aes"
-        return . Just $ clientSessionBackend key 120
+    makeSessionBackend _ = fmap Just $ defaultClientSessionBackend
+        (120 * 60) -- 120 minutes
+        "config/client_session_key.aes"
 
     defaultLayout widget = do
         setXsrfCookie
@@ -139,9 +142,6 @@ instance Yesod App where
     -- The page to be redirected to when authentication is required.
     authRoute _ = Just $ AuthR LoginR
 
-    messageLogger y loc level msg =
-      formatLogText (getLogger y) loc level msg >>= logMsg (getLogger y)
-
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
     -- expiration dates to be set far in the future without worry of
@@ -151,8 +151,15 @@ instance Yesod App where
     -- Place Javascript at bottom of the body tag so the rest of the page loads first
     jsLoader _ = BottomOfHeadBlocking
 
+    -- What messages should be logged. The following includes all messages when
+    -- in development, and warnings and errors in production.
+    shouldLog _ _source level =
+        development || level == LevelWarn || level == LevelError
 
-appTitle :: Handler Text
+    makeLogger = return . appLogger
+
+
+{-appTitle :: (MonadHandler m, MonadBaseControl IO m) => HandlerT App m Text-}
 appTitle = fmap (extraTitle . appExtra . settings) getYesod
 
 
@@ -162,10 +169,10 @@ instance YesodJquery App where
 
 -- How to run database actions.
 instance YesodPersist App where
-    type YesodPersistBackend App = SqlPersist
+    type YesodPersistBackend App = SqlPersistT
     runDB f = do
         master <- getYesod
-        Database.Persist.Store.runPool
+        Database.Persist.runPool
             (persistConfig master)
             f
             (connPool master)
@@ -187,11 +194,11 @@ instance YesodAuth App where
         x <- getBy $ UniqueUser $ credsIdent creds
         case x of
             Just (Entity uid _) -> return $ Just uid
-            Nothing -> do
+            Nothing ->
                 fmap Just $ insert $ User (credsIdent creds) Nothing defaultTimeZone noFlags
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [authBrowserId, authGoogleEmail, authEmail]
+    authPlugins _ = [authBrowserId def, authGoogleEmail, authEmail]
 
     authHttpManager = httpManager
 
@@ -217,10 +224,12 @@ instance YesodAuthEmail App where
         y <- getYesod
         -- Just log the verification URL for now, rather than emailing it...
         -- TODO this is insecure and user-unfriendly!
-        liftIO $ logLazyText (getLogger y) [stext|
+        liftIO $ putStrLn $ Text.unpack verurl
+        {-liftIO $ logLazyText (getLogger y) [stext|-}
+        return [stext|
 Hello #{email}!
 Please go to #{verurl}.
-|]
+|] >> return ()
     getVerifyKey = runDB . fmap (join . fmap emailVerkey) . get
     setVerifyKey eid key = runDB $ update eid [EmailVerkey =. Just key]
     verifyAccount eid = runDB $ do
@@ -243,8 +252,10 @@ Please go to #{verurl}.
             Nothing -> return Nothing
             Just (Entity eid e) -> return $ Just EmailCreds
                 { emailCredsId = eid
+                , emailCredsEmail = emailEmail e
                 , emailCredsAuthId = emailUser e
                 , emailCredsStatus = isJust $ emailUser e
                 , emailCredsVerkey = emailVerkey e
                 }
     getEmail = runDB . fmap (fmap emailEmail) . get
+    afterPasswordRoute = const TasksR

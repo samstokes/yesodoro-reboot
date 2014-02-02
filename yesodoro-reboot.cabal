@@ -25,6 +25,7 @@ library
                      Foundation
                      Import
                      Model
+                     Model.Types
                      Model.Note
                      Model.Plan
                      Settings
@@ -58,44 +59,45 @@ library
                 FlexibleContexts
                 EmptyDataDecls
                 NoMonomorphismRestriction
+                DeriveDataTypeable
 
-    build-depends: base                          >= 4          && < 5
-                 , yesod-platform                >= 1.0        && < 1.1
-                 , yesod                         >= 1.0        && < 1.1
-                 , yesod-core                    >= 1.0        && < 1.1
-                 , yesod-auth                    >= 1.0        && < 1.1
-                 , yesod-static                  >= 1.0        && < 1.1
-                 , yesod-default                 >= 1.0        && < 1.1
-                 , yesod-form                    >= 1.0        && < 1.1
-                 , yesod-test                    >= 0.2        && < 0.3
-                 , clientsession                 >= 0.7.3      && < 0.8
-                 , bytestring                    >= 0.9        && < 0.10
-                 , text                          >= 0.11       && < 0.12
-                 , persistent                    >= 0.9        && < 0.10
-                 , persistent-postgresql     >= 0.9        && < 0.10
+    build-depends: base
                  , template-haskell
-                 , hamlet                        >= 1.0        && < 1.1
-                 , shakespeare-css               >= 1.0        && < 1.1
-                 , shakespeare-js                >= 1.0        && < 1.1
-                 , shakespeare-text              >= 1.0        && < 1.1
-                 , hjsmin                        >= 0.1        && < 0.2
-                 , monad-control                 >= 0.3        && < 0.4
-                 , wai
-                 , wai-extra                     >= 1.2        && < 1.3
-                 , yaml                          >= 0.7        && < 0.8
-                 , http-conduit                  >= 1.4        && < 1.5
-                 , directory                     >= 1.1        && < 1.2
-                 , warp                          >= 1.2        && < 1.3
-                 , time                          >= 1.2        && < 1.3
-                 , blaze-markup                  >= 0.5        && < 0.6
-                 , aeson                         >= 0.6        && < 0.7
-                 , transformers                  >= 0.3        && < 0.4
-                 , old-locale                    >= 1.0        && < 1.1
+                 , yesod
+                 , yesod-auth
+                 , yesod-core
+                 , yesod-form
+                 , yesod-static
+                 , http-conduit
+                 , aeson
+                 , yaml
+                 , text
+                 , bytestring
                  , base64-bytestring
+                 , transformers
+                 , mtl
+                 , blaze-markup
+                 , hamlet
+                 , shakespeare-text
+                 , shakespeare-js
+                 , persistent
+                 , persistent-template
+                 , persistent-postgresql
+                 , yesod-persistent
+                 , wai
+                 , wai-extra
+                 , time
+                 , old-locale
                  , http-types
-                 , data-default
                  , cookie
+                 , clientsession
+                 , hjsmin
+                 , data-default
                  , safe
+                 , fast-logger
+                 , monad-logger
+                 , directory
+                 , warp
 
 executable         yesodoro-reboot
     if flag(library-only)
@@ -105,7 +107,6 @@ executable         yesodoro-reboot
     hs-source-dirs:    dist
     build-depends:     base
                      , yesodoro-reboot
-                     , yesod-default
 
 test-suite test
     type:              exitcode-stdio-1.0

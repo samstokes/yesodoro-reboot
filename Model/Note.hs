@@ -12,12 +12,12 @@ import Control.Monad.IO.Class (MonadIO)
 import Data.Aeson.Types (ToJSON, toJSON)
 import Data.Text (Text)
 import Data.Time (UTCTime)
-import Database.Persist.GenericSql (SqlPersist)
+import Database.Persist.Sql (SqlPersistT)
 import Model
 import Util
 
 
-taskNotes :: PersistQuery SqlPersist m => [SelectOpt Note] -> TaskId -> SqlPersist m [Entity Note]
+{-taskNotes :: PersistQuery SqlPersist m => [SelectOpt Note] -> TaskId -> SqlPersist m [Entity Note]-}
 taskNotes opts taskId = selectList [NoteTask ==. taskId] opts
 
 
@@ -30,14 +30,14 @@ newNote taskId createdAt (NewNote body) = Note {
   , noteCreatedAt = createdAt
   }
 
-createNote :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> NewNote -> SqlPersist m (NoteId, Note)
+{-createNote :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> NewNote -> SqlPersist m (NoteId, Note)-}
 createNote taskId note = do
   time <- now
   let note' = newNote taskId time note
   noteId <- insert note'
   return (noteId, note')
 
-instance ToJSON (NoteGeneric b) where
+instance ToJSON Note where
   toJSON note = object [
       ("taskId", toJSON $ noteTask note)
     , ("body", toJSON $ noteBody note)

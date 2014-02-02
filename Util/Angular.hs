@@ -19,7 +19,7 @@ import Yesod.Core
 import Yesod.Form.Types (FormMessage(MsgCsrfWarning))
 
 
-setXsrfCookie :: GHandler s m ()
+setXsrfCookie :: MonadHandler m => m ()
 setXsrfCookie = do
     request <- getRequest
     let token = reqToken request
@@ -39,14 +39,14 @@ setXsrfCookie = do
     }
 
 
-validXsrfHeader :: GHandler s m Bool
+validXsrfHeader :: MonadHandler m => m Bool
 validXsrfHeader = do
   token <- fmap reqToken getRequest
   mSuppliedToken <- fmap (fmap decodeUtf8 . lookup "X-XSRF-Token" . requestHeaders) waiRequest
   return $ token == mSuppliedToken
 
 
-requireAuthIdPreventingXsrf :: YesodAuth m => GHandler s m (AuthId m)
+{-requireAuthIdPreventingXsrf :: (YesodAuth s, YesodPersist s, PersistStore (YesodPersistBackend s m), m ~ HandlerT s IO) => m (AuthId s)-}
 requireAuthIdPreventingXsrf = do
   valid <- validXsrfHeader
   unless valid $ do
