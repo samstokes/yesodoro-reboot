@@ -13,14 +13,20 @@ import Yesod.Default.Main
 import Yesod.Default.Handlers
 import qualified Network.Wai.Middleware.Gzip as GZ
 import Network.Wai.Middleware.RequestLogger
+    ( mkRequestLogger, outputFormat, OutputFormat (..), IPAddrSource (..), destination
+    )
+import qualified Network.Wai.Middleware.RequestLogger as RequestLogger
 import Network.Wai.Middleware.MethodOverride (methodOverride)
 import qualified Database.Persist
 import Database.Persist.Sql (runMigration)
-import Network.HTTP.Conduit (newManager, def)
+import Network.HTTP.Conduit (newManager, conduitManagerSettings)
 import Control.Monad (foldM)
 import Control.Monad.Logger (runLoggingT)
-import System.IO (stdout)
-import System.Log.FastLogger (mkLogger)
+import Control.Concurrent (forkIO, threadDelay)
+import System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize)
+import Network.Wai.Logger (clockDateCacher)
+import Data.Default (def)
+import Yesod.Core.Types (loggerSet, Logger (Logger))
 
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
@@ -49,7 +55,7 @@ makeApplication conf = do
             if development
                 then Detailed True
                 else Apache FromSocket
-        , destination = Logger $ appLogger foundation
+        , destination = RequestLogger.Logger $ loggerSet $ appLogger foundation
         }
 
     let middlewares = [
@@ -62,14 +68,28 @@ makeApplication conf = do
 
 makeFoundation :: AppConfig DefaultEnv Extra -> IO App
 makeFoundation conf = do
-    manager <- newManager def
+    manager <- newManager conduitManagerSettings
     s <- staticSite
     dbconf <- withYamlEnvironment "config/postgresql.yml" (appEnv conf)
               Database.Persist.loadConfig >>=
               Database.Persist.applyEnv
     p <- Database.Persist.createPoolConfig (dbconf :: Settings.PersistConfig)
-    logger <- mkLogger True stdout
-    let foundation = App conf s p manager dbconf logger
+
+    loggerSet' <- newStdoutLoggerSet defaultBufSize
+    (getter, updater) <- clockDateCacher
+
+    -- If the Yesod logger (as opposed to the request logger middleware) is
+    -- used less than once a second on average, you may prefer to omit this
+    -- thread and use "(updater >> getter)" in place of "getter" below.  That
+    -- would update the cache every time it is used, instead of every second.
+    let updateLoop = do
+            threadDelay 1000000
+            updater
+            updateLoop
+    _ <- forkIO updateLoop
+
+    let logger = Yesod.Core.Types.Logger loggerSet' getter
+        foundation = App conf s p manager dbconf logger
 
     -- Perform database migration using our application's logging settings.
     runLoggingT

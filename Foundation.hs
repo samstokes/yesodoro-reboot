@@ -44,7 +44,7 @@ import Text.Jasmine (minifym)
 import Web.ClientSession (getKey)
 import Text.Hamlet (hamletFile)
 import Text.Shakespeare.Text (stext)
-import System.Log.FastLogger (Logger)
+import Yesod.Core.Types (Logger)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Data.Time (TimeZone(..))
