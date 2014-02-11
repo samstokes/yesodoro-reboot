@@ -40,7 +40,8 @@
   <td>
     $if not (taskDone task)
       $if taskActive task
-        ^{oneButton "btn" "||" (PauseTaskR taskId)}
+        $if has FeaturePause
+          ^{oneButton "btn" "||" (PauseTaskR taskId)}
       $else
         ^{oneButton "btn" "|>" (UnpauseTaskR taskId)}
   <td>^{deleteButton "btn btn-danger" "☠" (TaskR taskId)}
