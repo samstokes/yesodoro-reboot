@@ -1,7 +1,7 @@
 Default: &defaults
   user: yesodoro-reboot
   password: yesodoro-reboot
-  host: localhost
+  host: 127.0.0.1
   port: 5432
   database: yesodoro-reboot
   poolsize: 10
