@@ -23,7 +23,8 @@
   <button .btn ng-show="task.isTodoToday()" ng-click="postponeTask(task)">☔
   <button .btn ng-show="task.isPostponed()" ng-click="unpostponeTask(task)">☀
 <td ng-hide="task.isDone()">
-  <button .btn ng-hide="task.isPaused()" ng-click="pauseTask(task)">||
+  $if has FeaturePause
+    <button .btn ng-hide="task.isPaused()" ng-click="pauseTask(task)">||
   <button .btn ng-show="task.isPaused()" ng-click="unpauseTask(task)">|>
 <td>
   <button .btn .btn-danger ng-click="deleteTask(task)">☠

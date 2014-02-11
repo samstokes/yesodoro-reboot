@@ -35,6 +35,7 @@ data Feature = FeaturePomos
              | FeatureOverdueTasks
              | FeatureNonDailySchedules
              | FeatureSettings
+             | FeaturePause
              | FeatureExtTasks
   deriving (Show, Read, Eq, Enum, Bounded, Ord)
 
@@ -64,6 +65,7 @@ featureDescription FeatureNotes = "task notes"
 featureDescription FeatureOverdueTasks = "warning for overdue tasks"
 featureDescription FeatureNonDailySchedules = "more task schedule options"
 featureDescription FeatureSettings = "settings panel"
+featureDescription FeaturePause = "pausing tasks"
 featureDescription FeatureExtTasks = "external task links"
 
 
