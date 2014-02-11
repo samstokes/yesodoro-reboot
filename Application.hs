@@ -21,11 +21,10 @@ import Network.HTTP.Conduit (newManager, def)
 import Control.Concurrent (forkIO, threadDelay)
 import Control.Monad (forever)
 import qualified Data.Aeson as Aeson
+import qualified Data.Aeson.Types as Aeson.Types
 import qualified Data.HashMap.Strict as HashMap
 
-#ifdef DEVELOPMENT
-import qualified Data.Aeson.Types as Aeson.Types
-#else
+#ifndef DEVELOPMENT
 -- stuff for Heroku config parsing
 import Control.Arrow (second)
 import qualified Web.Heroku
@@ -71,7 +70,7 @@ makeFoundation conf setLogger = do
 
     manager <- newManager def
     s <- staticSite
-    heroku <- loadHerokuConfig
+    heroku <- loadHerokuConfig conf
     dbconf <- withYamlEnvironment "config/postgresql.yml" (appEnv conf)
               (Database.Persist.Store.loadConfig . combineMappings heroku) >>=
               Database.Persist.Store.applyEnv
@@ -102,9 +101,11 @@ combineMappings :: Aeson.Value -> Aeson.Value -> Aeson.Value
 combineMappings (Aeson.Object m1) (Aeson.Object m2) = Aeson.Object $ HashMap.union m1 m2
 combineMappings _ _ = error "not a mapping!"
 
-loadHerokuConfig :: IO Aeson.Value
+loadHerokuConfig :: AppConfig DefaultEnv Extra -> IO Aeson.Value
 #ifdef DEVELOPMENT
-loadHerokuConfig = return Aeson.Types.emptyObject
+loadHerokuConfig _ = return Aeson.Types.emptyObject
 #else
-loadHerokuConfig = Web.Heroku.dbConnParams >>= return . toMapping . map canonicalizeKey
+loadHerokuConfig conf
+  | extraIsHeroku (appExtra conf) = Web.Heroku.dbConnParams >>= return . toMapping . map canonicalizeKey
+  | otherwise = return Aeson.Types.emptyObject
 #endif

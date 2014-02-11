@@ -18,6 +18,7 @@ import Language.Haskell.TH.Syntax
 import Database.Persist.Postgresql (PostgresConf)
 import Yesod.Default.Config
 import qualified Yesod.Default.Util
+import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import Data.Yaml
 import Control.Applicative
@@ -61,6 +62,7 @@ data Extra = Extra
     { extraTitle :: Text
     , extraCopyright :: Text
     , extraAnalytics :: Maybe Text -- ^ Google Analytics
+    , extraIsHeroku :: Bool
     } deriving Show
 
 parseExtra :: DefaultEnv -> Object -> Parser Extra
@@ -68,3 +70,4 @@ parseExtra _ o = Extra
     <$> o .:  "title"
     <*> o .:  "copyright"
     <*> o .:? "analytics"
+    <*> fmap (fromMaybe False) (o .:? "is_heroku")
