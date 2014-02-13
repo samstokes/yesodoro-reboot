@@ -443,6 +443,7 @@ app.controller('TasksCtrl', function ($scope, Tasks, $timeout) {
 
   $scope.updateTask = function (task) {
     Tasks.update(task)
+      // TODO don't noop, apply updated task
       .then(noop, function () {
         task.broken = true;
       });
@@ -450,6 +451,7 @@ app.controller('TasksCtrl', function ($scope, Tasks, $timeout) {
 
   $scope.reorderTask = function (task, delta) {
     Tasks.reorder(task.id, delta)
+      // TODO don't noop, apply updated task
       .then(noop, function () {
         task.broken = true;
       });
