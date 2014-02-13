@@ -135,13 +135,13 @@
         Done
         ^{expandy Collapsed "#done h2" "#done .content"}
       <div .content style="display: none">
-        $forall (day, plans, taskEntitiesEstimatesNotes) <- doneByDay
+        $forall (day, dayPlans, taskEntitiesEstimatesNotes) <- doneByDay
           <h3>
             #{day}
             $if has FeaturePomos
               \ (#{sum $ map taskPomos $ map entityVal $ map twcTask taskEntitiesEstimatesNotes})
-          $if not (null plans)
-            $forall plan <- plans
+          $if not (null dayPlans)
+            $forall plan <- dayPlans
               <h4 .plan>
                 Completed: 
                 <span .body>#{planBody (entityVal plan)}
