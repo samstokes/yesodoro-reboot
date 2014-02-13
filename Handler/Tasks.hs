@@ -220,6 +220,15 @@ postReorderTaskR taskId = do
     _ -> undefined -- TODO
 
 
+patchTaskR :: TaskId -> Handler RepJson
+patchTaskR taskId = do
+  _ <- authedTaskPreventingXsrf taskId
+  tz <- currentUserTimeZone
+  edit <- parseJsonBody_ -- TODO error page is HTML, not friendly!
+  (_, updatedTask) <- runDB $ updateTask tz edit taskId
+  maybeJson taskId updatedTask
+
+
 postPostponeTaskR :: TaskId -> Handler RepJson
 postPostponeTaskR taskId = do
   _ <- authedTaskPreventingXsrf taskId

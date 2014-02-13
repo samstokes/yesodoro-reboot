@@ -433,6 +433,16 @@ data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
               deriving (Show)
 
 
+instance FromJSON TaskEdit where
+  parseJSON (Object o) = do
+    editType <- o .: "editType"
+    case editType of
+      "title" -> TaskTitleEdit <$> o .: "title"
+      "order" -> TaskOrderEdit <$> o .: "delta"
+      _ -> fail $ "don't understand task edit type \"" ++ editType ++ "\""
+  parseJSON v = fail $ "can't parse task edit: " ++ show v
+
+
 updateTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> TaskEdit -> TaskId -> SqlPersist m (Bool, Maybe (Entity Task))
 updateTask tz edit taskId = do
     mtask <- get taskId
