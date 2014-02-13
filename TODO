@@ -1,0 +1,11 @@
+partials
+overdue task warning
+pomodoro tracking
+split angular bits out of dynamic tasks.julius
+move JSON into a separate call
+consistently use camelCase or snake_case
+estimates
+done plans with automagic
+Correctly hide empty task sections
+Task reordering broken in Chrome
+Note popup layout broken in Firefox
