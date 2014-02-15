@@ -246,12 +246,25 @@ app.factory('Tasks', function ($q, $http) {
       .then(newTask);
   };
 
-  Tasks.reorder = function (taskId, delta) {
-    return $http({method: 'PATCH', url: "/tasks/" + taskId,
-      data: {editType: "order", delta: delta}
+  Tasks.edit = function (task, editType, editOptions) {
+    var edit = {editType: editType};
+    for (var k in editOptions) {
+      if (editOptions.hasOwnProperty(k))
+        edit[k] = editOptions[k];
+    }
+    return $http({method: 'PATCH', url: '/tasks/' + task.id,
+      data: edit
     })
       .then(extractData)
-      .then(newTask);
+      .then(newTask)
+      .then(function (editedTask) {
+        task.task = editedTask.task;
+        return editedTask;
+      });
+  };
+
+  Tasks.reorder = function (task, delta) {
+    return Tasks.edit(task, 'order', {delta: delta});
   };
 
   [
@@ -457,7 +470,7 @@ app.controller('TasksCtrl', function ($scope, Tasks, $timeout) {
   };
 
   $scope.reorderTask = function (task, delta) {
-    Tasks.reorder(task.id, delta)
+    Tasks.reorder(task, delta)
       // TODO don't noop, apply updated task
       .then(noop, function () {
         task.broken = true;
