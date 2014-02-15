@@ -313,6 +313,13 @@ app.controller('TasksCtrl', function ($scope, Tasks, $timeout) {
   $scope.isTodoToday = function (task) {
     return task.task.active && !task.task.done_at && isScheduledForToday(task);
   };
+  $scope.isOverdue = function (task) {
+    var yesterday = endOfDay(new Date());
+    // surprisingly, this does the right thing for day 1 (rolls back month)
+    yesterday.setDate(yesterday.getDate() - 1);
+    var scheduledFor = new Date(task.task.scheduled_for);
+    return task.task.active && !task.task.done_at && scheduledFor <= yesterday;
+  };
   $scope.isPostponed = function (task) {
     return task.task.active && !task.task.done_at && !isScheduledForToday(task);
   };

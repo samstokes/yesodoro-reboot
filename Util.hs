@@ -143,6 +143,11 @@ fieldListOptions :: (Show field, Enum field, Bounded field) => [(Text, field)]
 fieldListOptions = map (Text.pack . show &&& id) [minBound .. maxBound]
 
 
+jsBool :: Bool -> String
+jsBool True = "true"
+jsBool False = "false"
+
+
 both :: Arrow a => a b c -> a (b, b) (c, c)
 both f = first f >>> second f
 

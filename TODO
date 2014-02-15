@@ -1,5 +1,4 @@
 partials
-overdue task warning
 pomodoro tracking
 split angular bits out of dynamic tasks.julius
 move JSON into a separate call
