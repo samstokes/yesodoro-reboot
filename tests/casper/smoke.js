@@ -3,7 +3,7 @@
  */
 var root = require('system').env['ROOT_URL'];
 if (root === undefined) {
-  casper.echo('Must pass ROOT_URL environment variable!').exit();
+  casper.die('Must pass ROOT_URL environment variable!', 1);
 }
 
 if (root[root.length - 1] !== '/') {
