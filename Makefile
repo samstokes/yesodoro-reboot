@@ -3,6 +3,7 @@ ENVIRONMENT=Production
 DEPLOY_DIR=/var/keter/incoming
 FIX=fix
 CASPERJS=casperjs
+ROOT_URL=http://localhost:3000/
 
 -include Makefile.local
 
@@ -22,7 +23,7 @@ $(EXE):
 test: test-casper
 
 test-casper:
-	$(CASPERJS) test tests/casper
+	ROOT_URL=$(ROOT_URL) $(CASPERJS) test tests/casper
 
 deploy: $(KETER)
 	scp $(KETER) $(DEPLOY_HOST):$(DEPLOY_DIR)/
