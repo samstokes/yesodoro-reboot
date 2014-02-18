@@ -3,7 +3,7 @@ ENVIRONMENT=Production
 DEPLOY_DIR=/var/keter/incoming
 FIX=fix
 
-include Makefile.local
+-include Makefile.local
 
 EXE=dist/build/$(PROJECT)/$(PROJECT)
 KETER=$(PROJECT).keter
