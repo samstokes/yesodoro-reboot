@@ -2,6 +2,7 @@ PROJECT=yesodoro-reboot
 ENVIRONMENT=Production
 DEPLOY_DIR=/var/keter/incoming
 FIX=fix
+CASPERJS=casperjs
 
 -include Makefile.local
 
@@ -17,6 +18,11 @@ dist: $(EXE)
 $(EXE):
 	cabal-dev configure
 	cabal-dev build
+
+test: test-casper
+
+test-casper:
+	$(CASPERJS) test tests/casper
 
 deploy: $(KETER)
 	scp $(KETER) $(DEPLOY_HOST):$(DEPLOY_DIR)/
