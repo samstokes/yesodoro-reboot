@@ -4,6 +4,14 @@ function isArray(value) {
   return toString.call(value) === '[object Array]';
 }
 
+function mergeInto(dest, src) {
+  for (var k in src) {
+    if (src.hasOwnProperty(k))
+      dest[k] = src[k];
+  }
+  return dest;
+}
+
 function setupTaskHandlers(taskId) {
   var edit = false;
 
@@ -251,11 +259,7 @@ app.factory('Tasks', function ($q, $http) {
   };
 
   Tasks.edit = function (task, editType, editOptions) {
-    var edit = {editType: editType};
-    for (var k in editOptions) {
-      if (editOptions.hasOwnProperty(k))
-        edit[k] = editOptions[k];
-    }
+    var edit = mergeInto({editType: editType}, editOptions);
     return $http({method: 'PATCH', url: '/tasks/' + task.id,
       data: edit
     })
