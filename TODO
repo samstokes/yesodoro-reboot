@@ -10,3 +10,5 @@ Task reordering broken in Chrome
 Note popup layout broken in Firefox
 Update tasks when day ticks over
 re-sort tasks after reordering
+Get rid of 'you are now logged in' message
+handle login expiring
