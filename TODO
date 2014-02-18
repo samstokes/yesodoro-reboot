@@ -1,4 +1,3 @@
-move helper functions onto Task model
 partials
 pomodoro tracking
 split angular bits out of dynamic tasks.julius

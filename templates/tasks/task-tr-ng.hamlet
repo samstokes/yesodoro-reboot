@@ -1,4 +1,4 @@
-<td .reorder-handle ng-show="isTodoToday(task)">
+<td .reorder-handle ng-show="task.isTodoToday()">
   ⇳
 <td .schedule>
   <.schedule-label>{{task.task.schedule | scheduleLabel}}
@@ -16,14 +16,14 @@
         target=_blank>
           {{task.task.title}}
 <td>
-  <button .btn .btn-success ng-hide="isDone(task)" ng-click="completeTask(task)">☺
-  <button .btn .btn-inverse ng-show="isDone(task)" ng-click="restartTask(task)">☹
-<td ng-hide="isDone(task) || isPaused(task)">
-  <button .btn ng-show="isTodoToday(task)" ng-click="postponeTask(task)">☔
-  <button .btn ng-show="isPostponed(task)" ng-click="unpostponeTask(task)">☀
-<td ng-hide="isDone(task)">
-  <button .btn ng-hide="isPaused(task)" ng-click="pauseTask(task)">||
-  <button .btn ng-show="isPaused(task)" ng-click="unpauseTask(task)">|>
+  <button .btn .btn-success ng-hide="task.isDone()" ng-click="completeTask(task)">☺
+  <button .btn .btn-inverse ng-show="task.isDone()" ng-click="restartTask(task)">☹
+<td ng-hide="task.isDone() || task.isPaused()">
+  <button .btn ng-show="task.isTodoToday()" ng-click="postponeTask(task)">☔
+  <button .btn ng-show="task.isPostponed()" ng-click="unpostponeTask(task)">☀
+<td ng-hide="task.isDone()">
+  <button .btn ng-hide="task.isPaused()" ng-click="pauseTask(task)">||
+  <button .btn ng-show="task.isPaused()" ng-click="unpauseTask(task)">|>
 <td>
   <button .btn .btn-danger ng-click="deleteTask(task)">☠
 $if has FeatureNotes

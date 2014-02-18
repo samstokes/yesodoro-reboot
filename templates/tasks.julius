@@ -200,6 +200,44 @@ function Task(taskData) {
   this.estimates = taskData.estimates || [];
 }
 
+mergeInto(Task.prototype, (function () {
+  function endOfDay(date) {
+    date.setHours(23);
+    date.setMinutes(59);
+    date.setSeconds(59);
+    return date;
+  }
+
+  return {
+    isScheduledForToday: function isScheduledForToday() {
+      var today = endOfDay(new Date());
+      var scheduledFor = new Date(this.task.scheduled_for);
+      return scheduledFor <= today;
+    },
+
+    isTodoToday: function isTodoToday() {
+      return this.task.active && !this.task.done_at && this.isScheduledForToday();
+    },
+
+    isOverdue: function isOverdue() {
+      var yesterday = endOfDay(new Date());
+      // surprisingly, this does the right thing for day 1 (rolls back month)
+      yesterday.setDate(yesterday.getDate() - 1);
+      var scheduledFor = new Date(this.task.scheduled_for);
+      return this.task.active && !this.task.done_at && scheduledFor <= yesterday;
+    },
+    isPostponed: function isPostponed() {
+      return this.task.active && !this.task.done_at && !this.isScheduledForToday();
+    },
+    isPaused: function isPaused() {
+      return !this.task.active && !this.task.done_at;
+    },
+    isDone: function isDone() {
+      return !!this.task.done_at;
+    }
+  };
+}()));
+
 
 app.factory('Tasks', function ($q, $http) {
   function newTask(taskData) {
@@ -316,39 +354,6 @@ app.controller('TasksCtrl', function ($scope, Tasks, $timeout) {
       var task = $scope.tasks[start_pos];
       $scope.reorderTask(task, delta);
     }
-  };
-
-  function endOfDay(date) {
-    date.setHours(23);
-    date.setMinutes(59);
-    date.setSeconds(59);
-    return date;
-  }
-
-  function isScheduledForToday(task) {
-    var today = endOfDay(new Date());
-    var scheduledFor = new Date(task.task.scheduled_for);
-    return scheduledFor <= today;
-  }
-
-  $scope.isTodoToday = function (task) {
-    return task.task.active && !task.task.done_at && isScheduledForToday(task);
-  };
-  $scope.isOverdue = function (task) {
-    var yesterday = endOfDay(new Date());
-    // surprisingly, this does the right thing for day 1 (rolls back month)
-    yesterday.setDate(yesterday.getDate() - 1);
-    var scheduledFor = new Date(task.task.scheduled_for);
-    return task.task.active && !task.task.done_at && scheduledFor <= yesterday;
-  };
-  $scope.isPostponed = function (task) {
-    return task.task.active && !task.task.done_at && !isScheduledForToday(task);
-  };
-  $scope.isPaused = function (task) {
-    return !task.task.active && !task.task.done_at;
-  };
-  $scope.isDone = function (task) {
-    return !!task.task.done_at;
   };
 
   $scope.postponedOrder = function (task) {
