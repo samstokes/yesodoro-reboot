@@ -26,6 +26,11 @@
   <button .btn ng-show="task.isPaused()" ng-click="unpauseTask(task)">|>
 <td>
   <button .btn .btn-danger ng-click="deleteTask(task)">☠
+$if has FeaturePomos
+  <td .estimate>
+    <span ng-show="task.task.pomos &gt; 0">
+      <br>
+      <span ng-repeat="pomo in task.task.pomos | dummyList track by $index">✓
 $if has FeatureNotes
   <td .notes ng-controller="NotesCtrl">
     <span .notes-handle ng-class="{empty: notes.length == 0}">

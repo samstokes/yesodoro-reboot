@@ -590,6 +590,18 @@ app.filter('filterP', function () {
 });
 
 
+/*
+ * Filter for repeating a set number of times.  e.g.
+ *     <div ng-repeat="bottle in 99 | dummyList track by $index">
+ *       {{99 - $index}} bottles of beer on the wall...
+ */
+app.filter('dummyList', function () {
+  return function (n) {
+    return new Array(n);
+  };
+});
+
+
 
 app.filter('scheduleLabel', function () {
   var labels = {
