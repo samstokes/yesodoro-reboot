@@ -1,6 +1,6 @@
 pomodoro tracking
 split angular bits out of dynamic tasks.julius
-move JSON into a separate call
+fetch JSON tasks as separate call from JS load
 consistently use camelCase or snake_case
 estimates
 done plans with automagic
