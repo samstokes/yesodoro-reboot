@@ -28,6 +28,9 @@
   <button .btn .btn-danger ng-click="deleteTask(task)">☠
 $if has FeaturePomos
   <td .estimate>
+    <span ng-show="task.estimates.length &gt; 0"
+          ng-repeat="estimate in task.estimates">
+      <span ng-repeat="pomo in estimate.estimate.pomos | dummyList track by $index">❏
     <span ng-show="task.task.pomos &gt; 0">
       <br>
       <span ng-repeat="pomo in task.task.pomos | dummyList track by $index">✓
