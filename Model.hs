@@ -430,6 +430,7 @@ recurTask tz time taskEntity = do
 data TaskEdit = TaskTitleEdit { taskTitleAfter :: Text }
               | TaskOrderEdit { taskOrderDelta :: Int }
               | TaskSyncEdit { taskSyncTask :: NewTask }
+              | TaskPomosEdit { taskPomosAdded :: Int }
               deriving (Show)
 
 
@@ -439,6 +440,7 @@ instance FromJSON TaskEdit where
     case editType of
       "title" -> TaskTitleEdit <$> o .: "title"
       "order" -> TaskOrderEdit <$> o .: "delta"
+      "pomos" -> TaskPomosEdit <$> o .: "pomos"
       _ -> fail $ "don't understand task edit type \"" ++ editType ++ "\""
   parseJSON v = fail $ "can't parse task edit: " ++ show v
 
@@ -457,6 +459,8 @@ updateTask tz edit taskId = do
       | otherwise               = return False
     updateTask' (TaskOrderEdit delta) task = reorderTaskN delta tz (taskId, task)
     updateTask' (TaskSyncEdit (NewTask newTitle _ _)) task = updateTask' (TaskTitleEdit newTitle) task
+    updateTask' (TaskPomosEdit 0) _ = return False
+    updateTask' (TaskPomosEdit pomos) _ = update taskId [TaskPomos +=. pomos] >> return True
 
 
 data Direction = Up | Down deriving (Show, Enum, Bounded)

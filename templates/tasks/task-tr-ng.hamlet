@@ -31,6 +31,8 @@ $if has FeaturePomos
     <span ng-show="task.task.pomos &gt; 0">
       <br>
       <span ng-repeat="pomo in task.task.pomos | dummyList track by $index">✓
+  <td ng-hide="task.isDone()">
+    <button .btn ng-click="logPomo(task)">✓
 $if has FeatureNotes
   <td .notes ng-controller="NotesCtrl">
     <span .notes-handle ng-class="{empty: notes.length == 0}">
