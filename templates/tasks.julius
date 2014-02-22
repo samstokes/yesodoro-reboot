@@ -1,3 +1,5 @@
+'use strict';
+
 function noop() {}
 // borrowed from Angular source
 function isArray(value) {
