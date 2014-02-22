@@ -8,7 +8,6 @@ import Import
 import Data.List (partition, sort, sortBy, zipWith4)
 import Data.Ord (comparing)
 import qualified Data.Text as Text
-import Data.Text.Read (decimal)
 import System.Locale (defaultTimeLocale)
 import Database.Persist.Query.Internal (Update)
 import Forms
