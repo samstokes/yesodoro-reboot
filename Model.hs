@@ -139,6 +139,12 @@ instance ToJSON Estimate where
 instance ToJSON (Entity Estimate) where
   toJSON (Entity k e) = object ["id" .= k, "estimate" .= e]
 
+instance FromJSON Estimate where
+  parseJSON (Object o) = Estimate
+    <$> (o .: "task_id")
+    <*> (o .: "pomos")
+  parseJSON v = fail $ "can't parse estimate: " ++ show v
+
 
 instance ToJSON Task where
   toJSON (Task

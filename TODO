@@ -1,7 +1,6 @@
 split angular bits out of dynamic tasks.julius
 fetch JSON tasks as separate call from JS load
 consistently use camelCase or snake_case
-estimates
 done plans with automagic
 Correctly hide empty task sections
 Task reordering broken in Chrome

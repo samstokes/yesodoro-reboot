@@ -234,6 +234,18 @@ mergeInto(Task.prototype, (function () {
     },
     isDone: function isDone() {
       return !!this.task.done_at;
+    },
+
+    newEstimate: function (pomos) {
+      return {estimate: {pomos: pomos, task_id: this.id}};
+    },
+
+    addEstimate: function (estimate) {
+      var length = this.estimates.push(estimate);
+      return length - 1;
+    },
+    removeEstimate: function (index) {
+      return this.estimates.splice(index, 1);
     }
   };
 }()));
@@ -318,6 +330,16 @@ app.factory('Tasks', function ($q, $http) {
     return Tasks.edit(task, 'pomos', {pomos: pomos})
       .then(undefined, function (reason) {
         task.task.pomos -= pomos;
+        return $q.reject(reason);
+      });
+  };
+
+  Tasks.addEstimate = function (task, pomos) {
+    var estimate = task.newEstimate(pomos);
+    var index = task.addEstimate(estimate);
+    return $http.post("/tasks/" + task.id + "/estimates", estimate.estimate)
+      .then(extractData, function (reason) {
+        task.removeEstimate(index);
         return $q.reject(reason);
       });
   };
@@ -508,6 +530,13 @@ app.controller('TasksCtrl', function ($scope, Tasks, $timeout) {
         self.removeTask(task);
       }, function () {
         task.going = false;
+        task.broken = true;
+      });
+  };
+
+  $scope.addEstimate = function (task, pomos) {
+    Tasks.addEstimate(task, pomos)
+      .then(noop, function () {
         task.broken = true;
       });
   };

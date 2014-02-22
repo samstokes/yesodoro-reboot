@@ -259,19 +259,12 @@ postUnpauseTaskR taskId = do
   maybeJson taskId unpaused
 
 
-postTaskEstimatesR :: TaskId -> Handler RepHtml
+postTaskEstimatesR :: TaskId -> Handler RepJson
 postTaskEstimatesR taskId = do
-  _ <- authedTask taskId
-  pomosParam <- lookupPostParam "pomos"
-  let pomos = do
-      param <- maybeToEither "no pomos" pomosParam
-      (num, _) <- decimal param
-      return num
-  case pomos of
-    (Right numPomos) -> do
-      _ <- runDB $ insert $ Estimate taskId numPomos
-      redirect TasksR
-    Left msg -> error msg -- TODO
+  _ <- authedTaskPreventingXsrf taskId
+  estimate <- parseJsonBody_ -- TODO error page is HTML, not friendly!
+  estimateId <- runDB . insert $ estimate { estimateTask = taskId }
+  jsonToRepJson $ Entity estimateId estimate
 
 
 postTaskPomosR :: TaskId -> Handler RepHtml
