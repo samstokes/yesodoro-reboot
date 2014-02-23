@@ -10,6 +10,7 @@
     <div ng-show="task.ext_task">
       [
         {{task.ext_task.ext_source_name}} {{task.ext_task.ext_id}}
+        \ ({{task.ext_task.ext_status}})
       ] 
       <a .title
         href="{{task.ext_task.ext_url}}"
