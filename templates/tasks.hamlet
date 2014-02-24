@@ -61,7 +61,7 @@
 
   <section #newpaused ng-show="tasks.paused().length &gt; 0">
     <h2.collapsed>
-      Newpaused
+      Newpaused ({{tasks.paused().length}})
       ^{expandy Collapsed "#newpaused h2" "#newpaused .content"}
 
     <.content style="display: none">
