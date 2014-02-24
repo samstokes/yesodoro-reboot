@@ -30,7 +30,6 @@ library
                      Settings
                      Settings.StaticFiles
                      Settings.Development
-                     Forms
                      Handler.Api
                      Handler.Home
                      Handler.Tasks

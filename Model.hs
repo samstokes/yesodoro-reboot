@@ -514,10 +514,6 @@ taskDone :: Task -> Bool
 taskDone = isJust . taskDoneAt
 
 
-taskHasPomos :: Task -> Bool
-taskHasPomos = (> 0) . taskPomos
-
-
 taskTodo :: TimeZone -> UTCTime -> Task -> Bool
 taskTodo tz moment task = taskActive task && taskScheduledForDay tz task <= today
   where today = utcToLocalDay tz moment

@@ -7,7 +7,6 @@ import Import
 
 import Data.List (partition, sort, zipWith4)
 import qualified Data.Text as Text
-import Forms
 import Data.Aeson.Types (ToJSON, toJSON)
 import Text.Blaze (toMarkup)
 import Util
