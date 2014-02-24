@@ -124,11 +124,11 @@ instance Yesod App where
             $(widgetFile "default-layout")
             addScriptEither $ urlJqueryJs master
             addScriptEither $ urlJqueryUiJs master
-            addScript $ StaticR js_jquery_form_js
-            addScriptEither $ eitherDev (StaticR js_angular_1_1_5_js) "//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"
-            addScript $ StaticR js_showdown_js
-            addScript $ StaticR js_angular_markdown_js
-            addScript $ StaticR $ js_angular_ui_sortable_js
+            addScript $ StaticR js_vendor_jquery_form_js
+            addScriptEither $ eitherDev (StaticR js_vendor_angular_1_1_5_js) "//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"
+            addScript $ StaticR js_vendor_showdown_js
+            addScript $ StaticR js_vendor_angular_markdown_js
+            addScript $ StaticR $ js_vendor_angular_ui_sortable_js
             addScript $ StaticR js_expandy_js
             addStylesheet $ StaticR css_expandy_css
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
@@ -162,8 +162,8 @@ appTitle = fmap (extraTitle . appExtra . settings) getYesod
 
 
 instance YesodJquery App where
-  urlJqueryJs _ = eitherDev (StaticR js_jquery_1_6_4_js) "//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"
-  urlJqueryUiJs _ = eitherDev (StaticR js_jquery_ui_1_8_17_custom_min_js) "//ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"
+  urlJqueryJs _ = eitherDev (StaticR js_vendor_jquery_1_6_4_js) "//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"
+  urlJqueryUiJs _ = eitherDev (StaticR js_vendor_jquery_ui_1_8_17_custom_min_js) "//ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js"
 
 -- How to run database actions.
 instance YesodPersist App where
