@@ -29,10 +29,10 @@
             <td>
               <button .btn .btn-danger ng-click="deletePlan(plan)">☠
 
-  <section #newtodo>
+  <section #todo>
     <h2>
-      NEWTODO
-      ^{expandy Expanded "#newtodo h2" "#newtodo .content"}
+      TODO
+      ^{expandy Expanded "#todo h2" "#todo .content"}
 
     <div .content>
       <p ng-show="tasks.todoToday().length == 0">
@@ -53,28 +53,28 @@
               #{schedule}
         <input .btn .btn-primary type=submit value=Add>
 
-  <section #newpostponed ng-show="tasks.postponed().length &gt; 0">
+  <section #postponed ng-show="tasks.postponed().length &gt; 0">
     <h2.collapsed>
-      Newtomorrow
-      ^{expandy Collapsed "#newpostponed h2" "#newpostponed .content"}
+      Tomorrow
+      ^{expandy Collapsed "#postponed h2" "#postponed .content"}
 
     <.content style="display: none">
       <table><tbody>
         <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filterP:'isPostponed' | orderBy:postponedOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
 
-  <section #newpaused ng-show="tasks.paused().length &gt; 0">
+  <section #paused ng-show="tasks.paused().length &gt; 0">
     <h2.collapsed>
-      Newpaused ({{tasks.paused().length}})
-      ^{expandy Collapsed "#newpaused h2" "#newpaused .content"}
+      Paused ({{tasks.paused().length}})
+      ^{expandy Collapsed "#paused h2" "#paused .content"}
 
     <.content style="display: none">
       <table><tbody>
         <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filterP:'isPaused' | orderBy:pausedOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
 
-  <section #newdone ng-controller="DoneTasksCtrl" ng-show="tasks.done().length &gt; 0">
+  <section #done ng-controller="DoneTasksCtrl" ng-show="tasks.done().length &gt; 0">
     <h2.collapsed>
-      Newdone
-      ^{expandy Collapsed "#newdone h2" "#newdone .content"}
+      Done
+      ^{expandy Collapsed "#done h2" "#done .content"}
 
     <.content style="display: none">
       <div ng-repeat="taskPerDay in tasksToFilter() | filterP:'isDone' | filter:uniqueDay | orderBy:dayOrder:true">
