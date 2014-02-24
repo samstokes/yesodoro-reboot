@@ -35,9 +35,9 @@
       ^{expandy Expanded "#newtodo h2" "#newtodo .content"}
 
     <div .content>
-      <p ng-show="tasks.length == 0">
+      <p ng-show="tasks.todoToday().length == 0">
         Nothing to do. Congratulations! Why not take the rest of the day off?
-      <table ng-hide="tasks.length == 0"><tbody ui-sortable="sortableOptions" ng-model="tasks">
+      <table ng-hide="tasks.todoToday().length == 0"><tbody ui-sortable="sortableOptions" ng-model="tasks">
         <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks" ng-show="task.isTodoToday()" ng-class="{overdue: #{jsBool (has FeatureOverdueTasks)} && task.isOverdue(), broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
       <form .form-inline ng-submit="addNewTask()">
         <.control-group>
@@ -50,25 +50,25 @@
               #{schedule}
         <input .btn .btn-primary type=submit value=Add>
 
-  <section #newpostponed>
+  <section #newpostponed ng-show="tasks.postponed().length &gt; 0">
     <h2.collapsed>
       Newtomorrow
       ^{expandy Collapsed "#newpostponed h2" "#newpostponed .content"}
 
     <.content style="display: none">
-      <table ng-hide="tasks.length == 0"><tbody>
+      <table><tbody>
         <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filterP:'isPostponed' | orderBy:postponedOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
 
-  <section #newpaused>
+  <section #newpaused ng-show="tasks.paused().length &gt; 0">
     <h2.collapsed>
       Newpaused
       ^{expandy Collapsed "#newpaused h2" "#newpaused .content"}
 
     <.content style="display: none">
-      <table ng-hide="tasks.length == 0"><tbody>
+      <table><tbody>
         <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filterP:'isPaused' | orderBy:pausedOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
 
-  <section #newdone ng-controller="DoneTasksCtrl">
+  <section #newdone ng-controller="DoneTasksCtrl" ng-show="tasks.done().length &gt; 0">
     <h2.collapsed>
       Newdone
       ^{expandy Collapsed "#newdone h2" "#newdone .content"}
@@ -76,7 +76,7 @@
     <.content style="display: none">
       <div ng-repeat="taskPerDay in tasksToFilter() | filterP:'isDone' | filter:uniqueDay | orderBy:dayOrder:true">
         <h3>{{dayDone(taskPerDay)}}
-        <table ng-hide="tasks.length == 0"><tbody>
+        <table><tbody>
           <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filterP:'isDone' | filter:doneSameDay(taskPerDay) | orderBy:doneOrder:true" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
 
   <hr>
