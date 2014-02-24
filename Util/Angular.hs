@@ -1,5 +1,6 @@
 module Util.Angular
   ( requireAuthIdPreventingXsrf
+  , requireAuthPreventingXsrf
   , setXsrfCookie
   , validXsrfHeader
   ) where
@@ -14,9 +15,11 @@ import Data.Text.Encoding (decodeUtf8, encodeUtf8)
 import qualified Network.HTTP.Types as HTTP
 import Network.Wai (Request(..))
 import Web.Cookie (SetCookie(..))
+import Database.Persist.Store
 import Yesod.Auth
 import Yesod.Core
 import Yesod.Form.Types (FormMessage(MsgCsrfWarning))
+import Yesod.Persist
 
 
 setXsrfCookie :: GHandler s m ()
@@ -46,11 +49,25 @@ validXsrfHeader = do
   return $ token == mSuppliedToken
 
 
-requireAuthIdPreventingXsrf :: YesodAuth m => GHandler s m (AuthId m)
-requireAuthIdPreventingXsrf = do
+validateXsrfHeader :: RenderMessage m FormMessage => GHandler s m ()
+validateXsrfHeader = do
   valid <- validXsrfHeader
   unless valid $ do
     m <- getYesod
     langs <- languages
     sendResponseStatus HTTP.badRequest400 $ RepPlain $ toContent $ renderMessage m langs MsgCsrfWarning
-  requireAuthId
+
+
+requireAuthIdPreventingXsrf :: YesodAuth m => GHandler s m (AuthId m)
+requireAuthIdPreventingXsrf = validateXsrfHeader >> requireAuthId
+
+
+requireAuthPreventingXsrf ::
+  ( YesodPersist m
+  , YesodAuth m
+  , PersistEntity auth
+  , PersistStore (PersistEntityBackend auth) (GHandler s m)
+  , AuthId m ~ Key (PersistEntityBackend auth) auth
+  , YesodPersistBackend m ~ PersistEntityBackend auth
+  ) => GHandler s m (Entity auth)
+requireAuthPreventingXsrf = validateXsrfHeader >> requireAuth
