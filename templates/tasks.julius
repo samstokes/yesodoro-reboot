@@ -1,6 +1,5 @@
 'use strict';
 
-function noop() {}
 // borrowed from Angular source
 function isArray(value) {
   return toString.call(value) === '[object Array]';
@@ -434,7 +433,7 @@ app.controller('TasksCtrl', function ($scope, Tasks, $timeout) {
   $scope.updateTask = function (task) {
     Tasks.update(task)
       // TODO don't noop, apply updated task
-      .then(noop, function () {
+      .then(undefined, function () {
         task.broken = true;
       });
   };
@@ -442,7 +441,7 @@ app.controller('TasksCtrl', function ($scope, Tasks, $timeout) {
   $scope.reorderTask = function (task, delta) {
     Tasks.reorder(task, delta)
       // TODO don't noop, apply updated task
-      .then(noop, function () {
+      .then(undefined, function () {
         task.broken = true;
       });
   };
@@ -462,14 +461,14 @@ app.controller('TasksCtrl', function ($scope, Tasks, $timeout) {
 
   $scope.addEstimate = function (task, pomos) {
     Tasks.addEstimate(task, pomos)
-      .then(noop, function () {
+      .then(undefined, function () {
         task.broken = true;
       });
   };
 
   $scope.logPomo = function (task) {
     Tasks.logPomos(task, 1)
-      .then(noop, function () {
+      .then(undefined, function () {
         task.broken = true;
       });
   };
