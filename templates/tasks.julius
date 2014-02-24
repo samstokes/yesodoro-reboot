@@ -248,6 +248,16 @@ mergeInto(Task.prototype, (function () {
     },
     removeEstimate: function (index) {
       return this.estimates.splice(index, 1);
+    },
+
+    estimatedPomos: function () {
+      if (this.estimates.length == 0) return 0;
+      var estimate = this.estimates[0];
+      return estimate.estimate.pomos;
+    },
+    estimatedRemaining: function () {
+      return Math.max(0,
+        this.estimatedPomos() - this.task.pomos);
     }
   };
 }()));
@@ -393,6 +403,21 @@ app.controller('TasksCtrl', function ($scope, Tasks, $timeout) {
     return 0;
   });
   $scope.newTask = new Task();
+
+  $scope.estimatedRemaining = function estimatedRemaining() {
+    var sum = 0;
+    $scope.tasks.todoToday().forEach(function (task) {
+      sum += task.estimatedRemaining();
+    });
+    return sum;
+  };
+  $scope.estimatedTotal = function estimatedTotal() {
+    var sum = 0;
+    $scope.tasks.todoToday().forEach(function (task) {
+      sum += task.estimatedPomos();
+    });
+    return sum;
+  };
 
   $scope.sortableOptions = {
     handle: '.reorder-handle',
