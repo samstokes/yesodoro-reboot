@@ -5,17 +5,13 @@ module Handler.Tasks where
 
 import Import
 
-import Data.List (partition, sort, sortBy, zipWith4)
-import Data.Ord (comparing)
+import Data.List (partition, sort, zipWith4)
 import qualified Data.Text as Text
-import System.Locale (defaultTimeLocale)
-import Database.Persist.Query.Internal (Update)
 import Forms
 import Data.Aeson.Types (ToJSON, toJSON)
 import Text.Blaze (toMarkup)
 import Util
 import Util.Angular
-import Yesod.Auth (requireAuthId)
 
 
 data TaskWithChildren = TaskWithChildren
@@ -59,69 +55,16 @@ getTasksR = do
   let tasksWithChildren :: [TaskWithChildren]
       tasksWithChildren = zipWith4 TaskWithChildren tasks extTasks estimates notes
 
-  timeZone <- currentUserTimeZone
-  time <- now
-  let taskTodoToday :: Task -> Bool
-      taskTodoToday = taskTodo timeZone time
-      taskOverdueToday :: Task -> Bool
-      taskOverdueToday task = has FeatureOverdueTasks && taskOverdue timeZone time task
-
-  let (unsortedDone, pending) = partition (taskDone . entityVal . twcTask) tasksWithChildren
-  let done = reverse $ sortBy (comparing $ taskDoneAt . entityVal . twcTask) unsortedDone
-  let (active, paused) = partition (taskActive . entityVal . twcTask) pending
-  let (unsortedTodo, unsortedPostponed) = partition (taskTodoToday . entityVal . twcTask) active
-  let todo = sortBy (comparing $ taskOrder . entityVal . twcTask) unsortedTodo
-  let postponed = sortBy (comparing $ taskScheduledFor . entityVal . twcTask) unsortedPostponed
-
   let (donePlans, activePlans) = partition (planDone . entityVal) plans
-
-  let doneTasksByDay :: [(Day, [TaskWithChildren])]
-      doneTasksByDay = groupByEq (fromJust . taskDoneDay timeZone . entityVal . twcTask) done
-
-  let donePlansByDay :: [(Day, [Entity Plan])]
-      donePlansByDay = groupByEq (fromJust . planDoneDay timeZone . entityVal) donePlans
-
-  let doneByDay :: [(Day, [Entity Plan], [TaskWithChildren])]
-      doneByDay = reverse $ sortBy (comparing fst3) $ unionBothValues donePlansByDay doneTasksByDay
-
-  (newTaskWidget, newTaskEnctype) <- generateFormPost (newTaskForm scheduleOptions)
-  (editTaskWidget, editTaskEnctype) <- generateFormPost editTaskForm
-  (reorderTaskWidget, reorderTaskEnctype) <- generateFormPost reorderTaskForm
 
   let
       toggleableFeatures = sort $ filter ((/= FeatureSettings) . fst) features
       featureButtonLabel (feature, False) = Text.pack $ "Enable " ++ featureDescription feature
       featureButtonLabel (feature, True) = Text.pack $ "Disable " ++ featureDescription feature
-      taskTr (TaskWithChildren {
-                twcTask = Entity taskId task
-              , twcExtTask = maybeExtTask
-              , twcEstimates = estimateEntities
-              , twcNotes = noteEntities
-              }) = $(widgetFile "tasks/task-tr")
    in defaultLayout $ do
         title <- lift appTitle
         setTitle $ toMarkup title
         addWidget $(widgetFile "tasks") where
-
-  estimatedRemaining :: TaskWithChildren -> Int
-  estimatedRemaining (TaskWithChildren _ _ [] _) = 0
-  estimatedRemaining (TaskWithChildren (Entity _ task) _ (Entity _ estimate : _) _) = (estimatePomos estimate - taskPomos task) `max` 0
-
-
-notesWidget :: TaskId -> [Entity Note] -> Widget
-notesWidget taskId notes = do
-  widgetId <- lift newIdent
-  (newNoteWidget, newNoteEnctype) <- lift $ generateFormPost newNoteForm
-  time <- now
-  timeZone <- lift currentUserTimeZone
-
-  let renderTime format = formatTime defaultTimeLocale format . utcToLocalTime timeZone
-      selector = Text.concat . (["#", widgetId, " "] ++) . pure
-      handleSelector = selector ".notes-handle"
-      detailSelector = selector ".notes-detail"
-      dummyNote = Entity undefined $ Note "dummy" taskId time
-      noteWidget (Entity noteId note) = $(widgetFile "notes/note")
-    in $(widgetFile "notes")
 
 
 postTasksR :: Handler RepJson
@@ -139,20 +82,6 @@ oneButton classes label route = [whamlet|
     <button .#{classes}>#{label}
 |]
 
-deleteButton :: Text -> Text -> Route App -> Widget
-deleteButton classes label route = [whamlet|
-  <form method=POST action=@?{deleteR route}>
-    <button .#{classes}>#{label}
-|]
-
-
-updateAndRedirectR :: HasReps a => Route App -> [Update Task] -> TaskId -> Handler a
-updateAndRedirectR route updates taskId = do
-  _ <- authedTask taskId
-  runDB $ update taskId updates
-  redirect route
-
-
 postCompleteTaskR :: TaskId -> Handler RepJson
 postCompleteTaskR taskId = do
   taskEntity <- authedTaskPreventingXsrf taskId
@@ -165,15 +94,6 @@ postRestartTaskR taskId = do
   _ <- authedTaskPreventingXsrf taskId
   restarted <- runDB $ restartTask taskId
   maybeJson taskId restarted
-
-
-authedTask :: TaskId -> Handler Task
-authedTask taskId = do
-    userId <- requireAuthId
-    maybeAuthedTask <- runDB $ selectFirst [TaskId ==. taskId, TaskUser ==. userId] []
-    case maybeAuthedTask of
-      Just task -> return $ entityVal task
-      Nothing -> redirect TasksR
 
 
 authedTaskPreventingXsrf :: TaskId -> Handler (Entity Task)
@@ -205,18 +125,6 @@ putTaskR taskId = do
   (_, updatedTask') <- runDB $ updateTask tz edit taskId
   maybeJson taskId updatedTask'
   where taskDiff _ (Task { taskTitle = newTitle }) = TaskTitleEdit newTitle
-
-
-postReorderTaskR :: TaskId -> Handler RepJson
-postReorderTaskR taskId = do
-  _ <- authedTask taskId
-  tz <- currentUserTimeZone
-  ((result, _), _) <- runFormPost reorderTaskForm
-  case result of
-    FormSuccess edit -> do
-      (updated, _) <- runDB $ updateTask tz edit taskId
-      jsonToRepJson $ object [("updated", toJSON updated)]
-    _ -> undefined -- TODO
 
 
 patchTaskR :: TaskId -> Handler RepJson
@@ -264,7 +172,3 @@ postTaskEstimatesR taskId = do
   estimate <- parseJsonBody_ -- TODO error page is HTML, not friendly!
   estimateId <- runDB . insert $ estimate { estimateTask = taskId }
   jsonToRepJson $ Entity estimateId estimate
-
-
-postTaskPomosR :: TaskId -> Handler RepHtml
-postTaskPomosR = updateAndRedirectR TasksR [TaskPomos +=. 1]
