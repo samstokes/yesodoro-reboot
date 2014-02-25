@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('app.directives')
 .directive('ssEditablePopup', function () {
   return {

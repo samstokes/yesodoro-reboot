@@ -1,3 +1,5 @@
+'use strict';
+
 // borrowed from Angular source
 function isArray(value) {
   return toString.call(value) === '[object Array]';

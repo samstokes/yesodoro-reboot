@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('app.directives')
 .directive('ssEscape', function ($parse) {
   return function (scope, element, attrs) {

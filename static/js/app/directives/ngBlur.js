@@ -1,3 +1,5 @@
+'use strict';
+
 // this may be redundant in newer versions of Angular
 angular.module('app.directives')
 .directive('ngBlur', function ($parse) {
