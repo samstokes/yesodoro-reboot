@@ -3,6 +3,7 @@
 var app = angular.module('HibiApp',
   [ 'angular.markdown'
   , 'ui.sortable'
+  , 'app.services'
   , 'app.controllers'
   , 'app.directives'
   , 'app.filters'
