@@ -141,6 +141,8 @@ instance Yesod App where
             addScript $ StaticR js_app_directives_ssKeyboardDirectives_js
             addScript $ StaticR js_app_directives_ngBlur_js
 
+            addScript $ StaticR js_app_filters_js
+
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 
     -- This is done to provide an optimization for serving static files from
