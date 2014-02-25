@@ -13,7 +13,11 @@ function mergeInto(dest, src) {
   return dest;
 }
 
-var app = angular.module('HibiApp', ['angular.markdown', 'ui.sortable']);
+var app = angular.module('HibiApp',
+  [ 'angular.markdown'
+  , 'ui.sortable'
+  , 'app.directives'
+  ]);
 
 
 app.controller('PlansCtrl', function ($scope, $http, $log) {

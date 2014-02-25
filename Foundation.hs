@@ -129,8 +129,12 @@ instance Yesod App where
             addScript $ StaticR js_vendor_showdown_js
             addScript $ StaticR js_vendor_angular_markdown_js
             addScript $ StaticR $ js_vendor_angular_ui_sortable_js
+
             addScript $ StaticR js_lib_expandy_js
             addStylesheet $ StaticR css_expandy_css
+
+            addScript $ StaticR js_app_directives_js
+
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 
     -- This is done to provide an optimization for serving static files from
