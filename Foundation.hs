@@ -136,6 +136,7 @@ instance Yesod App where
             addStylesheet $ StaticR css_expandy_css
 
             addScript $ StaticR js_app_models_js
+            addScript $ StaticR js_app_models_Task_js
 
             addScript $ StaticR js_app_services_js
             addScript $ StaticR js_app_services_Tasks_js

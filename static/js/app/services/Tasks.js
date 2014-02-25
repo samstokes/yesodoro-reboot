@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('app.services')
-.factory('Tasks', function (initialTaskData, $q, $http) {
+.factory('Tasks', function (Task, initialTaskData, $q, $http) {
   function newTask(taskData) {
     return new Task(taskData);
   }
