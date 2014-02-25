@@ -134,6 +134,10 @@ instance Yesod App where
             addStylesheet $ StaticR css_expandy_css
 
             addScript $ StaticR js_app_directives_js
+            addScript $ StaticR js_app_directives_ssClickToEdit_js
+            addScript $ StaticR js_app_directives_ssEditablePopup_js
+            addScript $ StaticR js_app_directives_ssKeyboardDirectives_js
+            addScript $ StaticR js_app_directives_ngBlur_js
 
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 
