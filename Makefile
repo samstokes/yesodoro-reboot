@@ -3,8 +3,7 @@ ENVIRONMENT=Production
 DEPLOY_DIR=/var/keter/incoming
 FIX=fix
 CASPERJS=casperjs
-NODE_BIN=node_modules/.bin
-KARMA=$(NODE_BIN)/karma
+KARMA=node_modules/karma/bin/karma
 ROOT_URL=http://localhost:3000/
 
 -include Makefile.local

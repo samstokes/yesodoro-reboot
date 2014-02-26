@@ -2,7 +2,9 @@
   "description": "Hibi",
   "repository": "https://github.com/samstokes/yesodoro-reboot",
   "devDependencies": {
-    "karma": "*",
-    "karma-coverage": "*"
+    "karma": "~ 0.11.14",
+    "karma-jasmine": "~ 0.2.1",
+    "karma-phantomjs-launcher": "~ 0.1.2",
+    "karma-coverage": "~ 0.2.0"
   }
 }
