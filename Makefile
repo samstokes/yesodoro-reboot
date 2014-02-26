@@ -4,6 +4,7 @@ DEPLOY_DIR=/var/keter/incoming
 FIX=fix
 CASPERJS=casperjs
 NODE_BIN=node_modules/.bin
+KARMA=$(NODE_BIN)/karma
 ROOT_URL=http://localhost:3000/
 
 -include Makefile.local
@@ -21,7 +22,10 @@ $(EXE):
 	cabal-dev configure
 	cabal-dev build
 
-test: test-smoke
+test: test-unit test-smoke
+
+test-unit:
+	$(KARMA) start config/karma.conf.js
 
 test-smoke:
 	ROOT_URL=$(ROOT_URL) $(CASPERJS) test tests/casper
