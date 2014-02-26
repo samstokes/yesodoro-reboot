@@ -24,12 +24,40 @@ describe('Task', function () {
       expect(task.task.schedule).toBe('Once');
     });
 
+    it('should be todo today', function () {
+      expect(task.isTodoToday()).toBeTruthy();
+    });
+
+    it('should not be overdue', function () {
+      expect(task.isOverdue()).toBeFalsy();
+    });
+
+    it('should not be postponed', function () {
+      expect(task.isPostponed()).toBeFalsy();
+    });
+
+    it('should not be paused', function () {
+      expect(task.isPaused()).toBeFalsy();
+    });
+
+    it('should not be done', function () {
+      expect(task.isDone()).toBeFalsy();
+    });
+
     it('should have no external task link', function () {
       expect(task.ext_task).toBeUndefined();
     });
 
     it('should have no notes', function () {
       expect(task.notes.length).toBe(0);
+    });
+
+    it('should have a zero estimate', function () {
+      expect(task.estimatedPomos()).toBe(0);
+    });
+
+    it('should have zero estimated pomos remaining', function () {
+      expect(task.estimatedRemaining()).toBe(0);
     });
   });
 });

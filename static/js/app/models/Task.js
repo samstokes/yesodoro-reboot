@@ -2,15 +2,22 @@
 
 angular.module('app.models')
 .factory('Task', function (defaultTaskSchedule) {
+  function defaultTaskProperties() {
+    return {
+      scheduled_for: new Date(),
+      active: true,
+      schedule: defaultTaskSchedule,
+      pomos: 0
+    };
+  }
+
   function Task(taskData) {
     if (undefined === taskData) {
       taskData = {};
     }
 
     this.id = taskData.id || '_new';
-    this.task = taskData.task || {
-      schedule: defaultTaskSchedule
-    };
+    this.task = taskData.task || defaultTaskProperties();
     this.ext_task = taskData.ext_task;
     this.notes = taskData.notes || [];
     this.estimates = taskData.estimates || [];
