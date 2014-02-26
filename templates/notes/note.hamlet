@@ -1,5 +1,0 @@
-<div .body>
-  $forall para <- paras (noteBody note)
-    <p>#{para}
-<div .created>
-  #{renderTime "%a %e %b %l:%M%P" (noteCreatedAt note)}
