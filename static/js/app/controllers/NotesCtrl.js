@@ -16,5 +16,6 @@ angular.module('app.controllers')
       }).error(function (data, status, headers, config) {
         note.broken = true;
       });
+    return note;
   };
 });
