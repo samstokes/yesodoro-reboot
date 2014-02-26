@@ -3,6 +3,7 @@ ENVIRONMENT=Production
 DEPLOY_DIR=/var/keter/incoming
 FIX=fix
 CASPERJS=casperjs
+NODE_BIN=node_modules/.bin
 ROOT_URL=http://localhost:3000/
 
 -include Makefile.local

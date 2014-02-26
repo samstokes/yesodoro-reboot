@@ -8,3 +8,4 @@ tags
 keter/
 yesodoro-reboot.keter
 config/postgresql-*.yml
+node_modules
