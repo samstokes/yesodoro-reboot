@@ -2,6 +2,7 @@
   "description": "Hibi",
   "repository": "https://github.com/samstokes/yesodoro-reboot",
   "devDependencies": {
-    "karma": "*"
+    "karma": "*",
+    "karma-coverage": "*"
   }
 }
