@@ -20,7 +20,9 @@ $(EXE):
 	cabal-dev configure
 	cabal-dev build
 
-test: test-smoke
+test: test-unit test-smoke
+
+test-unit:
 
 test-smoke:
 	ROOT_URL=$(ROOT_URL) $(CASPERJS) test tests/casper
