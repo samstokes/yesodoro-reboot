@@ -3,7 +3,8 @@ consistently use camelCase or snake_case
 done plans with automagic
 Task reordering broken in Chrome
 Note popup layout broken in Firefox
-Update tasks when day ticks over
 re-sort tasks after reordering
+Update tasks when day ticks over
 Get rid of 'you are now logged in' message
 handle login expiring
+Prompt to refresh on backend update
