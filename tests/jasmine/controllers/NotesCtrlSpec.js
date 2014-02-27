@@ -5,7 +5,7 @@ describe('NotesCtrl', function () {
 
   beforeEach(module('app.controllers'));
 
-  beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
+  beforeEach(inject(function($rootScope, $controller) {
     task = {id: 42, notes: []};
 
     scope = $rootScope.$new();
