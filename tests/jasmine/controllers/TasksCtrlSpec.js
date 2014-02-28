@@ -12,7 +12,8 @@ describe('TasksCtrl', function () {
     $provide.factory('Task', function () { return FakeTask; });
     FakeTaskRepo = jasmine.createSpyObj('Tasks', [
       'all',
-      'create'
+      'create',
+      'complete'
     ]);
     FakeTaskRepo.all.and.returnValue([1, 2, 3, 4].map(function (id) {
       var task = {
@@ -100,6 +101,72 @@ describe('TasksCtrl', function () {
 
         scope.$apply();
         expect(addedTask.broken).toBeTruthy();
+      });
+    });
+  });
+
+
+  describe('completing a task', function () {
+    var task;
+    var completedTask = {
+      id: 42,
+      task: {
+        title: 'Clean the kitchen',
+        done_at: 'JUST NOW'
+      }
+    };
+
+    beforeEach(function () {
+      FakeTaskRepo.complete.and.returnValue($q.when({
+        completed: completedTask
+      }));
+
+      task = {id: 42, task: {}};
+    });
+
+    it('should mark the task as going away', function () {
+      scope.completeTask(task);
+
+      expect(task.going).toBeTruthy();
+    });
+
+    it('should sync the completion', function () {
+      scope.completeTask(task);
+
+      expect(FakeTaskRepo.complete).toHaveBeenCalledWith(42);
+    });
+
+    describe('if the sync succeeds', function () {
+      beforeEach(function () {
+        scope.completeTask(task);
+        scope.$apply();
+      });
+
+      it('should mark the task as done', function () {
+        expect(task.task.done_at).toBe('JUST NOW');
+      });
+
+      it('should clear the "going away" flag (since the task will actually go now)', function () {
+        expect(task.going).toBeFalsy();
+      });
+    });
+
+    describe('if the task recurs', function () {
+      beforeEach(function () {
+        FakeTaskRepo.complete.and.returnValue($q.when({
+          completed: completedTask,
+          recurred: {
+            id: 43,
+            task: {title: 'Clean the kitchen'}
+          }
+        }));
+
+        scope.completeTask(task);
+        scope.$apply();
+      });
+
+      it('should add the recurred task to the array', function () {
+        expect(scope.tasks).toContain(jasmine.objectContaining({id: 43}));
       });
     });
   });
