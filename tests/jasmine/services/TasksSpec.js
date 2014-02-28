@@ -26,7 +26,7 @@ describe('Tasks', function () {
     beforeEach(function () { allTasks = Tasks.all(); });
 
     it('should return an array of tasks', function () {
-      expect(isArray(allTasks)).toBe(true);
+      expect(isArray(allTasks)).toBeTruthy();
     });
 
     it('should construct Task objects from the task data', function () {
