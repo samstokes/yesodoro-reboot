@@ -81,6 +81,7 @@ angular.module('app.controllers')
       }, function () {
         task.broken = true;
       });
+    return task;
   };
 
   $scope.removeTask = function (task) {
