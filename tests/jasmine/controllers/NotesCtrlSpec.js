@@ -28,7 +28,7 @@ describe('NotesCtrl', function () {
       scope.newNote = {body: 'Follow up on Monday'};
     }));
 
-    afterEach(function() {
+    afterEach(function () {
       $httpBackend.verifyNoOutstandingExpectation();
     });
 
