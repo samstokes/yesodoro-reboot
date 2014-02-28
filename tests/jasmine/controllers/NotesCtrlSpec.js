@@ -41,8 +41,7 @@ describe('NotesCtrl', function () {
     it('should add the note to the task', function () {
       scope.addNewNote();
 
-      expect(task.notes.length).toBe(1);
-      expect(task.notes[0].note.body).toEqual('Follow up on Monday');
+      expect(task.notes).toContain(jasmine.objectContaining({note: {body: 'Follow up on Monday'}}));
     });
 
     it('should store the note on the server', function () {
@@ -51,11 +50,21 @@ describe('NotesCtrl', function () {
       scope.addNewNote();
     });
 
-    it('should give the note its server-assigned id', function () {
-      var addedNote = scope.addNewNote();
-      $httpBackend.flush();
+    describe('if adding the note succeeded', function () {
+      var addedNote;
 
-      expect(addedNote.id).toBe(139);
+      beforeEach(function () {
+        addedNote = scope.addNewNote();
+        $httpBackend.flush();
+      });
+
+      it('should give the note its server-assigned id', function () {
+        expect(addedNote.id).toBe(139);
+      });
+
+      it('should update the note in the list', function () {
+        expect(task.notes).toContain(jasmine.objectContaining({id: 139}));
+      });
     });
 
     describe('if adding the note failed', function () {
