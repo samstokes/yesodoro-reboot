@@ -40,7 +40,7 @@ describe('TasksCtrl', function () {
     expect(scope.newTask).toBeDefined();
   });
 
-  describe('.addNewTask()', function () {
+  describe('adding a task', function () {
     beforeEach(function () {
       FakeTaskRepo.create.and.returnValue($q.when({
         id: 42,
@@ -49,7 +49,7 @@ describe('TasksCtrl', function () {
         }
       }));
 
-      scope.newTask = {task: {title: 'Clean the kitchen', schedule: 'Once'}};
+      scope.newTask = {id: '_new', task: {title: 'Clean the kitchen', schedule: 'Once'}};
     });
 
     it('should reset the blank task', function () {
@@ -59,14 +59,9 @@ describe('TasksCtrl', function () {
     });
 
     it('should add the task to the array', function () {
-      var numTasks = scope.tasks.length;
-
       scope.addNewTask();
 
-      expect(scope.tasks.length).toBe(numTasks + 1, 'no task was added');
-      expect(scope.tasks.filter(function (task) {
-        return task.task.title === 'Clean the kitchen';
-      }).length).toBe(1, 'no task with correct title');
+      expect(scope.tasks).toContain(jasmine.objectContaining({id: '_new'}));
     });
 
     it('should save the task', function () {
@@ -77,11 +72,22 @@ describe('TasksCtrl', function () {
       }));
     });
 
-    it('should give the task its server-assigned id', function () {
-      var addedTask = scope.addNewTask();
+    describe('if adding the task succeeded', function () {
+      var addedTask;
 
-      scope.$apply();
-      expect(addedTask.id).toBe(42);
+      beforeEach(function () {
+        addedTask = scope.addNewTask();
+        scope.$apply();
+      });
+
+      it('should give the task its server-assigned id', function () {
+        expect(addedTask.id).toBe(42);
+      });
+
+      it('should update the task in the array', function () {
+        expect(scope.tasks).toContain(jasmine.objectContaining({id: 42}));
+        expect(scope.tasks).not.toContain(jasmine.objectContaining({id: '_new'}));
+      });
     });
 
     describe('if adding the task failed', function () {
