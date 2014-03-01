@@ -174,7 +174,7 @@ instance Yesod App where
     -- users receiving stale content.
     addStaticContent = addStaticContentExternal minifyInProd base64md5 Settings.staticDir (StaticR . flip StaticRoute [])
       where minifyInProd | production = minifym
-                         | otherwise  = Right . id
+                         | otherwise  = Right
 
     -- Place Javascript at bottom of the body tag so the rest of the page loads first
     jsLoader _ = BottomOfHeadBlocking
@@ -215,8 +215,8 @@ instance YesodAuth App where
         x <- getBy $ UniqueUser $ credsIdent creds
         case x of
             Just (Entity uid _) -> return $ Just uid
-            Nothing -> do
-                fmap Just $ insert $ User (credsIdent creds) Nothing defaultTimeZone noFlags
+            Nothing ->
+                  fmap Just $ insert $ User (credsIdent creds) Nothing defaultTimeZone noFlags
 
     -- You can add other plugins like BrowserID, email or OAuth here
     authPlugins _ = [authBrowserId, authGoogleEmail, authEmail]
