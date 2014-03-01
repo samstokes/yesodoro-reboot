@@ -94,4 +94,4 @@
 
 
 # Heroku configuration that runs your app
-web: ./dist/build/yesodoro-reboot/yesodoro-reboot staging -p $PORT
+web: ./script/run-heroku.sh staging -p $PORT
