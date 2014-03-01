@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Allows us to set the client session secret via a Heroku config variable
 if [ -n "$CLIENT_SESSION_KEY" ]; then
