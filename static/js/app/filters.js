@@ -14,7 +14,7 @@ angular.module('app.filters', [])
  *      obj.isAwesome() returns truthy.
  */
 .filter('filterP', function () {
-  return function(array, propName) {
+  return function filterPFilter(array, propName) {
     if (!isArray(array)) return array;
 
     var filtered = [];
@@ -40,9 +40,10 @@ angular.module('app.filters', [])
  * Filter for repeating a set number of times.  e.g.
  *     <div ng-repeat="bottle in 99 | dummyList track by $index">
  *       {{99 - $index}} bottles of beer on the wall...
+ * N.B. you need the "track by $index" or the digest cycle never converges.
  */
 .filter('dummyList', function () {
-  return function (n) {
+  return function dummyListFilter(n) {
     return new Array(n);
   };
 });
