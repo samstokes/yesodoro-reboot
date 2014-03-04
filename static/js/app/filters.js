@@ -44,4 +44,41 @@ angular.module('app.filters', [])
     for (var i = 0; i < n; ++i) array[i] = i;
     return array;
   };
+})
+
+
+/*
+ * Group the input objects by a named field: e.g.
+ * <div ng-repeat="group in people | groupBy:'homeTown'">
+ *   <h2>{{group.homeTown}}</h2>
+ *   <p ng-repeat="person in group.items">{{person.name}}</p>
+ *
+ * N.B. in practice this can't actually be used with ng-repeat, as the group
+ * objects it produces are different (by object identity) each time, so the
+ * digest cycle never converges.  "track by" should be able to solve this, but
+ * didn't seem to help.  So instead, use it in a controller (via $filter) to
+ * pre-group your data.  You'll need a $watchCollection to update the groupings
+ * when the data changes, and anything which edits the objects *in* the list
+ * (e.g. result of XHR calls) will need to update the groupings too.
+ *
+ * TODO maybe we can solve this by clever memoisation?
+ */
+.filter('groupBy', function () {
+  return function groupByFilter(items, groupField) {
+    var groups = {}, filtered = [];
+    angular.forEach(items, function (item) {
+      var groupValue = getProperty(item, groupField);
+      var group;
+      if (groups.hasOwnProperty(groupValue)) group = groups[groupValue];
+      if (group === undefined) {
+        group = {items: [item]};
+        group[groupField] = groupValue;
+        groups[groupValue] = group;
+        filtered.push(group);
+      } else {
+        group.items.push(item);
+      }
+    });
+    return filtered;
+  };
 });
