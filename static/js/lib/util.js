@@ -12,3 +12,14 @@ function mergeInto(dest, src) {
   }
   return dest;
 }
+
+function getProperty(value, propName) {
+  var property = value[propName];
+  var propValue;
+  if (typeof(property) === 'function') {
+    propValue = property.call(value);
+  } else {
+    propValue = property;
+  }
+  return propValue;
+}

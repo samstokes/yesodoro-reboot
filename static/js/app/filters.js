@@ -20,13 +20,7 @@ angular.module('app.filters', [])
     var filtered = [];
     for ( var j = 0; j < array.length; j++) {
       var value = array[j];
-      var property = value[propName];
-      var propValue;
-      if (typeof(property) === 'function') {
-        propValue = property.call(value);
-      } else {
-        propValue = property;
-      }
+      var propValue = getProperty(value, propName);
       if (propValue) {
         filtered.push(value);
       }
