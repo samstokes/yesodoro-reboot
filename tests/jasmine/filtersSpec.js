@@ -46,6 +46,10 @@ describe('app.filters', function () {
         return townAndPeople.items;
       }
 
+      function names(people) {
+        return people.map(function (person) { return person.name; });
+      }
+
 
       it('should return an array of group objects', function () {
         expect(isArray(filtered)).toBeTruthy('filtered is not an array!');
@@ -74,9 +78,6 @@ describe('app.filters', function () {
       });
 
       it('should preserve order of items within groups', function () {
-        function names(people) {
-          return people.map(function (person) { return person.name; });
-        }
         expect(names(townPeople('New York City'))).toEqual(['Bob', 'Alice']);
         expect(names(townPeople('London'))).toEqual(['Sam', 'Alex']);
       });
@@ -87,6 +88,28 @@ describe('app.filters', function () {
         });
 
         expect(towns).toEqual(['New York City', 'London', 'San Francisco']);
+      });
+
+      describe('if I typo the group field', function () {
+        var misfiltered;
+        beforeEach(function () {
+          misfiltered = groupByFilter(people, 'hoemTown');
+        });
+
+        it('should return a single group', function () {
+          expect(isArray(misfiltered)).toBeTruthy();
+          expect(misfiltered.length).toBe(1);
+        });
+
+        it('should put all the items in that group', function () {
+          expect(names(misfiltered[0].items)).toEqual(
+            ['Bob', 'Sam', 'Alice', 'Alex', 'Dave'])
+        });
+
+        it('should return undefined as the group field', function () {
+          expect(misfiltered[0].hasOwnProperty('hoemTown'));
+          expect(misfiltered[0].hoemTown).toBe(undefined);
+        });
       });
     });
 
