@@ -32,7 +32,7 @@ $if has FeaturePomos
   <td .estimate>
     <span ng-show="task.estimates.length &gt; 0"
           ng-repeat="estimate in task.estimates">
-      <span ng-repeat="pomo in estimate.estimate.pomos | dummyList track by $index">❏
+      <span ng-repeat="pomo in estimate.estimate.pomos | dummyList">❏
     <span ng-hide="task.estimates.length &gt; 0">
       <form .btn-group>
         $forall numPomos <- estimateOptions
@@ -40,7 +40,7 @@ $if has FeaturePomos
             #{show numPomos}
     <span ng-show="task.task.pomos &gt; 0">
       <br>
-      <span ng-repeat="pomo in task.task.pomos | dummyList track by $index">✓
+      <span ng-repeat="pomo in task.task.pomos | dummyList">✓
   <td ng-hide="task.isDone()">
     <button .btn ng-click="logPomo(task)">✓
 $if has FeatureNotes

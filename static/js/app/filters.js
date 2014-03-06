@@ -40,10 +40,14 @@ angular.module('app.filters', [])
  * Filter for repeating a set number of times.  e.g.
  *     <div ng-repeat="bottle in 99 | dummyList track by $index">
  *       {{99 - $index}} bottles of beer on the wall...
- * N.B. you need the "track by $index" or the digest cycle never converges.
  */
 .filter('dummyList', function () {
   return function dummyListFilter(n) {
-    return new Array(n);
+    var array = new Array(n);
+    // ng-repeat complains if the list complains duplicates, as a plain
+    // "new Array(n)" would (since undefined === undefined).  So generate some
+    // gratuitous diversity.
+    for (var i = 0; i < n; ++i) array[i] = i;
+    return array;
   };
 });
