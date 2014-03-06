@@ -8,5 +8,4 @@ Update tasks when day ticks over
 Get rid of 'you are now logged in' message
 handle login expiring
 Prompt to refresh on backend update
-Optimise JS startup time, way too slow
 Get test coverage to 80%
