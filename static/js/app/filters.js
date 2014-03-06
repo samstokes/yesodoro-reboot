@@ -64,6 +64,10 @@ angular.module('app.filters', [])
  * TODO maybe we can solve this by clever memoisation?
  */
 .filter('groupBy', function () {
+  function Group(initialItem) {
+    this.items = [initialItem];
+  }
+
   return function groupByFilter(items, groupField) {
     var groups = {}, filtered = [];
     angular.forEach(items, function (item) {
@@ -71,7 +75,7 @@ angular.module('app.filters', [])
       var group;
       if (groups.hasOwnProperty(groupValue)) group = groups[groupValue];
       if (group === undefined) {
-        group = {items: [item]};
+        group = new Group(item);
         group[groupField] = groupValue;
         groups[groupValue] = group;
         filtered.push(group);
