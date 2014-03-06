@@ -62,6 +62,22 @@ angular.module('app.filters', [])
  */
 .filter('groupBy', function () {
   var poolCache = {};
+  poolCache.poolFor = function poolFor(memoKey, groupField) {
+    var groupPool;
+    if (memoKey === undefined) {
+      // don't memoise, assume caller doesn't care about digest tracking
+      return new GroupPool(groupField);
+    } else if (this.hasOwnProperty(memoKey)) {
+      groupPool = this[memoKey];
+      if (groupPool.groupField !== groupField) {
+        throw new Error('expected grouping "' + memoKey + '" to group by ' + groupPool.groupField + ' but asked to group by ' + groupField + ' instead!');
+      }
+      return groupPool;
+    } else {
+      this[memoKey] = groupPool = new GroupPool(groupField);
+      return groupPool;
+    }
+  };
 
   function Group(initialItem, poolGen) {
     this.items = [initialItem];
@@ -115,18 +131,7 @@ angular.module('app.filters', [])
   };
 
   return function groupByFilter(items, groupField, memoKey) {
-    var groupPool;
-    if (memoKey === undefined) {
-      // don't memoise, assume caller doesn't care about digest tracking
-      groupPool = new GroupPool(groupField);
-    } else if (poolCache.hasOwnProperty(memoKey)) {
-      groupPool = poolCache[memoKey];
-      if (groupPool.groupField !== groupField) {
-        throw new Error('expected grouping "' + memoKey + '" to group by ' + groupPool.groupField + ' but asked to group by ' + groupField + ' instead!');
-      }
-    } else {
-      poolCache[memoKey] = groupPool = new GroupPool(groupField);
-    }
+    var groupPool = poolCache.poolFor(memoKey, groupField);
 
     var filtered = [];
     angular.forEach(items, function (item) {
