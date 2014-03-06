@@ -49,27 +49,28 @@ angular.module('app.filters', [])
 
 /*
  * Group the input objects by a named field: e.g.
- * <div ng-repeat="group in people | groupBy:'homeTown'">
+ * <div ng-repeat="group in people | groupBy:'homeTown':'peopleByTown'">
  *   <h2>{{group.homeTown}}</h2>
  *   <p ng-repeat="person in group.items">{{person.name}}</p>
  *
- * N.B. in practice this can't actually be used with ng-repeat, as the group
- * objects it produces are different (by object identity) each time, so the
- * digest cycle never converges.  "track by" should be able to solve this, but
- * didn't seem to help.  So instead, use it in a controller (via $filter) to
- * pre-group your data.  You'll need a $watchCollection to update the groupings
- * when the data changes, and anything which edits the objects *in* the list
- * (e.g. result of XHR calls) will need to update the groupings too.
- *
- * TODO maybe we can solve this by clever memoisation?
+ * N.B. to use this with ng-repeat, you need to supply a second argument
+ * ('peopleByTown' in the above example) which identifies the grouping being
+ * calculated.  It should be unique within your app.  It is used to cache the
+ * group objects returned by the filter, so that subsequent invocations can
+ * return the same objects, so that ng-repeat's digest cycle will correctly
+ * recognise the output has not changed.
  */
 .filter('groupBy', function () {
-  function Group(initialItem) {
+  var poolCache = {};
+
+  function Group(initialItem, poolGen) {
     this.items = [initialItem];
+    this._poolGen = poolGen;
   }
 
   function GroupPool(groupField) {
     this.groupField = groupField;
+    this.poolGen = 0;
   }
   GroupPool.prototype.addItem = function addItem(item) {
     var groupValue = getProperty(item, this.groupField);
@@ -81,24 +82,59 @@ angular.module('app.filters', [])
       this[groupValue] = group;
       return group;
     } else {
-      this.addToGroup(group, item);
+      var isNewGroup = this.addToGroup(group, item);
+      if (isNewGroup) return group;
     }
   };
   GroupPool.prototype.makeGroup = function makeGroup(initialItem) {
-    return new Group(initialItem);
+    return new Group(initialItem, this.poolGen);
   };
   GroupPool.prototype.addToGroup = function addToGroup(group, item) {
-    group.items.push(item);
+    if (group._poolGen < this.poolGen) {
+      // reuse group object from cached previous run
+      Group.call(group, item, this.poolGen);
+      return true;
+    } else {
+      group.items.push(item);
+      return false;
+    }
+  };
+  GroupPool.prototype.newGen = function newGen() {
+    this.deleteOldGroups();
+    ++this.poolGen;
+  };
+  GroupPool.prototype.deleteOldGroups = function deleteOldGroups() {
+    for (var groupKey in this) {
+      if (this.hasOwnProperty(groupKey)) {
+        var group = this[groupKey];
+        if (group._poolGen < this.poolGen) {
+          delete this[groupKey];
+        }
+      }
+    }
   };
 
-  return function groupByFilter(items, groupField) {
-    var groupPool = new GroupPool(groupField);
+  return function groupByFilter(items, groupField, memoKey) {
+    var groupPool;
+    if (memoKey === undefined) {
+      // don't memoise, assume caller doesn't care about digest tracking
+      groupPool = new GroupPool(groupField);
+    } else if (poolCache.hasOwnProperty(memoKey)) {
+      groupPool = poolCache[memoKey];
+      if (groupPool.groupField !== groupField) {
+        throw new Error('expected grouping "' + memoKey + '" to group by ' + groupPool.groupField + ' but asked to group by ' + groupField + ' instead!');
+      }
+    } else {
+      poolCache[memoKey] = groupPool = new GroupPool(groupField);
+    }
 
     var filtered = [];
     angular.forEach(items, function (item) {
       var newGroup = groupPool.addItem(item);
       if (newGroup) filtered.push(newGroup);
     });
+
+    groupPool.newGen();
 
     return filtered;
   };

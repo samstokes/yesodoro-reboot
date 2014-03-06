@@ -141,5 +141,60 @@ describe('app.filters', function () {
       expect(LONDONers.items).toContain(personNamed('Sam'));
       expect(LONDONers.items).toContain(personNamed('Alex'));
     });
+
+
+    describe('caching', function () {
+      var men = [
+        {name: 'Bob', homeTown: 'New York City'},
+        {name: 'Sam', homeTown: 'London'},
+        {name: 'Alex', homeTown: 'London'}
+      ], filteredMen,
+      women = [
+        {name: 'Alice', homeTown: 'New York City'},
+        {name: 'Dorothy', homeTown: 'London'}
+      ], filteredWomen;
+
+      function townPeople(filtered, town) {
+        var townAndPeople = filtered.filter(function (_townAndPeople) {
+          return _townAndPeople.homeTown === town;
+        })[0];
+        if (townAndPeople === undefined) return undefined;
+        return townAndPeople.items;
+      }
+
+      beforeEach(function () {
+        filteredMen = groupByFilter(men, 'homeTown', 'men');
+        filteredWomen = groupByFilter(women, 'homeTown', 'women');
+      });
+
+      it('should return the same group objects from subsequent invocations', function () {
+        var londonMen = filteredMen.filter(function (townAndPeople) {
+          return townAndPeople.homeTown === 'London';
+        })[0];
+        expect(londonMen).toBeDefined();
+
+        var refilteredMen = groupByFilter(men, 'homeTown', 'men');
+        var relondonMen = refilteredMen.filter(function (townAndPeople) {
+          return townAndPeople.homeTown === 'London';
+        })[0];
+        expect(relondonMen).toBe(londonMen);
+      });
+
+      it('should not mix up groups from unrelated invocations', function () {
+        var nycMen = townPeople(filteredMen, 'New York City');
+        expect(nycMen).toContain(personNamed('Bob'));
+        expect(nycMen).not.toContain(personNamed('Alice'));
+
+        var londonWomen = townPeople(filteredWomen, 'London');
+        expect(londonWomen).toContain(personNamed('Dorothy'));
+        expect(londonWomen).not.toContain(personNamed('Sam'));
+      });
+
+      it('should fail noisily if you reuse the memoKey for a different grouping', function () {
+        expect(function () {
+          groupByFilter(men, 'demographic', 'men');
+        }).toThrow();
+      });
+    });
   });
 });
