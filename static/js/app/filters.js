@@ -68,21 +68,38 @@ angular.module('app.filters', [])
     this.items = [initialItem];
   }
 
+  function GroupPool(groupField) {
+    this.groupField = groupField;
+  }
+  GroupPool.prototype.addItem = function addItem(item) {
+    var groupValue = getProperty(item, this.groupField);
+    var group;
+    if (this.hasOwnProperty(groupValue)) group = this[groupValue];
+    if (group === undefined) {
+      group = this.makeGroup(item);
+      group[this.groupField] = groupValue;
+      this[groupValue] = group;
+      return group;
+    } else {
+      this.addToGroup(group, item);
+    }
+  };
+  GroupPool.prototype.makeGroup = function makeGroup(initialItem) {
+    return new Group(initialItem);
+  };
+  GroupPool.prototype.addToGroup = function addToGroup(group, item) {
+    group.items.push(item);
+  };
+
   return function groupByFilter(items, groupField) {
-    var groups = {}, filtered = [];
+    var groupPool = new GroupPool(groupField);
+
+    var filtered = [];
     angular.forEach(items, function (item) {
-      var groupValue = getProperty(item, groupField);
-      var group;
-      if (groups.hasOwnProperty(groupValue)) group = groups[groupValue];
-      if (group === undefined) {
-        group = new Group(item);
-        group[groupField] = groupValue;
-        groups[groupValue] = group;
-        filtered.push(group);
-      } else {
-        group.items.push(item);
-      }
+      var newGroup = groupPool.addItem(item);
+      if (newGroup) filtered.push(newGroup);
     });
+
     return filtered;
   };
 });
