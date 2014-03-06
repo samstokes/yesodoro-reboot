@@ -71,13 +71,13 @@
       <table><tbody>
         <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filterP:'isPaused' | orderBy:pausedOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
 
-  <section #done ng-controller="DoneTasksCtrl" ng-show="tasks.done().length &gt; 0">
+  <section #done ng-show="tasks.done().length &gt; 0">
     <h2.collapsed>
       Done
       ^{expandy Collapsed "#done h2" "#done .content"}
 
     <.content style="display: none">
-      <div ng-repeat="taskPerDay in tasksToFilter() | filterP:'isDone' | filter:uniqueDay | orderBy:dayOrder:true">
-        <h3>{{dayDone(taskPerDay)}}
+      <div ng-repeat="dayTasks in tasks | filterP:'isDone' | orderBy:doneOrder:true | groupBy:'dayDone':'tasksByDay'">
+        <h3>{{dayTasks.dayDone}}</h3>
         <table><tbody>
-          <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filterP:'isDone' | filter:doneSameDay(taskPerDay) | orderBy:doneOrder:true" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
+          <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in dayTasks.items" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">

@@ -11,6 +11,10 @@ angular.module('app.models')
     };
   }
 
+  function dateYMD(date) {
+    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+  }
+
   function Task(taskData) {
     if (undefined === taskData) {
       taskData = {};
@@ -57,6 +61,11 @@ angular.module('app.models')
       },
       isDone: function isDone() {
         return !!this.task.done_at;
+      },
+
+      dayDone: function dayDone() {
+        if (!this.task.done_at) return null;
+        return dateYMD(new Date(this.task.done_at));
       },
 
       newEstimate: function (pomos) {
