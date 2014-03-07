@@ -41,6 +41,7 @@ library
                      Handler.Settings
                      Handler.Templates
                      Util
+                     Util.Http
                      Util.Angular
                      Widget.Expandy
 
@@ -100,6 +101,7 @@ library
                  , aeson                         >= 0.6        && < 0.7
                  , transformers                  >= 0.3        && < 0.4
                  , old-locale                    >= 1.0        && < 1.1
+                 , pureMD5
                  , base64-bytestring
                  , http-types
                  , data-default
