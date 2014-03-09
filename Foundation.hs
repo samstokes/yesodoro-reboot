@@ -37,7 +37,8 @@ import Settings (widgetFile, Extra (..))
 import Model
 import Model.Note
 import Model.Plan
-import Control.Monad (join)
+import Control.Applicative ((<$>))
+import Control.Monad (join, when)
 import Data.Maybe (isJust)
 import Text.Jasmine (minifym)
 import Web.ClientSession (getKey)
@@ -107,7 +108,8 @@ instance Yesod App where
         return . Just $ clientSessionBackend key 120
 
     defaultLayout widget = do
-        setXsrfCookie
+        authed <- isJust <$> maybeAuthId
+        when authed setXsrfCookie
 
         master <- getYesod
         mmsg <- getMessage
