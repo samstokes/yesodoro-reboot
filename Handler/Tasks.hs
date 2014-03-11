@@ -68,7 +68,9 @@ getTasksR = do
       featureButtonLabel (feature, False) = Text.pack $ "Enable " ++ featureDescription feature
       featureButtonLabel (feature, True) = Text.pack $ "Disable " ++ featureDescription feature
       taskTr (Entity taskId task, estimateEntities, noteEntities) = do
-        maybeExtTask <- lift $ runDB $ taskGetExtTask task
+        maybeExtTask <- if has FeatureExtTasks
+                        then lift $ runDB $ taskGetExtTask task
+                        else return Nothing
         $(widgetFile "tasks/task-tr")
    in defaultLayout $ do
         title <- lift appTitle
