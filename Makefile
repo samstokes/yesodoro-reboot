@@ -12,6 +12,8 @@ ROOT_URL=http://localhost:3000/
 EXE=dist/build/$(PROJECT)/$(PROJECT)
 KETER=$(PROJECT).keter
 
+JAVASCRIPTS=static/js
+
 $(KETER): dist config/postgresql-$(ENVIRONMENT).yml config/settings.yml config/keter.yaml
 	./build-keter.sh $(ENVIRONMENT)
 
@@ -21,6 +23,11 @@ dist: $(EXE)
 $(EXE):
 	cabal-dev configure
 	cabal-dev build
+
+check: check-js
+
+check-js:
+	$(JSHINT) $(JAVASCRIPTS)
 
 test: test-unit test-smoke
 
