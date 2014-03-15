@@ -1,4 +1,5 @@
-'use strict';
+/*global $
+ */
 
 var expandyIndicator = {
   "Collapsed": "☞",
@@ -7,6 +8,7 @@ var expandyIndicator = {
 
 
 function expandy(widgetId, handleSelector, targetSelector) {
+  'use strict';
   var indicator = $('#' + widgetId),
       handle = $(handleSelector),
       target = $(targetSelector);
@@ -19,11 +21,13 @@ function expandy(widgetId, handleSelector, targetSelector) {
 
   handle.click(function () {
     target.slideToggle('fast', function () {
+      // jshint sub: true
       if (target.css('display') === 'none') {
         indicator.html(' ' + expandyIndicator['Collapsed']);
       } else {
         indicator.html(' ' + expandyIndicator['Expanded']);
       }
+      // jshint sub: false
     });
   });
 }
