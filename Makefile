@@ -20,6 +20,8 @@ $(EXE):
 	cabal-dev configure
 	cabal-dev build
 
+check:
+
 test: test-unit test-smoke
 
 test-unit:
