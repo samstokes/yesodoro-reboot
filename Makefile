@@ -4,6 +4,7 @@ DEPLOY_DIR=/var/keter/incoming
 FIX=fix
 CASPERJS=casperjs
 KARMA=node_modules/karma/bin/karma
+JSHINT=node_modules/.bin/jshint
 ROOT_URL=http://localhost:3000/
 
 -include Makefile.local
