@@ -1,3 +1,7 @@
-'use strict';
+/*global angular */
 
-angular.module('app.controllers', []);
+(function controllers() {
+  'use strict';
+
+  angular.module('app.controllers', []);
+})();

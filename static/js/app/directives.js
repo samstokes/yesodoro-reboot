@@ -1,3 +1,7 @@
-'use strict';
+/*global angular */
 
-angular.module('app.directives', []);
+(function directives() {
+  'use strict';
+
+  angular.module('app.directives', []);
+})();

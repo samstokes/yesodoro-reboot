@@ -1,3 +1,7 @@
-'use strict';
+/*global angular */
 
-angular.module('app.models', []);
+(function models() {
+  'use strict';
+
+  angular.module('app.models', []);
+})();

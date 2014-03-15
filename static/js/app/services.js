@@ -1,3 +1,7 @@
-'use strict';
+/*global angular */
 
-angular.module('app.services', []);
+(function services() {
+  'use strict';
+
+  angular.module('app.services', []);
+})();
