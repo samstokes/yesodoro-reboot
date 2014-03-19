@@ -1,7 +1,12 @@
-'use strict';
+/*global
+   angular
+ , mergeInto
+ */
 
 angular.module('app.models')
 .factory('Task', function (defaultTaskSchedule) {
+  'use strict';
+
   function defaultTaskProperties() {
     return {
       scheduled_for: new Date(),
@@ -81,7 +86,7 @@ angular.module('app.models')
       },
 
       estimatedPomos: function () {
-        if (this.estimates.length == 0) return 0;
+        if (this.estimates.length === 0) return 0;
         var estimate = this.estimates[0];
         return estimate.estimate.pomos;
       },

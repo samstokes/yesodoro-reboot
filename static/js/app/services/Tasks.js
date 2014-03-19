@@ -1,7 +1,12 @@
-'use strict';
+/*global
+   angular
+ , mergeInto
+ */
 
 angular.module('app.services')
 .factory('Tasks', function (Task, initialTaskData, $q, $http) {
+  'use strict';
+
   function newTask(taskData) {
     return new Task(taskData);
   }

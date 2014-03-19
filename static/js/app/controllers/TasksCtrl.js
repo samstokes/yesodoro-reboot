@@ -1,7 +1,9 @@
-'use strict';
+/*global angular */
 
 angular.module('app.controllers')
 .controller('TasksCtrl', function ($scope, Task, Tasks, $timeout) {
+  'use strict';
+
   $scope.tasks = Tasks.all();
   $scope.tasks.todoToday = function todoToday() {
     return this.filter(function (task) {

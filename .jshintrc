@@ -5,6 +5,7 @@
   "immed": true,
   "indent": 2,
   "latedef": true,
+  "multistr": true,
   "newcap": true,
   "strict": true,
   "trailing": true,

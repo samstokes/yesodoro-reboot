@@ -1,7 +1,9 @@
-'use strict';
+/*global angular */
 
 angular.module('app.controllers')
 .controller('NotesCtrl', function ($scope, $http) {
+  'use strict';
+
   $scope.notes = $scope.task.notes;
   $scope.newNote = {};
 

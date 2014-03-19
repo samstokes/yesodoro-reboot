@@ -1,7 +1,9 @@
-'use strict';
+/*global angular */
 
 angular.module('app.directives')
 .directive('ssEditablePopup', function () {
+  'use strict';
+
   return {
     restrict: 'EA',
 
@@ -26,7 +28,7 @@ angular.module('app.directives')
       }).bind('blur', function (event) {
         scope.$apply(function () { scope.inputsFocused -= 1; });
       }).bind('keydown', function (event) {
-        if (event.keyCode == 27) {
+        if (event.keyCode === 27) {
           this.blur();
         }
       });

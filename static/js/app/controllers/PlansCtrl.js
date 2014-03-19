@@ -1,7 +1,9 @@
-'use strict';
+/*global angular */
 
 angular.module('app.controllers')
 .controller('PlansCtrl', function ($scope, initialPlanData, $http, $log) {
+  'use strict';
+
   $scope.plans = initialPlanData;
 
   $scope.addNewPlan = function () {

@@ -1,7 +1,9 @@
-'use strict';
+/*global angular */
 
 angular.module('app.directives')
 .directive('ssClickToEdit', function ($timeout) {
+  'use strict';
+
   return {
     restrict: 'E',
 
