@@ -1,4 +1,7 @@
-/*global $
+/*global $ */
+/*exported
+   expandy
+ , expandyIndicator
  */
 
 var expandyIndicator = {

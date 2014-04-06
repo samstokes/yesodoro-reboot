@@ -1,3 +1,9 @@
+/*exported
+   isArray
+ , mergeInto
+ , getProperty
+ */
+
 // borrowed from Angular source
 function isArray(value) {
   'use strict';
