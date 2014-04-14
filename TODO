@@ -11,5 +11,4 @@ Prompt to refresh on backend update
 Get test coverage to 80%
 set -e in buildpack
 Hovering should not recalc ng-repeats
-reordering seems to be buggy
 cache-control headers (not just etag) on task-tr-ng.hamlet
