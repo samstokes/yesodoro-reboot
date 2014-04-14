@@ -59,10 +59,24 @@ angular.module('app.controllers')
           endPos = ui.item.index(),
           taskToMove = $scope.tasks[startPos],
           taskAtEnd = $scope.tasks[endPos],
+
+          /*
+           * ui-sortable gets its item indices from the ng-model we specify,
+           * which is the overall tasks list, so startPos and endPos are
+           * indices into that list.  However, what we're sorting is just the
+           * tasks that are todo today, so to calculate the delta we need the
+           * tasks' indices into just the todo tasks.
+           */
           todoTasks = $scope.tasks.todoToday(),
           todoIndexStart = todoTasks.indexOf(taskToMove),
           todoIndexEnd = todoTasks.indexOf(taskAtEnd),
+
           delta = todoIndexEnd - todoIndexStart;
+
+      if (todoIndexStart < 0 || todoIndexEnd < 0) {
+        taskToMove.broken = true;
+        throw "Something got out of sync, couldn't reorder tasks!";
+      }
 
       $scope.reorderTask(taskToMove, delta);
     }
