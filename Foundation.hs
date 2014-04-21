@@ -126,7 +126,6 @@ instance Yesod App where
             $(widgetFile "default-layout")
             addScriptEither $ urlJqueryJs master
             addScriptEither $ urlJqueryUiJs master
-            addScript $ StaticR js_vendor_jquery_form_js
             addScriptEither $ eitherDev (StaticR js_vendor_angular_1_1_5_js) "//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"
             addScript $ StaticR js_vendor_showdown_js
             addScript $ StaticR js_vendor_angular_markdown_js
