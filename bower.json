@@ -1,0 +1,13 @@
+{
+  "name": "hibi",
+  "version": "0.0.0",
+  "homepage": "https://github.com/samstokes/yesodoro-reboot",
+  "authors": [
+    "Sam Stokes <me@samstokes.co.uk>"
+  ],
+  "main": "templates/tasks.julius",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+  }
+}
