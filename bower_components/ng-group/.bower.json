@@ -1,0 +1,32 @@
+{
+  "name": "ng-group",
+  "authors": [
+    "Sam Stokes <me@samstokes.co.uk>"
+  ],
+  "license": "MIT",
+  "main": "src/ngGroup.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "package.json",
+    "Gruntfile.js",
+    "test"
+  ],
+  "dependencies": {
+    "angular": "*"
+  },
+  "devDependencies": {
+    "angular-mocks": "*"
+  },
+  "homepage": "https://github.com/samstokes/ng-group",
+  "_release": "64f2c2da1a",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "64f2c2da1a4554d4f9c3e945629e3ba3ec375941"
+  },
+  "_source": "https://github.com/samstokes/ng-group.git",
+  "_target": "*",
+  "_originalSource": "https://github.com/samstokes/ng-group.git"
+}

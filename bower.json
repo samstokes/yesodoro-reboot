@@ -9,5 +9,6 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "ng-group": "https://github.com/samstokes/ng-group.git"
   }
 }
