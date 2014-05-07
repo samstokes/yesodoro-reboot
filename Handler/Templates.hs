@@ -11,7 +11,7 @@ import Text.Hamlet (hamletFile)
 
 getTemplateTaskTrR :: Handler RepHtml
 getTemplateTaskTrR = do
-  Entity _ user <- requireAuthPreventingXsrf
+  Entity _ user <- requireNgAuth
   withDigestEtag (featuresEtag user) $ do
     let
       features = userFeatureSettings user

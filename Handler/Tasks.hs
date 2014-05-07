@@ -71,7 +71,7 @@ getTasksR = do
 
 postTasksR :: Handler RepJson
 postTasksR = do
-  userId <- requireAuthIdPreventingXsrf
+  userId <- requireNgAuthId
 
   newTask <- parseJsonBody_ -- TODO error page is HTML, not friendly!
   taskEntity <- runDB $ createTaskAtBottom userId newTask
@@ -100,7 +100,7 @@ postRestartTaskR taskId = do
 
 authedTaskPreventingXsrf :: TaskId -> Handler (Entity Task)
 authedTaskPreventingXsrf taskId = do
-  userId <- requireAuthIdPreventingXsrf
+  userId <- requireNgAuthId
   maybeAuthedTask <- runDB $ selectFirst [TaskId ==. taskId, TaskUser ==. userId] []
   case maybeAuthedTask of
     Just task -> return task

@@ -6,7 +6,7 @@ import Util.Angular
 
 postPlansR :: Handler RepJson
 postPlansR = do
-  userId <- requireAuthIdPreventingXsrf
+  userId <- requireNgAuthId
   newPlan <- parseJsonBody_ -- TODO error page is HTML, not friendly!
   planEntity <- runDB $ createPlan userId newPlan
   jsonToRepJson planEntity
@@ -40,7 +40,7 @@ deletePlanR planId = do
 
 authedPlan :: PlanId -> Handler (Entity Plan)
 authedPlan planId = do
-  userId <- requireAuthIdPreventingXsrf
+  userId <- requireNgAuthId
   maybeAuthedPlan <- runDB $ selectFirst [PlanId ==. planId, PlanUser ==. userId] []
   case maybeAuthedPlan of
     Just plan -> return plan

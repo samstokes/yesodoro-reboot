@@ -13,7 +13,7 @@ postTaskNotesR taskId = do
 
 authedTask :: TaskId -> Handler (Entity Task)
 authedTask taskId = do
-  userId <- requireAuthIdPreventingXsrf
+  userId <- requireNgAuthId
   maybeAuthedTask <- runDB $ selectFirst [TaskId ==. taskId, TaskUser ==. userId] []
   case maybeAuthedTask of
     Just plan -> return plan

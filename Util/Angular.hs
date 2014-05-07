@@ -1,6 +1,6 @@
 module Util.Angular
-  ( requireAuthIdPreventingXsrf
-  , requireAuthPreventingXsrf
+  ( requireNgAuthId
+  , requireNgAuth
   , setXsrfCookie
   , validXsrfHeader
   ) where
@@ -10,6 +10,7 @@ import Prelude hiding (mapM_)
 import Data.Foldable (mapM_)
 
 import Control.Monad (unless)
+import Data.Aeson
 import Data.Default (def)
 import Data.Text.Encoding (decodeUtf8, encodeUtf8)
 import qualified Network.HTTP.Types as HTTP
@@ -19,7 +20,10 @@ import Database.Persist.Store
 import Yesod.Auth
 import Yesod.Core
 import Yesod.Form.Types (FormMessage(MsgCsrfWarning))
+import Yesod.Json (jsonToRepJson)
 import Yesod.Persist
+
+import Util (passthru)
 
 
 setXsrfCookie :: GHandler s m ()
@@ -58,11 +62,17 @@ validateXsrfHeader = do
     sendResponseStatus HTTP.badRequest400 $ RepPlain $ toContent $ renderMessage m langs MsgCsrfWarning
 
 
-requireAuthIdPreventingXsrf :: YesodAuth m => GHandler s m (AuthId m)
-requireAuthIdPreventingXsrf = validateXsrfHeader >> requireAuthId
+respondUnauthorized :: GHandler s m a
+respondUnauthorized = do
+  errorJson <- jsonToRepJson $ object ["message" .= ("Please log in." :: String)]
+  sendResponseStatus HTTP.unauthorized401 errorJson
 
 
-requireAuthPreventingXsrf ::
+requireNgAuthId :: YesodAuth m => GHandler s m (AuthId m)
+requireNgAuthId = maybeAuthId >>= maybe respondUnauthorized return >>= passthru validateXsrfHeader
+
+
+requireNgAuth ::
   ( YesodPersist m
   , YesodAuth m
   , PersistEntity auth
@@ -70,4 +80,4 @@ requireAuthPreventingXsrf ::
   , AuthId m ~ Key (PersistEntityBackend auth) auth
   , YesodPersistBackend m ~ PersistEntityBackend auth
   ) => GHandler s m (Entity auth)
-requireAuthPreventingXsrf = validateXsrfHeader >> requireAuth
+requireNgAuth = maybeAuth >>= maybe respondUnauthorized return >>= passthru validateXsrfHeader

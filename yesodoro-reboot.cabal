@@ -82,6 +82,7 @@ library
                  , text                          >= 0.11       && < 0.12
                  , persistent                    >= 0.9        && < 0.10
                  , yesod-persistent
+                 , yesod-json
                  , persistent-postgresql     >= 0.9        && < 0.10
                  , template-haskell
                  , hamlet                        >= 1.0        && < 1.1

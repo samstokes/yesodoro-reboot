@@ -119,6 +119,10 @@ untilM predicate f a = unless (predicate a) $ do
   untilM predicate f a'
 
 
+passthru :: Monad m => m b -> a -> m a
+passthru m v = m >> return v
+
+
 maybeToEither :: e -> Maybe a -> Either e a
 maybeToEither e Nothing = Left e
 maybeToEither _ (Just v) = Right v
