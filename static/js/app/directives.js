@@ -3,5 +3,5 @@
 (function directives() {
   'use strict';
 
-  angular.module('app.directives', []);
+  angular.module('app.directives', ['app.services']);
 })();

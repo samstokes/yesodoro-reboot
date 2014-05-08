@@ -1,4 +1,5 @@
 #main
+  position: relative
   border-radius: 3px
   margin: 60px
   padding: 30px
@@ -9,6 +10,34 @@
 
 h1
   text-align: center
+
+
+#billboard
+  position: absolute
+  width: 300px
+  left: 50%
+  margin-left: -150px
+
+  text-align: center
+
+  border-radius: 10px
+  padding: 10px
+  border-width: 1px
+  border-style: solid
+
+#billboard.success
+  border-color: rgba(0, 25, 0, 0.15)
+  background-color: rgba(182, 252, 126, 0.8)
+  color: rgb(45, 63, 31)
+
+#billboard.error
+  border-color: rgba(25, 0, 0, 0.15)
+  background-color: rgba(252, 182, 126, 0.8)
+  color: rgb(63, 45, 31)
+
+#billboard .dismiss
+  cursor: pointer
+  float: right
 
 
 section#settings

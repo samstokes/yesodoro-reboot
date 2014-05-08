@@ -142,6 +142,7 @@ instance Yesod App where
             addScript $ StaticR js_app_models_Task_js
 
             addScript $ StaticR js_app_services_js
+            addScript $ StaticR js_app_services_billboard_js
             addScript $ StaticR js_app_services_Tasks_js
 
             addScript $ StaticR js_app_controllers_js
@@ -150,6 +151,7 @@ instance Yesod App where
             addScript $ StaticR js_app_controllers_NotesCtrl_js
 
             addScript $ StaticR js_app_directives_js
+            addScript $ StaticR js_app_directives_billboard_js
             addScript $ StaticR js_app_directives_ssClickToEdit_js
             addScript $ StaticR js_app_directives_ssEditablePopup_js
             addScript $ StaticR js_app_directives_ssKeyboardDirectives_js

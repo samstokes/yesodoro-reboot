@@ -1,4 +1,6 @@
 <div ng-app="HibiApp" ng-controller="TasksCtrl">
+  <billboard #billboard>
+
   <h1>#{title}
 
   $if has FeatureSettings
