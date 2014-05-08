@@ -143,6 +143,7 @@ instance Yesod App where
 
             addScript $ StaticR js_app_services_js
             addScript $ StaticR js_app_services_billboard_js
+            addScript $ StaticR js_app_services_httpErrorHandler_js
             addScript $ StaticR js_app_services_Tasks_js
 
             addScript $ StaticR js_app_controllers_js

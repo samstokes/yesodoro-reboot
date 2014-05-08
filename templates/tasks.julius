@@ -10,6 +10,9 @@ var app = angular.module('HibiApp',
   , 'app.directives'
   , 'app.filters'
   ])
+.config(function ($httpProvider, httpErrorHandler) {
+  $httpProvider.interceptors.push(httpErrorHandler);
+})
 .value('defaultTaskSchedule', #{toJSON Once})
 .value('initialPlanData', #{toJSON activePlans})
 .value('initialTaskData', #{toJSON tasksWithChildren});
