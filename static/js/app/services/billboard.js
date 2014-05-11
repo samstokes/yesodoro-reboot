@@ -43,9 +43,11 @@ angular.module('app.services')
       throw new Error('Invalid event action: ' + reason);
     }
 
-    if (!action.url) {
-      invalid('must have "url" property');
+    if ((action.reload !== undefined) === (!!action.url)) {
+      invalid('must have either "reload" or "url" properties but not both');
     }
+
+    if (action.reload !== undefined && !action.reload) invalid('"reload: ' + action.reload + '" does not make sense');
 
     if (action.url && !isRelativeUrl(action.url)) {
       invalid("can't popup absolute URLs");

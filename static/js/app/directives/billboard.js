@@ -36,9 +36,14 @@ angular.module('app.directives')
       function popup(url) {
         return $window.open(url, 'popup', POPUP_FEATURES);
       }
+      function reload() {
+        $window.location.reload();
+      }
 
       $scope.performAction = function performAction(action) {
-        if (action.url) {
+        if (action.reload !== undefined) {
+          reload();
+        } else if (action.url) {
           popup(action.url);
         }
 
