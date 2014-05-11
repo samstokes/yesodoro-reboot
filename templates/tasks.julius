@@ -13,6 +13,7 @@ var app = angular.module('HibiApp',
 .config(function ($httpProvider, httpErrorHandler) {
   $httpProvider.interceptors.push(httpErrorHandler);
 })
+.value('messageFromServer', #{toJSON mmsg})
 .value('defaultTaskSchedule', #{toJSON Once})
 .value('initialPlanData', #{toJSON activePlans})
 .value('initialTaskData', #{toJSON tasksWithChildren});

@@ -9,6 +9,7 @@ import Data.List (partition, sort, zipWith4)
 import qualified Data.Text as Text
 import Data.Aeson.Types (ToJSON, toJSON)
 import Text.Blaze (toMarkup)
+import Text.Blaze.Renderer.Text (renderMarkup)
 import Util
 import Util.Angular
 
@@ -32,6 +33,7 @@ instance ToJSON TaskWithChildren where
 getTasksR :: Handler RepHtml
 getTasksR = do
   Entity userId user <- requireAuth
+  mmsg <- fmap renderMarkup <$> getMessage
   params <- reqGetParams <$> getRequest
   let
     window :: Maybe Integer

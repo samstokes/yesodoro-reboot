@@ -1,8 +1,19 @@
 /*global angular */
 
 angular.module('app.controllers')
-.controller('TasksCtrl', function ($scope, Task, Tasks, $timeout) {
+.controller('TasksCtrl', function ($scope, Task, Tasks, $timeout, messageFromServer, Billboard) {
   'use strict';
+
+  /*
+   * If the server set a message before we loaded the app, display it via
+   * Billboard.  Putting this here is a hack, but we need it somewhere that
+   * runs on app load, into which we can inject Billboard and
+   * messageFromServer.
+   */
+  if (messageFromServer) {
+    Billboard.success(messageFromServer, {timeout: 10000});
+  }
+
 
   $scope.tasks = Tasks.all();
   $scope.tasks.todoToday = function todoToday() {
