@@ -13,7 +13,12 @@ angular.module('app.services')
           Billboard.error("Maybe your XSRF token expired?");
           break;
         case 401:
-          Billboard.error('Oops tiem to login');
+          Billboard.error('Oops tiem to login', {
+            action: {
+              url: '/login_popup',
+              message: 'MOAR LOGIN!'
+            }
+          });
           break;
         case 500:
           Billboard.error("Something bad happened!");

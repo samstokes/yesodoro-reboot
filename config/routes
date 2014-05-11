@@ -4,6 +4,8 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
+/login_popup LoginPopupR GET
+
 / HomeR GET
 /tasks TasksR GET POST
 

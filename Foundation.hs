@@ -212,6 +212,8 @@ defaultTimeZone = read "PST"
 instance YesodAuth App where
     type AuthId App = UserId
 
+    redirectToReferer _ = True
+
     -- Where to send a user after successful login
     loginDest _ = HomeR
     -- Where to send a user after logout
