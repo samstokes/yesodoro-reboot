@@ -11,9 +11,14 @@ angular.module('app.services')
     'severity'
   ];
 
+  var SEVERITIES = [
+    'success',
+    'error'
+  ];
+
   var scope = $rootScope.$new();
 
-  var Billboard = {};
+  var Billboard = {SEVERITIES: SEVERITIES};
 
   Billboard.watch = function watch(watchFn) {
     scope.$watch('lastEvent', watchFn);
@@ -27,6 +32,8 @@ angular.module('app.services')
     REQUIRED_EVENT_PROPERTIES.forEach(function (property) {
       if (!event[property]) invalid('must have "' + property + '" property');
     });
+
+    if (SEVERITIES.indexOf(event.severity) < 0) invalid('unknown severity "' + event.severity + '"');
   }
 
   Billboard.notify = function notify(severity, message) {
@@ -39,7 +46,7 @@ angular.module('app.services')
     scope.lastEvent = null;
   };
 
-  ['success', 'error'].forEach(function (severity) {
+  SEVERITIES.forEach(function (severity) {
     Billboard[severity] = Billboard.notify.bind(Billboard, severity);
   });
 
