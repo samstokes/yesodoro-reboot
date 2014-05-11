@@ -1,7 +1,7 @@
 /*global angular */
 
 angular.module('app.directives')
-.directive('billboard', function (Billboard) {
+.directive('billboard', function ($window, Billboard) {
   'use strict';
 
   return {
@@ -22,8 +22,8 @@ angular.module('app.directives')
         </div> \
         ',
 
-    controller: function ($scope, $window) {
-      $scope.dismiss = Billboard.clear.bind(Billboard);
+    link: function (scope, elem, attrs) {
+      scope.dismiss = Billboard.clear.bind(Billboard);
 
       var POPUP_FEATURES = [
         'height=300',
@@ -40,7 +40,7 @@ angular.module('app.directives')
         $window.location.reload();
       }
 
-      $scope.performAction = function performAction(action) {
+      scope.performAction = function performAction(action) {
         if (action.reload !== undefined) {
           reload();
         } else if (action.url) {
@@ -57,9 +57,9 @@ angular.module('app.directives')
 
       Billboard.watch(function billboardDirectiveWatch(event) {
         if (event) {
-          $scope.event = event;
+          scope.event = event;
         } else {
-          $scope.event = null;
+          scope.event = null;
         }
       });
     }
