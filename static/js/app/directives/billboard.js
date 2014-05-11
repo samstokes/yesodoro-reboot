@@ -13,7 +13,7 @@ angular.module('app.directives')
     template: '\
         <div ng-show="event" class="{{event.severity}}"> \
           <span class="message">{{event.message}}</span> \
-          <a class="dismiss" ng-click="dismiss()">X</a> \
+          <a class="dismiss" ng-click="dismiss(event)">X</a> \
         </div>\
         ',
 

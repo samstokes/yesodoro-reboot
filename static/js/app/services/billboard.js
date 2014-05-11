@@ -42,7 +42,10 @@ angular.module('app.services')
     scope.lastEvent = event;
   };
 
-  Billboard.clear = function clear() {
+  Billboard.clear = function clear(event) {
+    if (event && scope.lastEvent !== event) {
+      return;
+    }
     scope.lastEvent = null;
   };
 
