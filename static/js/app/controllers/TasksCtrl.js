@@ -93,14 +93,23 @@ angular.module('app.controllers')
   $scope.addNewTask = function () {
     var task = this.newTask;
     this.newTask = new Task();
-    this.tasks.splice(this.tasks.length, 0, task);
+
+    var self = this;
     Tasks.create(task.task)
       .then(function (created) {
         task.id = created.id;
         task.task = created.task;
         task.notes = created.notes;
+
+        self.tasks.splice(self.tasks.length, 0, task);
       }, function () {
-        task.broken = true;
+        var index = self.tasks.indexOf(task);
+        if (index >= 0) {
+          self.tasks.splice(index, 1);
+        }
+        if (!self.newTask.task.title) {
+          self.newTask = task;
+        }
       });
     return task;
   };

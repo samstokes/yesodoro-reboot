@@ -59,12 +59,6 @@ describe('TasksCtrl', function () {
       expect(scope.newTask.task.title).toBeUndefined();
     });
 
-    it('should add the task to the array', function () {
-      scope.addNewTask();
-
-      expect(scope.tasks).toContain(jasmine.objectContaining({id: '_new'}));
-    });
-
     it('should save the task', function () {
       scope.addNewTask();
 
@@ -85,7 +79,7 @@ describe('TasksCtrl', function () {
         expect(addedTask.id).toBe(42);
       });
 
-      it('should update the task in the array', function () {
+      it('should add the task to the array', function () {
         expect(scope.tasks).toContain(jasmine.objectContaining({id: 42}));
         expect(scope.tasks).not.toContain(jasmine.objectContaining({id: '_new'}));
       });
@@ -94,13 +88,17 @@ describe('TasksCtrl', function () {
     describe('if adding the task failed', function () {
       beforeEach(function () {
         FakeTaskRepo.create.and.returnValue($q.reject());
+        scope.addNewTask();
+        scope.$apply();
       });
 
-      it('should mark the task as broken', function () {
-        var addedTask = scope.addNewTask();
+      it('should not add the task to the array', function () {
+        expect(scope.tasks).not.toContain(jasmine.objectContaining({id: '_new'}));
+      });
 
-        scope.$apply();
-        expect(addedTask.broken).toBeTruthy();
+      it('should refill the blank task with the task title', function () {
+
+        expect(scope.newTask.task.title).toBe('Clean the kitchen');
       });
     });
   });
