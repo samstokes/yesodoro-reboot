@@ -52,6 +52,10 @@ angular.module('app.services')
     if (action.url && !isRelativeUrl(action.url)) {
       invalid("can't popup absolute URLs");
     }
+
+    if (action.onCloseMessage && !action.url) {
+      invalid('"onCloseMessage" can only be used with a url');
+    }
   }
 
   function isRelativeUrl(url) {

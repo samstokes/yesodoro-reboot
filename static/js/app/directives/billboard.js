@@ -44,7 +44,12 @@ angular.module('app.directives')
         if (action.reload !== undefined) {
           reload();
         } else if (action.url) {
-          popup(action.url);
+          var poppedUp = popup(action.url);
+          if (action.onCloseMessage) {
+            poppedUp.onunload = function onPopupClose() {
+              Billboard.success(action.onCloseMessage);
+            };
+          }
         }
 
         this.dismiss();
