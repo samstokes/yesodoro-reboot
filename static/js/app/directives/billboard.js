@@ -11,13 +11,13 @@ angular.module('app.directives')
 
     replace: true,
     template: '\
-        <div ng-show="event" class="{{event.severity}}"> \
-          <div> \
+        <div ng-class="{empty: !event}" class="billboard {{event.severity}}"> \
+          <div ng-show="event.message"> \
             <span class="message">{{event.message}}</span> \
             <a class="dismiss" ng-click="dismiss(event)">X</a> \
           </div> \
           <div ng-show="event.action"> \
-            <a ng-click="performAction(event.action)">{{event.action.message}}</a> \
+            <a class="action" ng-click="performAction(event.action)">{{event.action.message}}</a> \
           </div> \
         </div> \
         ',
@@ -52,7 +52,7 @@ angular.module('app.directives')
           }
         }
 
-        this.dismiss();
+        this.dismiss(scope.event);
       };
 
       Billboard.watch(function billboardDirectiveWatch(event) {

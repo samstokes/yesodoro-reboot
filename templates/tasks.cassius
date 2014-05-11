@@ -12,7 +12,7 @@ h1
   text-align: center
 
 
-#billboard
+.billboard
   position: absolute
   width: 300px
   left: 50%
@@ -25,19 +25,25 @@ h1
   border-width: 1px
   border-style: solid
 
-#billboard.success
+.billboard.empty
+  display: none
+
+.billboard.success
   border-color: rgba(0, 25, 0, 0.15)
   background-color: rgba(182, 252, 126, 0.8)
   color: rgb(45, 63, 31)
 
-#billboard.error
+.billboard.error
   border-color: rgba(25, 0, 0, 0.15)
   background-color: rgba(252, 182, 126, 0.8)
   color: rgb(63, 45, 31)
 
-#billboard .dismiss
+.billboard .dismiss
   cursor: pointer
   float: right
+
+.billboard .action
+  cursor: pointer
 
 
 section#settings
