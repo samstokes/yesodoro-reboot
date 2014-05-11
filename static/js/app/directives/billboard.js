@@ -47,7 +47,7 @@ angular.module('app.directives')
           var poppedUp = popup(action.url);
           if (action.onCloseMessage) {
             poppedUp.onunload = function onPopupClose() {
-              Billboard.success(action.onCloseMessage);
+              Billboard.success(action.onCloseMessage, {timeout: 10000});
             };
           }
         }
