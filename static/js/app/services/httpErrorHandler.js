@@ -21,7 +21,8 @@ angular.module('app.services')
           Billboard.error('Oops tiem to login', {
             action: {
               url: '/login_popup',
-              message: 'MOAR LOGIN!'
+              message: 'MOAR LOGIN!',
+              onCloseMessage: 'TRY AGANE'
             }
           });
           break;
