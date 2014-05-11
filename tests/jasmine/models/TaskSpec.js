@@ -49,7 +49,7 @@ describe('Task', function () {
     });
 
     it('should have no notes', function () {
-      expect(task.notes.length).toBe(0);
+      expect(task.notes).toBeEmpty();
     });
 
     it('should have a zero estimate', function () {

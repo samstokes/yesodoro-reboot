@@ -33,7 +33,7 @@ describe('Tasks', function () {
       var tasksThatAreNotTasks = allTasks.filter(function (task) {
         return task.constructor !== FakeTask;
       });
-      expect(tasksThatAreNotTasks).toEqual([]);
+      expect(tasksThatAreNotTasks).toBeEmpty();
     });
   });
 

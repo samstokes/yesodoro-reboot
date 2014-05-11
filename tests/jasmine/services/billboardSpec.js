@@ -131,7 +131,7 @@ describe('Billboard service', function () {
         $rootScope.$apply();
 
         expect(lastEvent.action.message).not.toBeFalsy();
-        expect(lastEvent.action.message.length).toBeGreaterThan(0);
+        expect(lastEvent.action.message).not.toBeEmpty();
       });
 
       it('should allow setting a message for when the popup closes', function () {
