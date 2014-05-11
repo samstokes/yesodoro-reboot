@@ -43,7 +43,7 @@ angular.module('app.services')
       throw new Error('Invalid event action: ' + reason);
     }
 
-    if ((action.reload !== undefined) === (!!action.url)) {
+    if ((action.reload !== undefined) === (!!action.url)) { // jshint ignore:line
       invalid('must have either "reload" or "url" properties but not both');
     }
 
@@ -63,9 +63,10 @@ angular.module('app.services')
   }
 
   Billboard.notify = function notify(severity, message, properties) {
+    var timeout, action;
     if (properties) {
-      var timeout = properties.timeout,
-          action = properties.action;
+      timeout = properties.timeout;
+      action = properties.action;
     }
 
     var event = {severity: severity, message: message};
