@@ -3,7 +3,7 @@
  */
 
 angular.module('app.services')
-.factory('Billboard', function ($rootScope) {
+.factory('Billboard', function ($rootScope, $timeout) {
   'use strict';
 
   var REQUIRED_EVENT_PROPERTIES = [
@@ -64,7 +64,8 @@ angular.module('app.services')
 
   Billboard.notify = function notify(severity, message, properties) {
     if (properties) {
-      var action = properties.action;
+      var timeout = properties.timeout,
+          action = properties.action;
     }
 
     var event = {severity: severity, message: message};
@@ -77,6 +78,12 @@ angular.module('app.services')
     }
     validateEvent(event);
     scope.lastEvent = event;
+
+    if (timeout > 0) {
+      $timeout(function notifyTimeout() {
+        this.clear(event);
+      }.bind(this), timeout);
+    }
   };
 
   Billboard.clear = function clear(event) {
