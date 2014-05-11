@@ -4,7 +4,6 @@ done plans with automagic
 Note popup layout broken in Firefox
 Update tasks when day ticks over
 Get rid of 'you are now logged in' message
-handle login expiring
 Prompt to refresh on backend update
 Get test coverage to 80%
 Hovering should not recalc ng-repeats
