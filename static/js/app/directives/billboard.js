@@ -12,13 +12,38 @@ angular.module('app.directives')
     replace: true,
     template: '\
         <div ng-show="event" class="{{event.severity}}"> \
-          <span class="message">{{event.message}}</span> \
-          <a class="dismiss" ng-click="dismiss(event)">X</a> \
-        </div>\
+          <div> \
+            <span class="message">{{event.message}}</span> \
+            <a class="dismiss" ng-click="dismiss(event)">X</a> \
+          </div> \
+          <div ng-show="event.action"> \
+            <a ng-click="performAction(event.action)">{{event.action.message}}</a> \
+          </div> \
+        </div> \
         ',
 
-    controller: function ($scope) {
+    controller: function ($scope, $window) {
       $scope.dismiss = Billboard.clear.bind(Billboard);
+
+      var POPUP_FEATURES = [
+        'height=300',
+        'width=400',
+        'menubar=0',
+        'toolbar=0',
+        'location=1'
+      ].join(',');
+
+      function popup(url) {
+        return $window.open(url, 'popup', POPUP_FEATURES);
+      }
+
+      $scope.performAction = function performAction(action) {
+        if (action.url) {
+          popup(action.url);
+        }
+
+        this.dismiss();
+      };
 
       Billboard.watch(function billboardDirectiveWatch(event) {
         if (event) {

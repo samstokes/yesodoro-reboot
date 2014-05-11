@@ -34,10 +34,41 @@ angular.module('app.services')
     });
 
     if (SEVERITIES.indexOf(event.severity) < 0) invalid('unknown severity "' + event.severity + '"');
+
+    if (event.action) validateAction(event.action);
   }
 
-  Billboard.notify = function notify(severity, message) {
+  function validateAction(action) {
+    function invalid(reason) {
+      throw new Error('Invalid event action: ' + reason);
+    }
+
+    if (!action.url) {
+      invalid('must have "url" property');
+    }
+
+    if (action.url && !isRelativeUrl(action.url)) {
+      invalid("can't popup absolute URLs");
+    }
+  }
+
+  function isRelativeUrl(url) {
+    return url[0] === '/' && url[1] !== '/';
+  }
+
+  Billboard.notify = function notify(severity, message, properties) {
+    if (properties) {
+      var action = properties.action;
+    }
+
     var event = {severity: severity, message: message};
+    if (action) {
+      event.action = action;
+
+      if (!event.action.message) {
+        event.action.message = 'Click here';
+      }
+    }
     validateEvent(event);
     scope.lastEvent = event;
   };
