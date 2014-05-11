@@ -5,9 +5,19 @@
       "from": "https://registry.npmjs.org/karma-jasmine/-/karma-jasmine-0.2.1.tgz",
       "resolved": "https://registry.npmjs.org/karma-jasmine/-/karma-jasmine-0.2.1.tgz"
     },
+    "karma-spec-reporter": {
+      "version": "0.0.12",
+      "from": "karma-spec-reporter@",
+      "dependencies": {
+        "colors": {
+          "version": "0.6.2",
+          "from": "colors@~0.6.0"
+        }
+      }
+    },
     "jshint": {
       "version": "2.4.4",
-      "from": "jshint@",
+      "from": "https://registry.npmjs.org/jshint/-/jshint-2.4.4.tgz",
       "resolved": "https://registry.npmjs.org/jshint/-/jshint-2.4.4.tgz",
       "dependencies": {
         "shelljs": {
@@ -51,30 +61,39 @@
         "htmlparser2": {
           "version": "3.3.0",
           "from": "htmlparser2@3.3.x",
-          "resolved": "https://registry.npmjs.org/htmlparser2/-/htmlparser2-3.3.0.tgz",
           "dependencies": {
             "domhandler": {
               "version": "2.1.0",
-              "from": "domhandler@2.1",
-              "resolved": "https://registry.npmjs.org/domhandler/-/domhandler-2.1.0.tgz"
+              "from": "domhandler@2.1"
             },
             "domutils": {
               "version": "1.1.6",
-              "from": "domutils@1.1",
-              "resolved": "https://registry.npmjs.org/domutils/-/domutils-1.1.6.tgz"
+              "from": "domutils@1.1"
             },
             "domelementtype": {
               "version": "1.1.1",
-              "from": "domelementtype@1",
-              "resolved": "https://registry.npmjs.org/domelementtype/-/domelementtype-1.1.1.tgz"
+              "from": "domelementtype@1"
             },
             "readable-stream": {
-              "version": "1.0.26-2",
+              "version": "1.0.27-1",
               "from": "readable-stream@1.0",
               "dependencies": {
+                "core-util-is": {
+                  "version": "1.0.1",
+                  "from": "core-util-is@~1.0.0"
+                },
+                "isarray": {
+                  "version": "0.0.1",
+                  "from": "isarray@0.0.1",
+                  "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
+                },
                 "string_decoder": {
                   "version": "0.10.25-1",
                   "from": "string_decoder@~0.10.x"
+                },
+                "inherits": {
+                  "version": "2.0.1",
+                  "from": "inherits@2"
                 }
               }
             }
