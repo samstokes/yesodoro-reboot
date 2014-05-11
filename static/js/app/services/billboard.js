@@ -85,6 +85,8 @@ angular.module('app.services')
         this.clear(event);
       }.bind(this), timeout);
     }
+
+    return event;
   };
 
   Billboard.clear = function clear(event) {
