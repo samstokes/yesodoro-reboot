@@ -10,7 +10,12 @@ angular.module('app.services')
     responseError: function httpErrorHandler(rejection) {
       switch (rejection.status) {
         case 400:
-          Billboard.error("Maybe your XSRF token expired?");
+          Billboard.error("Maybe your XSRF token expired?", {
+            action: {
+              reload: true,
+              message: 'RELOAD'
+            }
+          });
           break;
         case 401:
           Billboard.error('Oops tiem to login', {
