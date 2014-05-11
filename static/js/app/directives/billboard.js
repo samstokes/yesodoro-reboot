@@ -11,8 +11,8 @@ angular.module('app.directives')
 
     replace: true,
     template: '\
-        <div ng-show="message" class="{{severity}}"> \
-          <span class="message">{{message}}</span> \
+        <div ng-show="event" class="{{event.severity}}"> \
+          <span class="message">{{event.message}}</span> \
           <a class="dismiss" ng-click="dismiss()">X</a> \
         </div>\
         ',
@@ -22,10 +22,9 @@ angular.module('app.directives')
 
       Billboard.watch(function billboardDirectiveWatch(event) {
         if (event) {
-          $scope.message = event.message;
-          $scope.severity = event.severity;
+          $scope.event = event;
         } else {
-          $scope.message = null;
+          $scope.event = null;
         }
       });
     }
