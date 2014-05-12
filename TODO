@@ -2,6 +2,7 @@ Launch blockers
 	Disable email/password login
 	Make session cookie Secure
 	Lengthen session expiry
+	Merge wip.angular-tasks
 Post-launch
 	fetch JSON tasks as separate call from JS load
 	consistently use camelCase or snake_case
