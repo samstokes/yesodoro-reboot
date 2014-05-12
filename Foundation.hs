@@ -20,7 +20,6 @@ import Prelude
 import Yesod
 import Yesod.Static
 import Yesod.Auth
-import Yesod.Auth.BrowserId
 import Yesod.Auth.Email
 import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
@@ -228,7 +227,7 @@ instance YesodAuth App where
                   fmap Just $ insert $ User (credsIdent creds) Nothing defaultTimeZone noFlags
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [authBrowserId, authGoogleEmail, authEmail]
+    authPlugins _ = [authGoogleEmail, authEmail]
 
     authHttpManager = httpManager
 
