@@ -1,10 +1,15 @@
-fetch JSON tasks as separate call from JS load
-consistently use camelCase or snake_case
-done plans with automagic
-Note popup layout broken in Firefox
-Update tasks when day ticks over
-Prompt to refresh on backend update
-Get test coverage to 80%
-Hovering should not recalc ng-repeats
-cache-control headers (not just etag) on task-tr-ng.hamlet
-Update buildpack for "set -e" etc
+Launch blockers
+	Disable email/password login
+	Make session cookie Secure
+	Lengthen session expiry
+Post-launch
+	fetch JSON tasks as separate call from JS load
+	consistently use camelCase or snake_case
+	done plans with automagic
+	Note popup layout broken in Firefox
+	Update tasks when day ticks over
+	Prompt to refresh on backend update
+	Get test coverage to 80%
+	Hovering should not recalc ng-repeats
+	cache-control headers (not just etag) on task-tr-ng.hamlet
+	Update buildpack for "set -e" etc
