@@ -10,30 +10,30 @@ angular.module('app.services')
     responseError: function httpErrorHandler(rejection) {
       switch (rejection.status) {
         case 400:
-          Billboard.error("Maybe your XSRF token expired?", {
+          Billboard.error('Oh dear, something went wrong!', {
             action: {
               reload: true,
-              message: 'RELOAD'
+              message: 'Click here to try refreshing the page.'
             }
           });
           break;
         case 401:
-          Billboard.error('Oops tiem to login', {
+          Billboard.error('Sorry, your session has expired.', {
             action: {
               url: '/login_popup',
-              message: 'MOAR LOGIN!',
-              onCloseMessage: 'TRY AGANE'
+              message: 'Click here to log in.',
+              onCloseMessage: 'Now please try again.'
             }
           });
           break;
         case 500:
-          Billboard.error("Something bad happened!");
+          Billboard.error('Sorry, something went wrong!');
           break;
         case 0:
-          Billboard.error("Looks like the server is down maybe?");
+          Billboard.error('Oops, either your wifi or our servers are down!  Please try again later.');
           break;
         default:
-          Billboard.error("I don't even: " + rejection.status);
+          Billboard.error("Oh dear, that didn't work: " + rejection.status);
       }
 
       return $q.reject(rejection);
