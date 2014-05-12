@@ -227,7 +227,7 @@ instance YesodAuth App where
                   fmap Just $ insert $ User (credsIdent creds) Nothing defaultTimeZone noFlags
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [authGoogleEmail, authEmail]
+    authPlugins _ = authGoogleEmail : ifDev [authEmail] []
 
     authHttpManager = httpManager
 
