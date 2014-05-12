@@ -14,3 +14,4 @@ Post-launch
 	Hovering should not recalc ng-repeats
 	cache-control headers (not just etag) on task-tr-ng.hamlet
 	Update buildpack for "set -e" etc
+	Bugsnag
