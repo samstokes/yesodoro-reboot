@@ -43,6 +43,7 @@ library
                      Util
                      Util.Http
                      Util.Angular
+                     Util.SessionBackend
                      Widget.Expandy
 
     if flag(dev) || flag(library-only)
@@ -110,6 +111,7 @@ library
                  , safe
                  , unordered-containers
                  , heroku
+                 , cereal
 
 executable         yesodoro-reboot
     if flag(library-only)

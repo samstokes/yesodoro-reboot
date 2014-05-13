@@ -47,6 +47,7 @@ import Data.Text (Text)
 import Data.Time (TimeZone(..))
 import Util
 import Util.Angular
+import Util.SessionBackend
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -104,7 +105,7 @@ instance Yesod App where
     -- default session idle timeout is 120 minutes
     makeSessionBackend _ = do
         key <- getKey "config/client_session_key.aes"
-        return . Just $ clientSessionBackend key 120
+        return . Just $ secureClientSessionBackend key 120
 
     defaultLayout widget = do
         authed <- isJust <$> maybeAuthId
