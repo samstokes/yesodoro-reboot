@@ -252,7 +252,7 @@ instance YesodAuthEmail App where
     sendVerifyEmail email _ verurl = do
         y <- getYesod
         -- Just log the verification URL for now, rather than emailing it...
-        -- TODO this is insecure and user-unfriendly!
+        -- this is insecure and user-unfriendly, but only used in dev
         liftIO $ logLazyText (getLogger y) [stext|
 Hello #{email}!
 Please go to #{verurl}.
