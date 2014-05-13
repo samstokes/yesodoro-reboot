@@ -1,5 +1,4 @@
 Launch blockers
-	Disable email/password signup
 	Make session cookie Secure
 	Lengthen session expiry
 	Merge wip.angular-tasks
