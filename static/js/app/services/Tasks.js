@@ -28,7 +28,7 @@ angular.module('app.services')
   var Tasks = {};
 
   Tasks.all = function () {
-    return tasksFromServer;
+    return $q.when(tasksFromServer);
   };
 
   Tasks.create = function (task) {
