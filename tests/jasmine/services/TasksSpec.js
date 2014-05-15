@@ -9,7 +9,6 @@ describe('Tasks', function () {
 
   beforeEach(module(function ($provide) {
     $provide.factory('Task', function () { return FakeTask; });
-    $provide.value('initialTaskData', [1, 2, 3, 4]);
   }));
 
   beforeEach(inject(function(_Tasks_, _$httpBackend_) {
@@ -22,15 +21,34 @@ describe('Tasks', function () {
   });
 
   describe('.all()', function () {
-    var allTasks;
-    beforeEach(function () { allTasks = Tasks.all(); });
+    beforeEach(function () {
+      $httpBackend.whenGET('/tasks_json').respond([
+        'foo', 'bar', 'baz'
+      ]);
+    });
 
-    it('should return an array of tasks', function () {
-      expect(isArray(allTasks)).toBeTruthy();
+    it('should request the tasks from the server', function () {
+      $httpBackend.expectGET('/tasks_json');
+      Tasks.all();
+    });
+
+    it('should return a promise of an array of tasks', function () {
+      var allTasks = Tasks.all();
+      expect(allTasks.then).toBeDefined();
+
+      var tasks;
+      allTasks.then(function (_tasks) { tasks = _tasks; });
+      $httpBackend.flush();
+
+      expect(isArray(tasks)).toBeTruthy();
     });
 
     it('should construct Task objects from the task data', function () {
-      var tasksThatAreNotTasks = allTasks.filter(function (task) {
+      var tasks;
+      Tasks.all().then(function (_tasks) { tasks = _tasks; });
+      $httpBackend.flush();
+
+      var tasksThatAreNotTasks = tasks.filter(function (task) {
         return task.constructor !== FakeTask;
       });
       expect(tasksThatAreNotTasks).toBeEmpty();

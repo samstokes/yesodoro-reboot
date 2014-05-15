@@ -4,14 +4,12 @@
  */
 
 angular.module('app.services')
-.factory('Tasks', function (Task, initialTaskData, $q, $http) {
+.factory('Tasks', function (Task, $q, $http) {
   'use strict';
 
   function newTask(taskData) {
     return new Task(taskData);
   }
-
-  var tasksFromServer = initialTaskData.map(newTask);
 
   function extractData(response) {
     return response.data;
@@ -28,7 +26,11 @@ angular.module('app.services')
   var Tasks = {};
 
   Tasks.all = function () {
-    return $q.when(tasksFromServer);
+    return $http.get('/tasks_json')
+      .then(extractData)
+      .then(function (taskData) {
+        return taskData.map(newTask);
+      });
   };
 
   Tasks.create = function (task) {

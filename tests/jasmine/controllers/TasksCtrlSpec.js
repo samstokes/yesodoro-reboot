@@ -21,12 +21,21 @@ describe('TasksCtrl', function () {
 
     $provide.factory('Task', function () { return FakeTask; });
 
+    // We'd like to use $q.when to mock FakeTaskRepo.all below, but $q hasn't
+    // been injected yet, and we can't do it before registering this module.
+    // As a workaround, here's a hacky synchronous fake of a promise.
+    function FakePromise(value) {
+      this.then = function then(callback) {
+        callback(value);
+        return this;
+      };
+    }
     FakeTaskRepo = jasmine.createSpyObj('Tasks', [
       'all',
       'create',
       'complete'
     ]);
-    FakeTaskRepo.all.and.returnValue([1, 2, 3, 4].map(function (id) {
+    FakeTaskRepo.all.and.returnValue(new FakePromise([1, 2, 3, 4].map(function (id) {
       var task = {
         id: id,
         task: {
@@ -34,7 +43,7 @@ describe('TasksCtrl', function () {
         }
       };
       return task;
-    }));
+    })));
     $provide.factory('Tasks', function () { return FakeTaskRepo; });
   }));
 

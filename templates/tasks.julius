@@ -15,8 +15,7 @@ var app = angular.module('HibiApp',
 })
 .value('messageFromServer', #{toJSON mmsg})
 .value('defaultTaskSchedule', #{toJSON Once})
-.value('initialPlanData', #{toJSON activePlans})
-.value('initialTaskData', #{toJSON tasksWithChildren});
+.value('initialPlanData', #{toJSON activePlans});
 
 
 app.filter('scheduleLabel', function () {
