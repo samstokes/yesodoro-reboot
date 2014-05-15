@@ -30,6 +30,14 @@ instance ToJSON TaskWithChildren where
     , "estimates" .= estimates, "notes" .= notes]
 
 
+getJsonTasksR :: Handler RepJson
+getJsonTasksR = do
+  userId <- requireNgAuthId
+  horizon <- horizonFromParams
+  tasks <- runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
+  jsonToRepJson tasks
+
+
 getTasksR :: Handler RepHtml
 getTasksR = do
   Entity userId user <- requireAuth

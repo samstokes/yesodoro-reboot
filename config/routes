@@ -8,6 +8,7 @@
 
 / HomeR GET
 /tasks TasksR GET POST
+/tasks_json JsonTasksR GET
 
 /tasks/#TaskId TaskR PUT DELETE PATCH
 
