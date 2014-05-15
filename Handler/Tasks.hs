@@ -34,16 +34,13 @@ getTasksR :: Handler RepHtml
 getTasksR = do
   Entity userId user <- requireAuth
   mmsg <- fmap renderMarkup <$> getMessage
-  params <- reqGetParams <$> getRequest
   let
-    window :: Maybe Integer
-    window = read . Text.unpack <$> lookup "days" params
     features = userFeatureSettings user
     has feature = hasFlag feature features
     scheduleOptions = if has FeatureNonDailySchedules
       then schedules
       else filter (not . nonDaily) schedules
-  horizon <- ago $ fromMaybe (weeks 2) (days . fromIntegral <$> window)
+  horizon <- horizonFromParams
   tasks <- runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
   plans <- runDB $ selectUserPlansSince userId horizon [Desc PlanCreatedAt, Desc PlanDoneAt]
 
@@ -69,6 +66,14 @@ getTasksR = do
         title <- lift appTitle
         setTitle $ toMarkup title
         addWidget $(widgetFile "tasks") where
+
+
+horizonFromParams :: Handler UTCTime
+horizonFromParams = do
+  params <- reqGetParams <$> getRequest
+  let window :: Maybe Integer
+      window = read . Text.unpack <$> lookup "days" params
+  ago $ fromMaybe (weeks 2) (days . fromIntegral <$> window)
 
 
 postTasksR :: Handler RepJson
