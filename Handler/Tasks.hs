@@ -6,11 +6,8 @@ module Handler.Tasks where
 import Handler
 import Import
 
-import Data.List (sort, zipWith4)
-import qualified Data.Text as Text
+import Data.List (zipWith4)
 import Data.Aeson.Types (ToJSON, toJSON)
-import Text.Blaze (toMarkup)
-import Text.Blaze.Renderer.Text (renderMarkup)
 import Util
 import Util.Angular
 
@@ -40,25 +37,6 @@ getJsonTasksR = do
   jsonToRepJson tasksWithChildren
 
 
-getTasksR :: Handler RepHtml
-getTasksR = do
-  Entity userId user <- requireAuth
-  mmsg <- fmap renderMarkup <$> getMessage
-  let
-    features = userFeatureSettings user
-    has feature = hasFlag feature features
-    scheduleOptions = if has FeatureNonDailySchedules
-      then schedules
-      else filter (not . nonDaily) schedules
-    toggleableFeatures = sort $ filter ((/= FeatureSettings) . fst) features
-    featureButtonLabel (feature, False) = Text.pack $ "Enable " ++ featureDescription feature
-    featureButtonLabel (feature, True) = Text.pack $ "Disable " ++ featureDescription feature
-   in defaultLayout $ do
-        title <- lift appTitle
-        setTitle $ toMarkup title
-        addWidget $(widgetFile "tasks") where
-
-
 userTasksSince :: UserId -> UTCTime -> Handler [Entity Task]
 userTasksSince userId horizon = runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
 
@@ -86,12 +64,6 @@ postTasksR = do
   taskEntity <- runDB $ createTaskAtBottom userId newTask
   jsonToRepJson taskEntity
 
-
-oneButton :: Text -> Text -> Route App -> Widget
-oneButton classes label route = [whamlet|
-  <form method=POST action=@{route}>
-    <button .#{classes}>#{label}
-|]
 
 postCompleteTaskR :: TaskId -> Handler RepJson
 postCompleteTaskR taskId = do
