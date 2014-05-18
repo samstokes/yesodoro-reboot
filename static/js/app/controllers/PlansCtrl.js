@@ -1,7 +1,7 @@
 /*global angular */
 
 angular.module('app.controllers')
-.controller('PlansCtrl', function ($scope, initialPlanData, $http, $log) {
+.controller('PlansCtrl', function ($scope, $http, $log) {
   'use strict';
 
   function Plan(planData) {
@@ -13,8 +13,15 @@ angular.module('app.controllers')
   };
 
   function makePlan(planData) { return new Plan(planData); }
+  function extractData(response) {
+    return response.data;
+  }
 
-  $scope.plans = initialPlanData.map(makePlan);
+  $http.get('/plans')
+    .then(extractData)
+    .then(function (plansData) {
+      $scope.plans = plansData.map(makePlan);
+    });
 
   $scope.addNewPlan = function () {
     var plan = new Plan({id: '_new', plan: this.newPlan});

@@ -1,8 +1,16 @@
 module Handler.Plans where
 
+import Handler
 import Import
 import Util
 import Util.Angular
+
+getPlansR :: Handler RepJson
+getPlansR = do
+  userId <- requireNgAuthId
+  horizon <- horizonFromParams
+  plans <- userPlansSince userId horizon
+  jsonToRepJson plans
 
 postPlansR :: Handler RepJson
 postPlansR = do
@@ -36,6 +44,10 @@ deletePlanR planId = do
   runDB $ delete planId
   jsonToRepJson $ object ["deleted" .= True]
 
+
+
+userPlansSince :: UserId -> UTCTime -> Handler [Entity Plan]
+userPlansSince userId horizon = runDB $ selectUserPlansSince userId horizon [Desc PlanCreatedAt, Desc PlanDoneAt]
 
 
 authedPlan :: PlanId -> Handler (Entity Plan)

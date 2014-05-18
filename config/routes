@@ -21,7 +21,7 @@
 
 /tasks/#TaskId/estimates TaskEstimatesR POST
 
-/plans PlansR POST
+/plans PlansR GET POST
 /plans/#PlanId PlanR PUT DELETE
 /plans/#PlanId/complete CompletePlanR POST
 

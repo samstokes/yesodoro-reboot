@@ -3,6 +3,7 @@
 
 module Handler.Tasks where
 
+import Handler
 import Import
 
 import Data.List (sort, zipWith4)
@@ -49,8 +50,6 @@ getTasksR = do
     scheduleOptions = if has FeatureNonDailySchedules
       then schedules
       else filter (not . nonDaily) schedules
-  horizon <- horizonFromParams
-  plans <- runDB $ selectUserPlansSince userId horizon [Desc PlanCreatedAt, Desc PlanDoneAt]
 
   let
       toggleableFeatures = sort $ filter ((/= FeatureSettings) . fst) features
@@ -60,14 +59,6 @@ getTasksR = do
         title <- lift appTitle
         setTitle $ toMarkup title
         addWidget $(widgetFile "tasks") where
-
-
-horizonFromParams :: Handler UTCTime
-horizonFromParams = do
-  params <- reqGetParams <$> getRequest
-  let window :: Maybe Integer
-      window = read . Text.unpack <$> lookup "days" params
-  ago $ fromMaybe (weeks 2) (days . fromIntegral <$> window)
 
 
 userTasksSince :: UserId -> UTCTime -> Handler [Entity Task]

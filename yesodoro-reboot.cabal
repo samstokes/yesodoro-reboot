@@ -33,6 +33,7 @@ library
                      Settings
                      Settings.StaticFiles
                      Settings.Development
+                     Handler
                      Handler.Api
                      Handler.Home
                      Handler.Tasks
