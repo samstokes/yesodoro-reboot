@@ -4,10 +4,20 @@ angular.module('app.controllers')
 .controller('PlansCtrl', function ($scope, initialPlanData, $http, $log) {
   'use strict';
 
-  $scope.plans = initialPlanData;
+  function Plan(planData) {
+    this.id = planData.id;
+    this.plan = planData.plan;
+  }
+  Plan.prototype.isActive = function isActive() {
+    return !this.plan.done_at;
+  };
+
+  function makePlan(planData) { return new Plan(planData); }
+
+  $scope.plans = initialPlanData.map(makePlan);
 
   $scope.addNewPlan = function () {
-    var plan = {id: '_new', plan: this.newPlan};
+    var plan = new Plan({id: '_new', plan: this.newPlan});
     this.newPlan = {};
     this.plans.splice(0, 0, plan);
     $http.post("/plans", plan.plan)

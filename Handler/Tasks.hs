@@ -5,7 +5,7 @@ module Handler.Tasks where
 
 import Import
 
-import Data.List (partition, sort, zipWith4)
+import Data.List (sort, zipWith4)
 import qualified Data.Text as Text
 import Data.Aeson.Types (ToJSON, toJSON)
 import Text.Blaze (toMarkup)
@@ -51,8 +51,6 @@ getTasksR = do
       else filter (not . nonDaily) schedules
   horizon <- horizonFromParams
   plans <- runDB $ selectUserPlansSince userId horizon [Desc PlanCreatedAt, Desc PlanDoneAt]
-
-  let (donePlans, activePlans) = partition (planDone . entityVal) plans
 
   let
       toggleableFeatures = sort $ filter ((/= FeatureSettings) . fst) features

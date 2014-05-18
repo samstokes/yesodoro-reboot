@@ -22,7 +22,7 @@
           <input required placeholder="Add a plan" ng-model="newPlan.body">
           <input .btn .btn-primary type=submit value=Add>
         <table ng-show="plans.length &gt; 0"><tbody>
-          <tr .plan id="plan-{{plan.id}}" ng-class="{broken: plan.broken, going: plan.going}" ng-repeat="plan in plans">
+          <tr .plan id="plan-{{plan.id}}" ng-class="{broken: plan.broken, going: plan.going}" ng-repeat="plan in plans" ng-show="plan.isActive()">
             <td .body>
               <ss-click-to-edit ss-model="plan.plan.body" ss-on-edit="updatePlan(plan)">
                 {{plan.plan.body}}
