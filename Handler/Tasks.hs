@@ -32,10 +32,11 @@ instance ToJSON TaskWithChildren where
 
 getJsonTasksR :: Handler RepJson
 getJsonTasksR = do
-  userId <- requireNgAuthId
+  Entity userId user <- requireNgAuth
   horizon <- horizonFromParams
-  tasks <- runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
-  jsonToRepJson tasks
+  tasks <- userTasksSince userId horizon
+  tasksWithChildren <- fetchTaskChildren user tasks
+  jsonToRepJson tasksWithChildren
 
 
 getTasksR :: Handler RepHtml
@@ -49,20 +50,7 @@ getTasksR = do
       then schedules
       else filter (not . nonDaily) schedules
   horizon <- horizonFromParams
-  tasks <- runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
   plans <- runDB $ selectUserPlansSince userId horizon [Desc PlanCreatedAt, Desc PlanDoneAt]
-
-  extTasks <- if has FeatureExtTasks
-              then runDB $ mapM (taskGetExtTask . entityVal) tasks
-              else return $ map (const Nothing) tasks
-  estimates <- if has FeaturePomos
-               then runDB $ mapM (taskEstimates . entityKey) tasks
-               else return $ map (const []) tasks
-  notes <- if has FeatureNotes
-           then runDB $ mapM (taskNotes [Asc NoteCreatedAt] . entityKey) tasks
-           else return $ map (const []) tasks
-  let tasksWithChildren :: [TaskWithChildren]
-      tasksWithChildren = zipWith4 TaskWithChildren tasks extTasks estimates notes
 
   let (donePlans, activePlans) = partition (planDone . entityVal) plans
 
@@ -82,6 +70,25 @@ horizonFromParams = do
   let window :: Maybe Integer
       window = read . Text.unpack <$> lookup "days" params
   ago $ fromMaybe (weeks 2) (days . fromIntegral <$> window)
+
+
+userTasksSince :: UserId -> UTCTime -> Handler [Entity Task]
+userTasksSince userId horizon = runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
+
+
+fetchTaskChildren :: User -> [Entity Task] -> Handler [TaskWithChildren]
+fetchTaskChildren user tasks = zipWith4 TaskWithChildren tasks <$> extTasks <*> estimates <*> notes where
+  extTasks = if has FeatureExtTasks
+              then runDB $ mapM (taskGetExtTask . entityVal) tasks
+              else return $ map (const Nothing) tasks
+  estimates = if has FeaturePomos
+               then runDB $ mapM (taskEstimates . entityKey) tasks
+               else return $ map (const []) tasks
+  notes = if has FeatureNotes
+           then runDB $ mapM (taskNotes [Asc NoteCreatedAt] . entityKey) tasks
+           else return $ map (const []) tasks
+  has feature = hasFlag feature features
+  features = userFeatureSettings user
 
 
 postTasksR :: Handler RepJson
