@@ -1,0 +1,42 @@
+@font-face {
+ font-family: 'Ostrich Sans Rounded';
+ font-style: normal;
+ font-weight: 500;
+ src: local('Ostrich Sans Rounded'), local('Ostrich-Sans-Rounded'), url(@{StaticR fonts_ostrich_sans_ostrich_rounded_ttf});
+}
+
+@font-face {
+ font-family: 'Nunito';
+ font-style: normal;
+ font-weight: 400;
+ src: local('Nunito'), local('Nunito-Regular'), url(@{StaticR fonts_Nunito_Nunito_Regular_ttf});
+}
+
+body {
+  background-image: url(@{StaticR images_barcelona_boardwalk_jpg});
+  background-size: cover;
+  padding-top: 50pt;
+  padding-bottom: 60pt;
+}
+
+body * {
+  font-family: 'Nunito', sans-serif;
+}
+
+body > header {
+  font-family: 'Ostrich Sans Rounded', sans-serif;
+  font-size: 100pt;
+  line-height: 100pt;
+  text-align: center;
+  text-shadow: #333 0 0 15px;
+  color: white;
+}
+
+#holder {
+  margin-top: 20px; /* = padding */
+
+  margin-left: auto;
+  margin-right: auto;
+
+  width: 460px; /* = 500px - 2x padding */
+}

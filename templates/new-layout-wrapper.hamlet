@@ -1,0 +1,10 @@
+\<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+
+    <title>#{pageTitle pc}
+
+    ^{pageHead pc}
+  <body>
+    ^{pageBody pc}

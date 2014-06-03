@@ -9,6 +9,7 @@ module Foundation
     , maybeAuth
     , requireAuth
     , putR, deleteR
+    , newLayout
     , appTitle
     , module Settings
     , module Model
@@ -154,6 +155,30 @@ instance Yesod App where
     -- Place Javascript at bottom of the body tag so the rest of the page loads first
     jsLoader _ = BottomOfHeadBlocking
 
+
+
+newLayout :: Widget -> Handler RepHtml
+newLayout widget = do
+    authed <- isJust <$> maybeAuthId
+    when authed setXsrfCookie
+
+    mmsg <- getMessage
+    title <- appTitle
+
+    -- We break up the layout into two components:
+    -- new-layout is the contents of the body tag, and
+    -- new-layout-wrapper is the entire page. Since the final
+    -- value passed to hamletToRepHtml cannot be a widget, this allows
+    -- you to use normal widget features in new-layout.
+
+    pc <- widgetToPageContent $ do
+        $(widgetFile "new-layout")
+
+        addThirdPartyJs
+
+        addAppJs
+
+    hamletToRepHtml $(hamletFile "templates/new-layout-wrapper.hamlet")
 
 
 addDefaultLayoutCss :: GWidget sub App ()
