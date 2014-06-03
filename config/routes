@@ -7,6 +7,7 @@
 /login_popup LoginPopupR GET
 
 / HomeR GET
+/new-design NewAppR GET
 /tasks TasksR GET POST
 /tasks_json JsonTasksR GET
 

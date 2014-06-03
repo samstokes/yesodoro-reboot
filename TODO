@@ -2,8 +2,10 @@ Launch blockers
 	Resolve API vs Angular JSON endpoints
 	Lengthen session expiry
 	Upgrade to new GoogleEmail plugin
+	Attribution for icons and backgrounds
 Post-launch
 	Merge wip.angular-tasks
+	favicon
 	fetch JSON tasks as separate call from JS load
 	consistently use camelCase or snake_case
 	done plans with automagic

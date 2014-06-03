@@ -21,6 +21,11 @@ getHomeR = maybeAuthId >>= getHomeR' where
       $(widgetFile "homepage")
   getHomeR' (Just _) = redirect TasksR
 
+getNewAppR :: Handler RepHtml
+getNewAppR = do
+  newLayout $(widgetFile "new-design")
+
+
 getLoginPopupR :: Handler RepHtml
 getLoginPopupR = do
   _ <- requireAuthId
