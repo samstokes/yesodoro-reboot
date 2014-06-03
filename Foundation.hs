@@ -121,46 +121,13 @@ instance Yesod App where
         -- you to use normal widget features in default-layout.
 
         pc <- widgetToPageContent $ do
-            $(widgetFile "normalize")
-            addStylesheet $ StaticR css_bootstrap_css
+            addDefaultLayoutCss
+
             $(widgetFile "default-layout")
-            addScriptEither $ urlJqueryJs master
-            addScriptEither $ urlJqueryUiJs master
-            addScriptEither $ eitherDev (StaticR js_vendor_angular_1_1_5_js) "//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"
-            addScript $ StaticR js_vendor_showdown_js
-            addScript $ StaticR js_vendor_angular_markdown_js
-            addScript $ StaticR js_vendor_angular_ui_sortable_js
 
-            addScript $ StaticR bower_components_ng_group_src_ngGroup_js
+            addThirdPartyJs
 
-            addScript $ StaticR js_lib_util_js
-
-            addScript $ StaticR js_lib_expandy_js
-            addStylesheet $ StaticR css_expandy_css
-
-            addScript $ StaticR js_app_models_js
-            addScript $ StaticR js_app_models_Task_js
-
-            addScript $ StaticR js_app_services_js
-            addScript $ StaticR js_app_services_billboard_js
-            addScript $ StaticR js_app_services_exceptionHandler_js
-            addScript $ StaticR js_app_services_httpErrorHandler_js
-            addScript $ StaticR js_app_services_Tasks_js
-
-            addScript $ StaticR js_app_controllers_js
-            addScript $ StaticR js_app_controllers_PlansCtrl_js
-            addScript $ StaticR js_app_controllers_TasksCtrl_js
-            addScript $ StaticR js_app_controllers_NotesCtrl_js
-
-            addScript $ StaticR js_app_directives_js
-            addScript $ StaticR js_app_directives_billboard_js
-            addScript $ StaticR js_app_directives_ssClickToEdit_js
-            addScript $ StaticR js_app_directives_ssEditablePopup_js
-            addScript $ StaticR js_app_directives_ssKeyboardDirectives_js
-            addScript $ StaticR js_app_directives_ngBlur_js
-            addScript $ StaticR js_app_directives_hibiTask_js
-
-            addScript $ StaticR js_app_filters_js
+            addAppJs
 
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 
@@ -186,6 +153,59 @@ instance Yesod App where
 
     -- Place Javascript at bottom of the body tag so the rest of the page loads first
     jsLoader _ = BottomOfHeadBlocking
+
+
+
+addDefaultLayoutCss :: GWidget sub App ()
+addDefaultLayoutCss = do
+  $(widgetFile "normalize")
+  addStylesheet $ StaticR css_bootstrap_css
+
+
+addThirdPartyJs :: GWidget sub App ()
+addThirdPartyJs = do
+  master <- lift getYesod
+
+  addScriptEither $ urlJqueryJs master
+  addScriptEither $ urlJqueryUiJs master
+  addScriptEither $ eitherDev (StaticR js_vendor_angular_1_1_5_js) "//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"
+  addScript $ StaticR js_vendor_showdown_js
+  addScript $ StaticR js_vendor_angular_markdown_js
+  addScript $ StaticR js_vendor_angular_ui_sortable_js
+
+  addScript $ StaticR bower_components_ng_group_src_ngGroup_js
+
+
+addAppJs :: GWidget sub App ()
+addAppJs = do
+  addScript $ StaticR js_lib_util_js
+
+  addScript $ StaticR js_lib_expandy_js
+  addStylesheet $ StaticR css_expandy_css
+
+  addScript $ StaticR js_app_models_js
+  addScript $ StaticR js_app_models_Task_js
+
+  addScript $ StaticR js_app_services_js
+  addScript $ StaticR js_app_services_billboard_js
+  addScript $ StaticR js_app_services_exceptionHandler_js
+  addScript $ StaticR js_app_services_httpErrorHandler_js
+  addScript $ StaticR js_app_services_Tasks_js
+
+  addScript $ StaticR js_app_controllers_js
+  addScript $ StaticR js_app_controllers_PlansCtrl_js
+  addScript $ StaticR js_app_controllers_TasksCtrl_js
+  addScript $ StaticR js_app_controllers_NotesCtrl_js
+
+  addScript $ StaticR js_app_directives_js
+  addScript $ StaticR js_app_directives_billboard_js
+  addScript $ StaticR js_app_directives_ssClickToEdit_js
+  addScript $ StaticR js_app_directives_ssEditablePopup_js
+  addScript $ StaticR js_app_directives_ssKeyboardDirectives_js
+  addScript $ StaticR js_app_directives_ngBlur_js
+  addScript $ StaticR js_app_directives_hibiTask_js
+
+  addScript $ StaticR js_app_filters_js
 
 
 appTitle :: Handler Text
