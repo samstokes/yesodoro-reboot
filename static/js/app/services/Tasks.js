@@ -25,8 +25,14 @@ angular.module('app.services')
 
   var Tasks = {};
 
-  Tasks.all = function () {
-    return $http.get('/tasks_json')
+  Tasks.all = function (params) {
+    var config;
+    if (params !== undefined) {
+      // TODO HACK this is a bit yuck.
+      config = {params: params};
+    }
+
+    return $http.get('/tasks_json', config)
       .then(extractData)
       .then(function (taskData) {
         return taskData.map(newTask);

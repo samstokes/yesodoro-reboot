@@ -1,7 +1,7 @@
 /*global angular */
 
 angular.module('app.controllers')
-.controller('TasksCtrl', function ($scope, Task, Tasks, $timeout, messageFromServer, Billboard) {
+.controller('TasksCtrl', function ($scope, Task, Tasks, $timeout, messageFromServer, Billboard, $window /* TODO */) {
   'use strict';
 
   /*
@@ -14,8 +14,14 @@ angular.module('app.controllers')
     Billboard.success(messageFromServer, {timeout: 10000});
   }
 
+  /* TODO hack - pull params out of the URL */
+  var daysMatch = $window.location.toString().match(/\?days=(\d+)/),
+      params = {};
+  if (daysMatch !== null) {
+    params.days = daysMatch[1];
+  }
 
-  Tasks.all().then(function (tasks) {
+  Tasks.all(params).then(function (tasks) {
     $scope.tasks = tasks;
     $scope.tasks.todoToday = function todoToday() {
       return this.filter(function (task) {
