@@ -14,7 +14,12 @@ var app = angular.module('HibiApp',
   $httpProvider.interceptors.push(httpErrorHandler);
 })
 .value('messageFromServer', #{toJSON mmsg})
-.value('defaultTaskSchedule', #{toJSON Once});
+.value('defaultTaskSchedule', #{toJSON Once})
+.run(function (Billboard, messageFromServer) {
+  if (messageFromServer) {
+    Billboard.success(messageFromServer, {timeout: 10000});
+  }
+});
 
 
 app.filter('scheduleLabel', function () {

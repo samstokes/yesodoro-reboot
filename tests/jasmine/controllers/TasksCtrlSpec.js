@@ -5,20 +5,10 @@ describe('TasksCtrl', function () {
 
   beforeEach(module('app.controllers'));
 
-  var fakeMessageFromServer = 'Hello from the server!';
   function FakeTask(task) { this.task = task || {}; }
   var FakeTaskRepo;
-  var FakeBillboard;
 
   beforeEach(module(function ($provide) {
-    $provide.value('messageFromServer', fakeMessageFromServer);
-
-    FakeBillboard = jasmine.createSpyObj('Billboard', [
-      'success',
-      'error'
-    ]);
-    $provide.value('Billboard', FakeBillboard);
-
     $provide.factory('Task', function () { return FakeTask; });
 
     // We'd like to use $q.when to mock FakeTaskRepo.all below, but $q hasn't
@@ -59,11 +49,6 @@ describe('TasksCtrl', function () {
 
   it('should provide a blank task', function () {
     expect(scope.newTask).toBeDefined();
-  });
-
-  it('should show the message from the server', function () {
-    expect(FakeBillboard.success)
-      .toHaveBeenCalledWith('Hello from the server!', jasmine.objectContaining({}));
   });
 
   describe('adding a task', function () {

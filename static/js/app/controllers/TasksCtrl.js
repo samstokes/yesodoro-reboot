@@ -1,18 +1,8 @@
 /*global angular */
 
 angular.module('app.controllers')
-.controller('TasksCtrl', function ($scope, Task, Tasks, $timeout, messageFromServer, Billboard, $window /* TODO */) {
+.controller('TasksCtrl', function ($scope, Task, Tasks, $timeout, $window /* TODO */) {
   'use strict';
-
-  /*
-   * If the server set a message before we loaded the app, display it via
-   * Billboard.  Putting this here is a hack, but we need it somewhere that
-   * runs on app load, into which we can inject Billboard and
-   * messageFromServer.
-   */
-  if (messageFromServer) {
-    Billboard.success(messageFromServer, {timeout: 10000});
-  }
 
   /* TODO hack - pull params out of the URL */
   var daysMatch = $window.location.toString().match(/\?days=(\d+)/),
