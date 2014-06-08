@@ -9,7 +9,8 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "ng-group": "https://github.com/samstokes/ng-group.git"
+    "ng-group": "https://github.com/samstokes/ng-group.git",
+    "angular-ui-router": "~0.2.10"
   },
   "devDependencies": {
   }
