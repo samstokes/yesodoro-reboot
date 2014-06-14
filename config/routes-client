@@ -1,0 +1,4 @@
+/settings    NewSettingsR
+/tasks/today NewTasksTodayR
+/tasks/later NewTasksLaterR
+/tasks/done NewTasksDoneR

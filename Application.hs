@@ -45,6 +45,9 @@ import Handler.Templates
 -- the comments there for more details.
 mkYesodDispatch "App" resourcesApp
 
+instance YesodDispatch Client App where
+  yesodDispatch = error "Dummy endpoint"
+
 -- This function allocates resources (such as a database connection pool),
 -- performs initialization and creates a WAI application. This is also the
 -- place to put your migrate statements to have automatic database
@@ -78,7 +81,7 @@ makeFoundation conf setLogger = do
               Database.Persist.Store.applyEnv
     p <- Database.Persist.Store.createPoolConfig (dbconf :: Settings.PersistConfig)
     Database.Persist.Store.runPool dbconf (runMigration migrateAll) p
-    return $ App conf setLogger s p manager dbconf
+    return $ App conf setLogger s p manager dbconf Client
 
 -- for yesod devel
 getApplicationDev :: IO (Int, Application)

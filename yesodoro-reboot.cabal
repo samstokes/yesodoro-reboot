@@ -35,6 +35,7 @@ library
                      Settings.Development
                      Handler
                      Handler.Api
+                     Handler.Client
                      Handler.Home
                      Handler.Tasks
                      Handler.Notes

@@ -1,5 +1,6 @@
 module Foundation
     ( App (..)
+    , Client (..)
     , Route (..)
     , AppMessage (..)
     , resourcesApp
@@ -61,7 +62,11 @@ data App = App
     , connPool :: Database.Persist.Store.PersistConfigPool Settings.PersistConfig -- ^ Database connection pool.
     , httpManager :: Manager
     , persistConfig :: Settings.PersistConfig
+    , getClient :: Client
     }
+
+-- Dummy subsite so our client-side routing can be type-safe too.
+data Client = Client
 
 -- Set up i18n messages. See the message folder.
 mkMessage "App" "messages" "en"
@@ -85,6 +90,7 @@ mkMessage "App" "messages" "en"
 -- for our application to be in scope. However, the handler functions
 -- usually require access to the AppRoute datatype. Therefore, we
 -- split these actions into two functions and place them in separate files.
+mkYesodSubData "Client" [] $(parseRoutesFile "config/routes-client")
 mkYesodData "App" $(parseRoutesFile "config/routes")
 
 
@@ -136,6 +142,10 @@ instance Yesod App where
     -- a separate domain. Please see the staticRoot setting in Settings.hs
     urlRenderOverride y (StaticR s) =
         Just $ uncurry (joinPath y (Settings.staticRoot $ settings y)) $ renderRoute s
+    -- For client-side routes, suppress the root completely: we just want the
+    -- relative path (or ui-router can't join the dots).
+    urlRenderOverride y (ClientR s) =
+        Just $ uncurry (joinPath y "") $ renderRoute s
     urlRenderOverride _ _ = Nothing
 
     -- The page to be redirected to when authentication is required.
