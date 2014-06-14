@@ -197,6 +197,7 @@ addThirdPartyJs = do
   addScript $ StaticR js_vendor_showdown_js
   addScript $ StaticR js_vendor_angular_markdown_js
   addScript $ StaticR js_vendor_angular_ui_sortable_js
+  addScript $ StaticR $ ifDev bower_components_angular_ui_router_release_angular_ui_router_js bower_components_angular_ui_router_release_angular_ui_router_min_js
 
   addScript $ StaticR bower_components_ng_group_src_ngGroup_js
 
