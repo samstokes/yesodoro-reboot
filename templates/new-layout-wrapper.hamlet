@@ -6,5 +6,5 @@
     <title>#{pageTitle pc}
 
     ^{pageHead pc}
-  <body>
+  <body ng-app="HibiApp">
     ^{pageBody pc}

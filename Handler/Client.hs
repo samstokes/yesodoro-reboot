@@ -5,6 +5,7 @@ module Handler.Client (
 , statesDeclJavascript
 ) where
 
+import Data.Monoid ((<>))
 import Data.Aeson (ToJSON(..))
 import Data.Foldable (foldMap)
 import Data.String (IsString)
@@ -60,6 +61,8 @@ stateDeclJavascript state = [julius|
     })
 |]
 
-statesDeclJavascript :: (Route App -> [param] -> Text) -> Javascript
-statesDeclJavascript render = foldMap decl states
-  where decl = flip stateDeclJavascript render
+statesDeclJavascript :: (Route App -> [param] -> Text) -> Text -> Javascript
+statesDeclJavascript render stateProvider = header <> foldMap decl states
+  where
+    header = [julius|#{stateProvider}|] render
+    decl = flip stateDeclJavascript render

@@ -6,8 +6,10 @@ import Data.List (sort)
 import qualified Data.Text as Text
 import Text.Blaze (toMarkup)
 import Text.Blaze.Renderer.Text (renderMarkup)
+import Text.Julius (renderJavascript)
 import Yesod.Auth
 
+import Handler.Client
 import Import
 import Util
 
@@ -23,6 +25,8 @@ getHomeR = maybeAuthId >>= getHomeR' where
 
 getNewAppR :: Handler RepHtml
 getNewAppR = do
+  render <- getUrlRenderParams
+  let declareStates stateProvider = renderJavascript $ statesDeclJavascript render stateProvider
   newLayout $(widgetFile "new-design")
 
 

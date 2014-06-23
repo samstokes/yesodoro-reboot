@@ -1,74 +1,16 @@
 <#content>
-  <a.settings-holder href="#settings">
+  <a.settings-holder ui-sref="#{StateSettings}">
     <img.settings-icon src="@{StaticR images_icon_settings_svg}"
       alt="Settings">
     <.settings-pagecurl>
-  <article.tasks>
-    <header>
-      <h1>Wednesday, September 20th
-    <section.tasks>
-      <ul.tasks>
-        <li>
-          <button.postpone-button>
-            <img src="@{StaticR images_icon_postpone_svg}"
-              alt="Postpone">
-          <.task>
-            <span.title>Write a couple proposals for PyCon
-            <button.delete-button>
-              <img src="@{StaticR images_icon_delete_svg}"
-              alt="Delete">
-        <li>
-          <button.postpone-button>
-            <img src="@{StaticR images_icon_postpone_svg}"
-              alt="Postpone">
-          <.task>
-            <span.title>Make travel arrangements for Monaco
-            <button.delete-button>
-              <img src="@{StaticR images_icon_delete_svg}"
-              alt="Delete">
-        <li>
-          <button.postpone-button>
-            <img src="@{StaticR images_icon_postpone_svg}"
-              alt="Postpone">
-          <.task>
-            <span.title>Finish reading Neil Gaiman's new book
-            <button.delete-button>
-              <img src="@{StaticR images_icon_delete_svg}"
-              alt="Delete">
-        <li>
-          <button.postpone-button>
-            <img src="@{StaticR images_icon_postpone_svg}"
-              alt="Postpone">
-          <.task>
-            <span.title>
-              Don't miss the party tomorrow (remember to bring a gift, forgot last time.)
-            <button.delete-button>
-              <img src="@{StaticR images_icon_delete_svg}"
-              alt="Delete">
-        <li>
-          <button.postpone-button>
-            <img src="@{StaticR images_icon_postpone_svg}"
-              alt="Postpone">
-          <.task>
-            <img.recurring-icon src="@{StaticR images_icon_recurring_svg}"
-            alt="Recurring">
-            <span.title>Take out the kitchen trash
-            <button.delete-button>
-              <img src="@{StaticR images_icon_delete_svg}"
-              alt="Delete">
-    <section.new-task>
-      <.form-row>
-        <input name="title" placeholder="Add task...">
-      <.form-row>
-        <fieldset.schedules>
-          <input#schedule-once name="schedule" type="radio" checked>
-          <label for="schedule-once">Once
-          <input#schedule-daily name="schedule" type="radio">
-          <label for="schedule-daily">Daily
-        <button.action>Add task
+  <billboard>
+  < ui-view>
 <.tabshield>
 <nav>
   <ul.tabs>
-    <li.tab-selected>Today
-    <li.tab-unselected>Later
-    <li.tab-unselected>Recently Done
+    <li ui-sref-active="tab-selected">
+      <a ui-sref="#{StateTasksToday}">Today
+    <li ui-sref-active="tab-selected">
+      <a ui-sref="#{StateTasksLater}">Later
+    <li ui-sref-active="tab-selected">
+      <a ui-sref="#{StateTasksDone}">Recently Done

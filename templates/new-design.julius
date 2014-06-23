@@ -1,0 +1,35 @@
+'use strict';
+
+var app = angular.module('HibiApp',
+  [ 'ui.router'
+  , 'angular.markdown'
+  , 'ui.sortable'
+  , 'ng.group'
+  , 'app.models'
+  , 'app.services'
+  , 'app.controllers'
+  , 'app.directives'
+  , 'app.filters'
+  ])
+.config(function ($httpProvider, httpErrorHandler) {
+  $httpProvider.interceptors.push(httpErrorHandler);
+})
+.config(function ($stateProvider, $urlRouterProvider) {
+  $urlRouterProvider.otherwise('@{ClientR NewTasksTodayR}');
+
+  #{declareStates "$stateProvider"}
+})
+.value('defaultTaskSchedule', #{toJSON Once});
+
+
+app.filter('scheduleLabel', function () {
+  var labels = {
+    #{toJSON Once}: '',
+    #{toJSON Daily}: '♳',
+    #{toJSON Weekly}: '♹',
+    #{toJSON Fortnightly}: '♹♹'
+  };
+  return function (schedule) {
+    return labels[schedule];
+  };
+});

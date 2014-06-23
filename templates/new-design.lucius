@@ -101,11 +101,11 @@
   height: 45px;
 }
 
-article.tasks {
+article {
   color: #666;
 }
 
-article.tasks header {
+article header {
   margin-left: 20px;
   margin-right: 20px;
   margin-top: 10px;
@@ -114,15 +114,15 @@ article.tasks header {
   color: black;
 }
 
-article.tasks section.new-task {
-  margin-top: 30px;
-  margin-bottom: 25px;
-}
-
-article.tasks h1 {
+article h1 {
   margin: 0;
   font-size: 16pt;
   font-weight: normal;
+}
+
+article.tasks section.new-task {
+  margin-top: 30px;
+  margin-bottom: 25px;
 }
 
 ul.tasks {
@@ -314,7 +314,7 @@ ul.tabs > li {
   color: #aaa;
   font-size: 10.5pt;
 
-  padding: 18px 10px 10px 10px;
+  padding: 8px 10px 0px 10px;
 
   margin-right: 9px;
 
@@ -325,7 +325,14 @@ ul.tabs > li {
   cursor: pointer;
 }
 
-ul.tabs > li.tab-unselected {
+ul.tabs a {
+  display: block;
+  padding: 10px;
+  color: #aaa;
+  text-decoration: none;
+}
+
+ul.tabs > li {
   position: relative;
   z-index: 10;
 
@@ -333,7 +340,6 @@ ul.tabs > li.tab-unselected {
 }
 
 ul.tabs > li.tab-selected {
-  position: relative;
   z-index: 30;
 
   box-shadow: #222 0 5px 5px -1px;
