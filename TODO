@@ -1,8 +1,8 @@
 Launch blockers
 	Resolve API vs Angular JSON endpoints
 	Lengthen session expiry
-	Merge wip.angular-tasks
 Post-launch
+	Merge wip.angular-tasks
 	fetch JSON tasks as separate call from JS load
 	consistently use camelCase or snake_case
 	done plans with automagic
