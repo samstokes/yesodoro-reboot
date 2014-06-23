@@ -19,7 +19,13 @@ var app = angular.module('HibiApp',
 
   #{declareStates "$stateProvider"}
 })
-.value('defaultTaskSchedule', #{toJSON Once});
+.value('messageFromServer', #{toJSON mmsg})
+.value('defaultTaskSchedule', #{toJSON Once})
+.run(function (Billboard, messageFromServer) {
+  if (messageFromServer) {
+    Billboard.success(messageFromServer, {timeout: 10000});
+  }
+});
 
 
 app.filter('scheduleLabel', function () {

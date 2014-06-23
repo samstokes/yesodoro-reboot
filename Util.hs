@@ -99,6 +99,9 @@ squishMaybe :: Monoid m => Maybe m -> m
 squishMaybe Nothing = mempty
 squishMaybe (Just something) = something
 
+orElse :: Maybe a -> a -> Maybe a
+ma `orElse` b = maybe (Just b) Just ma
+
 lookupCasual :: (Eq k, Monoid v) => k -> [(k, v)] -> v
 lookupCasual k l = squishMaybe $ lookup k l
 

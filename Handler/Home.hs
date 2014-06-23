@@ -25,6 +25,8 @@ getHomeR = maybeAuthId >>= getHomeR' where
 
 getNewAppR :: Handler RepHtml
 getNewAppR = do
+  mmsgFromServer <- fmap renderMarkup <$> getMessage
+  let mmsg = mmsgFromServer `orElse` "Welcome to the shiny new Hibi!"
   render <- getUrlRenderParams
   let declareStates stateProvider = renderJavascript $ statesDeclJavascript render stateProvider
   newLayout $(widgetFile "new-design")
