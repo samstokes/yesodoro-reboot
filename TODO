@@ -1,6 +1,7 @@
 Launch blockers
 	Resolve API vs Angular JSON endpoints
 	Lengthen session expiry
+	Upgrade to new GoogleEmail plugin
 Post-launch
 	Merge wip.angular-tasks
 	fetch JSON tasks as separate call from JS load
