@@ -54,6 +54,14 @@
   opacity: 0.35;
 }
 
+.settings-active .settings-icon {
+  opacity: 0.35;
+}
+
+.settings-active .settings-pagecurl {
+  display: none;
+}
+
 .settings-pagecurl {
   position: absolute;
   left: -5px;

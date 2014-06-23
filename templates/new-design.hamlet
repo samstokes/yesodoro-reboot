@@ -1,5 +1,5 @@
 <#content>
-  <a.settings-holder ui-sref="#{StateSettings}">
+  <a.settings-holder ui-sref="#{StateSettings}" ui-sref-active="settings-active">
     <img.settings-icon src="@{StaticR images_icon_settings_svg}"
       alt="Settings">
     <.settings-pagecurl>
