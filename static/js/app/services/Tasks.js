@@ -25,11 +25,12 @@ angular.module('app.services')
 
   var Tasks = {};
 
-  Tasks.all = function (params) {
+  Tasks.all = function (opts) {
     var config;
-    if (params !== undefined) {
-      // TODO HACK this is a bit yuck.
-      config = {params: params};
+    if (opts !== undefined && opts.days) {
+      if ('number' !== typeof(opts.days))
+        return $q.reject("days must be a number!");
+      config = {params: {days: opts.days}};
     }
 
     return $http.get('/tasks_json', config)

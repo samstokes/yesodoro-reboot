@@ -17,8 +17,21 @@ var app = angular.module('HibiApp',
 .config(function ($stateProvider) {
   $stateProvider
     .state('tasks', {
-      url: '/tasks',
+      url: '/tasks?days',
       controller: 'TasksCtrl',
+      resolve: {
+        tasks: function ($stateParams, Tasks) {
+          var params = {}, days = $stateParams.days;
+          if (days !== null) {
+            if (/^[0-9]+$/.test(days)) {
+              params.days = Number(days);
+            } else {
+              throw "days must be numeric!";
+            }
+          }
+          return Tasks.all(params);
+        }
+      },
       templateUrl: '@{TemplateOldTasksR}'
     })
 })

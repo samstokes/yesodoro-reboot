@@ -1,44 +1,35 @@
 /*global angular */
 
 angular.module('app.controllers')
-.controller('TasksCtrl', function ($scope, Task, Tasks, $timeout, $window /* TODO */) {
+.controller('TasksCtrl', function ($scope, Task, Tasks, tasks, $timeout) {
   'use strict';
 
-  /* TODO hack - pull params out of the URL */
-  var daysMatch = $window.location.toString().match(/\?days=(\d+)/),
-      params = {};
-  if (daysMatch !== null) {
-    params.days = daysMatch[1];
-  }
-
-  Tasks.all(params).then(function (tasks) {
-    $scope.tasks = tasks;
-    $scope.tasks.todoToday = function todoToday() {
-      return this.filter(function (task) {
-        return task.isTodoToday();
-      });
-    };
-    $scope.tasks.postponed = function postponed() {
-      return this.filter(function (task) {
-        return task.isPostponed();
-      });
-    };
-    $scope.tasks.paused = function paused() {
-      return this.filter(function (task) {
-        return task.isPaused();
-      });
-    };
-    $scope.tasks.done = function done() {
-      return this.filter(function (task) {
-        return task.isDone();
-      });
-    };
-    $scope.tasks.sort(function (task1, task2) {
-      var order1 = task1.task.order, order2 = task2.task.order;
-      if (order1 < order2) return -1;
-      if (order1 > order2) return 1;
-      return 0;
+  $scope.tasks = tasks;
+  $scope.tasks.todoToday = function todoToday() {
+    return this.filter(function (task) {
+      return task.isTodoToday();
     });
+  };
+  $scope.tasks.postponed = function postponed() {
+    return this.filter(function (task) {
+      return task.isPostponed();
+    });
+  };
+  $scope.tasks.paused = function paused() {
+    return this.filter(function (task) {
+      return task.isPaused();
+    });
+  };
+  $scope.tasks.done = function done() {
+    return this.filter(function (task) {
+      return task.isDone();
+    });
+  };
+  $scope.tasks.sort(function (task1, task2) {
+    var order1 = task1.task.order, order2 = task2.task.order;
+    if (order1 < order2) return -1;
+    if (order1 > order2) return 1;
+    return 0;
   });
 
 

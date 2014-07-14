@@ -5,36 +5,29 @@ describe('TasksCtrl', function () {
 
   beforeEach(module('app.controllers'));
 
+  var fakeTasks = [1, 2, 3, 4].map(function (id) {
+    var task = {
+      id: id,
+      task: {
+        order: 100 - id
+      }
+    };
+    return task;
+  });
   function FakeTask(task) { this.task = task || {}; }
   var FakeTaskRepo;
 
   beforeEach(module(function ($provide) {
     $provide.factory('Task', function () { return FakeTask; });
 
-    // We'd like to use $q.when to mock FakeTaskRepo.all below, but $q hasn't
-    // been injected yet, and we can't do it before registering this module.
-    // As a workaround, here's a hacky synchronous fake of a promise.
-    function FakePromise(value) {
-      this.then = function then(callback) {
-        callback(value);
-        return this;
-      };
-    }
     FakeTaskRepo = jasmine.createSpyObj('Tasks', [
-      'all',
       'create',
       'complete'
     ]);
-    FakeTaskRepo.all.and.returnValue(new FakePromise([1, 2, 3, 4].map(function (id) {
-      var task = {
-        id: id,
-        task: {
-          order: 100 - id
-        }
-      };
-      return task;
-    })));
+    //FakeTaskRepo.all.and.returnValue(new FakePromise(fakeTasks));
     $provide.factory('Tasks', function () { return FakeTaskRepo; });
+
+    $provide.value('tasks', fakeTasks);
   }));
 
   beforeEach(inject(function($rootScope, $controller, _$q_) {
@@ -43,8 +36,14 @@ describe('TasksCtrl', function () {
     $q = _$q_;
   }));
 
-  it('should expose an array of tasks', function () {
+  it('should expose the provided tasks', function () {
     expect(isArray(scope.tasks)).toBeTruthy();
+    expect(scope.tasks.length).toEqual(fakeTasks.length);
+  });
+
+  it('should sort the tasks', function () {
+    expect(scope.tasks[0].id).toBe(4);
+    expect(scope.tasks[3].id).toBe(1);
   });
 
   it('should provide a blank task', function () {

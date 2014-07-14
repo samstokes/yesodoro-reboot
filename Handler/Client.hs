@@ -57,6 +57,9 @@ stateDeclJavascript :: State -> (Route App -> [param] -> Text) -> Javascript
 stateDeclJavascript state = [julius|
     .state(#{toJSON state}, {
       url: '@{stateR state}',
+      resolve: {
+        tasks: function (Tasks) { return Tasks.all(); }
+      },
       templateUrl: '@{stateTemplateR state}'
     })
 |]
