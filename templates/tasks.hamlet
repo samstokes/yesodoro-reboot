@@ -39,8 +39,9 @@
     <div .content>
       <p ng-show="tasks.todoToday().length == 0">
         Nothing to do. Congratulations! Why not take the rest of the day off?
-      <table ng-hide="tasks.todoToday().length == 0"><tbody ui-sortable="sortableOptions" ng-model="tasks">
-        <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks" ng-show="task.isTodoToday()" ng-class="{overdue: #{jsBool (has FeatureOverdueTasks)} && task.isOverdue(), broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
+      <table ng-hide="tasks.todoToday().length == 0" ui-sortable="sortableOptions" ng-model="tasks">
+        <tbody ng-repeat="task in tasks" ng-show="task.isTodoToday()">
+          <tr.task ng-class="{overdue: #{jsBool (has FeatureOverdueTasks)} && task.isOverdue(), broken: task.broken, going: task.going}" hibi-task="task" on-extra-task="appendTask(extraTask)" on-remove="removeTask(task)">
       $if has FeaturePomos
         <h3>
           Remaining: {{estimatedRemaining()}} of {{estimatedTotal()}} estimated
@@ -61,8 +62,9 @@
       ^{expandy Collapsed "#postponed h2" "#postponed .content"}
 
     <.content style="display: none">
-      <table><tbody>
-        <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filterP:'isPostponed' | orderBy:postponedOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
+      <table>
+        <tbody ng-repeat="task in tasks | filterP:'isPostponed' | orderBy:postponedOrder">
+          <tr.task ng-class="{broken: task.broken, going: task.going}" hibi-task="task" on-extra-task="appendTask(extraTask)" on-remove="removeTask(task)">
 
   <section #paused ng-show="tasks.paused().length &gt; 0">
     <h2.collapsed>
@@ -70,8 +72,9 @@
       ^{expandy Collapsed "#paused h2" "#paused .content"}
 
     <.content style="display: none">
-      <table><tbody>
-        <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in tasks | filterP:'isPaused' | orderBy:pausedOrder" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
+      <table>
+        <tbody ng-repeat="task in tasks | filterP:'isPaused' | orderBy:pausedOrder">
+          <tr.task ng-class="{broken: task.broken, going: task.going}" hibi-task="task" on-extra-task="appendTask(extraTask)" on-remove="removeTask(task)">
 
   <section #done ng-show="tasks.done().length &gt; 0">
     <h2.collapsed>
@@ -81,5 +84,6 @@
     <.content style="display: none">
       <div ng-repeat="dayTasks in tasks | filterP:'isDone' | orderBy:doneOrder:true | groupBy:'dayDone':'tasksByDay'">
         <h3>{{dayTasks.dayDone}}</h3>
-        <table><tbody>
-          <tr.task ng-include="'@{TemplateTaskTrR}'" ng-repeat="task in dayTasks.items" ng-class="{broken: task.broken, going: task.going}" ng-mouseenter="showNotes(task)" ng-mouseleave="hideNotes(task)">
+        <table>
+          <tbody ng-repeat="task in dayTasks.items">
+            <tr.task ng-class="{broken: task.broken, going: task.going}" hibi-task="task" on-extra-task="appendTask(extraTask)" on-remove="removeTask(task)">

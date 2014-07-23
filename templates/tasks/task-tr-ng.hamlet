@@ -4,7 +4,7 @@
   <.schedule-label>{{task.task.schedule | scheduleLabel}}
 <th .title ng-class="{'ext-link': task.ext_task}">
   <div ng-hide="task.ext_task">
-    <ss-click-to-edit ss-model="task.task.title" ss-on-edit="updateTask(task)">
+    <ss-click-to-edit ss-model="task.task.title" ss-on-edit="update()">
       {{task.task.title}}
   $if has FeatureExtTasks
     <div ng-show="task.ext_task">
@@ -17,17 +17,17 @@
         target=_blank>
           {{task.task.title}}
 <td>
-  <button .btn .btn-success ng-hide="task.isDone()" ng-click="completeTask(task)">☺
-  <button .btn .btn-inverse ng-show="task.isDone()" ng-click="restartTask(task)">☹
+  <button .btn .btn-success ng-hide="task.isDone()" ng-click="complete()">☺
+  <button .btn .btn-inverse ng-show="task.isDone()" ng-click="restart()">☹
 <td ng-hide="task.isDone() || task.isPaused()">
-  <button .btn ng-show="task.isTodoToday()" ng-click="postponeTask(task)">☔
-  <button .btn ng-show="task.isPostponed()" ng-click="unpostponeTask(task)">☀
+  <button .btn ng-show="task.isTodoToday()" ng-click="postpone()">☔
+  <button .btn ng-show="task.isPostponed()" ng-click="unpostpone()">☀
 <td ng-hide="task.isDone()">
   $if has FeaturePause
-    <button .btn ng-hide="task.isPaused()" ng-click="pauseTask(task)">||
-  <button .btn ng-show="task.isPaused()" ng-click="unpauseTask(task)">|>
+    <button .btn ng-hide="task.isPaused()" ng-click="pause()">||
+  <button .btn ng-show="task.isPaused()" ng-click="unpause()">|>
 <td>
-  <button .btn .btn-danger ng-click="deleteTask(task)">☠
+  <button .btn .btn-danger ng-click="delete()">☠
 $if has FeaturePomos
   <td .estimate>
     <span ng-show="task.estimates.length &gt; 0"
@@ -36,13 +36,13 @@ $if has FeaturePomos
     <span ng-hide="task.estimates.length &gt; 0">
       <form .btn-group>
         $forall numPomos <- estimateOptions
-          <button .btn value=#{show numPomos} ng-click="addEstimate(task, #{show numPomos})">
+          <button .btn value=#{show numPomos} ng-click="addEstimate(#{show numPomos})">
             #{show numPomos}
     <span ng-show="task.task.pomos &gt; 0">
       <br>
       <span ng-repeat="pomo in task.task.pomos | dummyList">✓
   <td ng-hide="task.isDone()">
-    <button .btn ng-click="logPomo(task)">✓
+    <button .btn ng-click="logPomo()">✓
 $if has FeatureNotes
   <td .notes ng-controller="NotesCtrl">
     <span .notes-handle ng-class="{empty: notes.length == 0}">

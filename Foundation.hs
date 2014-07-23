@@ -158,6 +158,7 @@ instance Yesod App where
             addScript $ StaticR js_app_directives_ssEditablePopup_js
             addScript $ StaticR js_app_directives_ssKeyboardDirectives_js
             addScript $ StaticR js_app_directives_ngBlur_js
+            addScript $ StaticR js_app_directives_hibiTask_js
 
             addScript $ StaticR js_app_filters_js
 
