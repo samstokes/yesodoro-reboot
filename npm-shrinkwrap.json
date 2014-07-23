@@ -1,5 +1,10 @@
 {
   "dependencies": {
+    "jasmine-jquery": {
+      "version": "2.0.3",
+      "from": "git://github.com/velesin/jasmine-jquery.git#2.0.3",
+      "resolved": "git://github.com/velesin/jasmine-jquery.git#b94ad8741909b8a48521d168a1ae6b742180122e"
+    },
     "karma-jasmine": {
       "version": "0.2.1",
       "from": "https://registry.npmjs.org/karma-jasmine/-/karma-jasmine-0.2.1.tgz",

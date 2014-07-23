@@ -12,6 +12,5 @@
     "ng-group": "https://github.com/samstokes/ng-group.git"
   },
   "devDependencies": {
-    "jasmine-jquery": "~2.0.3"
   }
 }
