@@ -124,7 +124,7 @@ angular.module('app.controllers')
         task.task = created.task;
         task.notes = created.notes;
 
-        self.tasks.splice(self.tasks.length, 0, task);
+        self.appendTask(task);
       }, function () {
         var index = self.tasks.indexOf(task);
         if (index >= 0) {
@@ -135,6 +135,11 @@ angular.module('app.controllers')
         }
       });
     return task;
+  };
+
+
+  $scope.appendTask = function (task) {
+    this.tasks.push(task);
   };
 
   $scope.removeTask = function (task) {
@@ -160,7 +165,7 @@ angular.module('app.controllers')
 
         if (data.recurred) {
           data.recurred.notes = [];
-          self.tasks.push(data.recurred);
+          self.appendTask(data.recurred);
         }
       }, function () {
         task.going = false;
