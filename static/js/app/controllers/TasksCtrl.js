@@ -55,6 +55,7 @@ angular.module('app.controllers')
   $scope.newTask = new Task();
 
   $scope.estimatedRemaining = function estimatedRemaining() {
+    if ($scope.tasks === undefined) return 0;
     var sum = 0;
     $scope.tasks.todoToday().forEach(function (task) {
       sum += task.estimatedRemaining();
@@ -62,6 +63,7 @@ angular.module('app.controllers')
     return sum;
   };
   $scope.estimatedTotal = function estimatedTotal() {
+    if ($scope.tasks === undefined) return 0;
     var sum = 0;
     $scope.tasks.todoToday().forEach(function (task) {
       sum += task.estimatedPomos();
