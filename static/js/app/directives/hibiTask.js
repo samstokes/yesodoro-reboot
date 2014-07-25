@@ -12,7 +12,12 @@ angular.module('app.directives')
       onRemove: '&'
     },
     controller: 'HibiTaskCtrl',
-    templateUrl: '/templates/taskTr',
+    templateUrl: function (tElement, tAttrs) {
+      switch (tAttrs.hibiUi) {
+      case 'old': return '/templates/taskTr';
+      default: throw 'must specify hibi-ui attribute';
+      }
+    },
     link: function (scope, elem, attrs) {
       elem.mouseenter(function () {
         scope.$apply(function () {
