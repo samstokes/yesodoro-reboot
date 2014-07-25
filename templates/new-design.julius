@@ -19,6 +19,11 @@ var app = angular.module('HibiApp',
 
   #{declareStates "$stateProvider"}
 })
+.run(function ($rootScope, Billboard) {
+  $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
+    Billboard.error('Error changing to state ' + toState + ': ' + error, {timeout: 10000});
+  });
+})
 .value('messageFromServer', #{toJSON mmsg})
 .value('defaultTaskSchedule', #{toJSON Once})
 .run(function (Billboard, messageFromServer) {
