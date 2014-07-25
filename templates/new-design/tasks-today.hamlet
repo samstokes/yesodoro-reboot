@@ -6,12 +6,12 @@
       <li ng-repeat="task in tasks | filterP:'isTodoToday'">
         <div hibi-task="task" hibi-ui="new">
   <section.new-task>
-    <.form-row>
-      <input name="title" placeholder="Add task...">
-    <.form-row>
-      <fieldset.schedules>
-        <input#schedule-once name="schedule" type="radio" checked>
-        <label for="schedule-once">Once
-        <input#schedule-daily name="schedule" type="radio">
-        <label for="schedule-daily">Daily
-      <button.action>Add task
+    <form ng-submit="addNewTask()">
+      <.form-row>
+        <input ng-model="newTask.task.title" name="title" placeholder="Add task...">
+      <.form-row>
+        <fieldset.schedules>
+          $forall schedule <- scheduleOptions
+            <input##{toScheduleId schedule} ng-model="newTask.task.schedule" name="schedule" type="radio" value="#{schedule}">
+            <label for="#{toScheduleId schedule}">#{schedule}
+        <button.action type="submit">Add task
