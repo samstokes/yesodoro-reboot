@@ -47,10 +47,10 @@ getTasksR = do
     toggleableFeatures = sort $ filter ((/= FeatureSettings) . fst) features
     featureButtonLabel (feature, False) = Text.pack $ "Enable " ++ featureDescription feature
     featureButtonLabel (feature, True) = Text.pack $ "Disable " ++ featureDescription feature
-   in defaultLayout $ do
-        title <- lift appTitle
-        setTitle $ toMarkup title
-        addWidget $(widgetFile "tasks") where
+  title <- appTitle
+  defaultLayout $ do
+    setTitle $ toMarkup title
+    addWidget $(widgetFile "tasks") where
 
 
 oneButton :: Text -> Text -> Route App -> Widget
