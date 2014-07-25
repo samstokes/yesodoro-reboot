@@ -29,7 +29,10 @@ getNewAppR = do
   let mmsg = mmsgFromServer `orElse` "Welcome to the shiny new Hibi!"
   render <- getUrlRenderParams
   let declareStates stateProvider = renderJavascript $ statesDeclJavascript render stateProvider
-  newLayout $(widgetFile "new-design")
+  title <- appTitle
+  newLayout $ do
+    setTitle $ toMarkup title
+    $(widgetFile "new-design")
 
 
 getLoginPopupR :: Handler RepHtml
