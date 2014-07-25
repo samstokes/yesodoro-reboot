@@ -21,7 +21,13 @@ var app = angular.module('HibiApp',
 })
 .run(function ($rootScope, Billboard) {
   $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
-    Billboard.error('Error changing to state ' + toState + ': ' + error, {timeout: 10000});
+    var message;
+    if (typeof(error) === 'string') {
+      message = error;
+    } else {
+      message = JSON.stringify(error);
+    }
+    Billboard.error('Error changing to state ' + toState.name + ': ' + message, {timeout: 10000});
   });
 })
 .value('messageFromServer', #{toJSON mmsg})
