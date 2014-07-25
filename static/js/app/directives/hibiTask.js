@@ -14,9 +14,12 @@ angular.module('app.directives')
     controller: 'HibiTaskCtrl',
     templateUrl: function (tElement, tAttrs) {
       switch (tAttrs.hibiUi) {
-      case 'old': return '/templates/taskTr';
-      case 'new': return '/new-design/templates/task';
-      default: throw 'must specify hibi-ui attribute';
+      case 'old':
+        return '/templates/taskTr';
+      case 'new':
+        return '/new-design/templates/task';
+      default:
+        throw 'must specify hibi-ui attribute';
       }
     },
     link: function (scope, elem, attrs) {
