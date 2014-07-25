@@ -1,0 +1,7 @@
+<button.postpone-button>
+  <img src="@{StaticR images_icon_postpone_svg}" alt="Postpone">
+<.task>
+  <img.recurring-icon src="@{StaticR images_icon_recurring_svg}" alt="Recurring">
+  <span.title>{{task.task.title}}
+  <button.delete-button>
+    <img src="@{StaticR images_icon_delete_svg}" alt="Delete">

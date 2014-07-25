@@ -39,5 +39,6 @@
 /new-design/templates/tasks-today TemplateNewTasksTodayR GET
 /new-design/templates/tasks-later TemplateNewTasksLaterR GET
 /new-design/templates/tasks-done TemplateNewTasksDoneR GET
+/new-design/templates/task TemplateNewTaskR GET
 
 /client ClientR Client getClient

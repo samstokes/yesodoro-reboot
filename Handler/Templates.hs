@@ -10,7 +10,7 @@ import qualified Data.ByteString.Lazy.Char8 as B
 import Text.Hamlet (hamletFile)
 
 
-getTemplateOldTasksR, getTemplateTaskTrR, getTemplateNewSettingsR, getTemplateNewTasksTodayR, getTemplateNewTasksLaterR, getTemplateNewTasksDoneR :: Handler RepHtml
+getTemplateOldTasksR, getTemplateTaskTrR, getTemplateNewSettingsR, getTemplateNewTasksTodayR, getTemplateNewTasksLaterR, getTemplateNewTasksDoneR, getTemplateNewTaskR :: Handler RepHtml
 
 
 getTemplateOldTasksR = do
@@ -38,6 +38,7 @@ getTemplateNewSettingsR = hamletToRepHtml $(hamletFile "templates/new-design/set
 getTemplateNewTasksTodayR = hamletToRepHtml $(hamletFile "templates/new-design/tasks-today.hamlet")
 getTemplateNewTasksLaterR = hamletToRepHtml $(hamletFile "templates/new-design/tasks-later.hamlet")
 getTemplateNewTasksDoneR = hamletToRepHtml $(hamletFile "templates/new-design/tasks-done.hamlet")
+getTemplateNewTaskR = hamletToRepHtml $(hamletFile "templates/new-design/task.hamlet")
 
 featuresEtag :: User -> Handler B.ByteString
 featuresEtag user = return . B.pack . concat $ [

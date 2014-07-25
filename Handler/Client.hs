@@ -41,6 +41,7 @@ stateR :: State -> Route App
 stateR = ClientR . stateClientR
 
 stateController :: State -> Maybe Text
+stateController StateTasksToday = Just "TasksCtrl"
 stateController _ = Nothing
 
 stateResolves :: State -> [(Text, t -> Javascript)]
