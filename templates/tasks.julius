@@ -1,7 +1,8 @@
 'use strict';
 
 var app = angular.module('HibiApp',
-  [ 'angular.markdown'
+  [ 'ui.router'
+  , 'angular.markdown'
   , 'ui.sortable'
   , 'ng.group'
   , 'app.models'
@@ -12,6 +13,14 @@ var app = angular.module('HibiApp',
   ])
 .config(function ($httpProvider, httpErrorHandler) {
   $httpProvider.interceptors.push(httpErrorHandler);
+})
+.config(function ($stateProvider) {
+  $stateProvider
+    .state('tasks', {
+      url: '/tasks',
+      controller: 'TasksCtrl',
+      templateUrl: '@{TemplateOldTasksR}'
+    })
 })
 .value('messageFromServer', #{toJSON mmsg})
 .value('defaultTaskSchedule', #{toJSON Once})

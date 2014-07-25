@@ -33,6 +33,7 @@
 /api/tasks ApiTasksR POST
 /api/ext_tasks/#ExternalSourceName ApiExtTasksForSourceR GET
 
+/templates/tasks TemplateOldTasksR GET
 /templates/taskTr TemplateTaskTrR GET
 /new-design/templates/settings TemplateNewSettingsR GET
 /new-design/templates/tasks-today TemplateNewTasksTodayR GET

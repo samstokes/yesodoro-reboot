@@ -50,9 +50,6 @@ getTasksR = do
   let
     features = userFeatureSettings user
     has feature = hasFlag feature features
-    scheduleOptions = if has FeatureNonDailySchedules
-      then schedules
-      else filter (not . nonDaily) schedules
     toggleableFeatures = sort $ filter ((/= FeatureSettings) . fst) features
     featureButtonLabel (feature, False) = Text.pack $ "Enable " ++ featureDescription feature
     featureButtonLabel (feature, True) = Text.pack $ "Disable " ++ featureDescription feature
