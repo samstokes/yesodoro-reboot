@@ -6,6 +6,7 @@ Launch blockers
 Post-launch
 	Merge wip.angular-tasks
 	favicon
+	Pre-filter tasks for today, done etc, instead of loading all and filtering on client
 	consistently use camelCase or snake_case
 	done plans with automagic
 	Note popup layout broken in Firefox
