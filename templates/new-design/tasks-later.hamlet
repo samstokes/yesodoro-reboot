@@ -3,30 +3,5 @@
     <h1>For later
   <section.tasks>
     <ul.tasks>
-      <li>
-        <.task>
-          <span.title>Jevgr n pbhcyr cebcbfnyf sbe ClPba
-          <button.delete-button>
-            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
-      <li>
-        <.task>
-          <span.title>Znxr geniry neenatrzragf sbe Zbanpb
-          <button.delete-button>
-            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
-      <li>
-        <.task>
-          <span.title>Svavfu ernqvat Arvy Tnvzna'f arj obbx
-          <button.delete-button>
-            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
-      <li>
-        <.task>
-          <span.title>
-            Qba'g zvff gur cnegl gbzbeebj (erzrzore gb oevat n tvsg, sbetbg ynfg gvzr.)
-          <button.delete-button>
-            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
-      <li>
-        <.task>
-          <hibi-icon.recurring-icon src="@{StaticR images_icon_recurring_svg}" title="Recurring">
-          <span.title>Gnxr bhg gur xvgpura genfu
-          <button.delete-button>
-            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
+      <li ng-repeat="task in tasks | filterP:'isPostponed' | orderBy:postponedOrder">
+        <div hibi-task="task" hibi-ui="new" on-remove="removeTask(task)">

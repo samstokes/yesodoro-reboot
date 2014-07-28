@@ -42,11 +42,15 @@ stateR = ClientR . stateClientR
 
 stateController :: State -> Maybe Text
 stateController StateTasksToday = Just "TasksCtrl"
+stateController StateTasksLater = Just "TasksCtrl"
 stateController StateTasksDone = Just "TasksCtrl"
 stateController _ = Nothing
 
 stateResolves :: State -> [(Text, t -> Javascript)]
 stateResolves StateTasksToday = [
+    ("tasks", [julius|function (Tasks) { return Tasks.all(); }|])
+  ]
+stateResolves StateTasksLater = [
     ("tasks", [julius|function (Tasks) { return Tasks.all(); }|])
   ]
 stateResolves StateTasksDone = [
