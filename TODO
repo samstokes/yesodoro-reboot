@@ -6,7 +6,6 @@ Launch blockers
 Post-launch
 	Merge wip.angular-tasks
 	favicon
-	fetch JSON tasks as separate call from JS load
 	consistently use camelCase or snake_case
 	done plans with automagic
 	Note popup layout broken in Firefox
