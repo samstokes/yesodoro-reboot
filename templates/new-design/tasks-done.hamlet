@@ -7,32 +7,26 @@
         <.task>
           <span.title>Write a couple proposals for PyCon
           <button.delete-button>
-            <img src="@{StaticR images_icon_delete_svg}"
-            alt="Delete">
+            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
       <li>
         <.task>
           <span.title>Make travel arrangements for Monaco
           <button.delete-button>
-            <img src="@{StaticR images_icon_delete_svg}"
-            alt="Delete">
+            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
       <li>
         <.task>
           <span.title>Finish reading Neil Gaiman's new book
           <button.delete-button>
-            <img src="@{StaticR images_icon_delete_svg}"
-            alt="Delete">
+            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
       <li>
         <.task>
           <span.title>
             Don't miss the party tomorrow (remember to bring a gift, forgot last time.)
           <button.delete-button>
-            <img src="@{StaticR images_icon_delete_svg}"
-            alt="Delete">
+            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
       <li>
         <.task>
-          <img.recurring-icon src="@{StaticR images_icon_recurring_svg}"
-          alt="Recurring">
+          <hibi-icon.recurring-icon src="@{StaticR images_icon_recurring_svg}" title="Recurring">
           <span.title>Take out the kitchen trash
           <button.delete-button>
-            <img src="@{StaticR images_icon_delete_svg}"
-            alt="Delete">
+            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">

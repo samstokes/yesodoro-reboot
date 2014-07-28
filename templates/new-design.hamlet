@@ -1,7 +1,7 @@
 <#content>
   <a.settings-holder ui-sref="#{StateSettings}" ui-sref-active="settings-active">
-    <img.settings-icon src="@{StaticR images_icon_settings_svg}"
-      alt="Settings">
+    <hibi-icon.settings-icon src="@{StaticR images_icon_settings_svg}"
+      title="Settings">
     <.settings-pagecurl>
   <billboard>
   < ui-view>

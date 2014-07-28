@@ -7,32 +7,26 @@
         <.task>
           <span.title>Jevgr n pbhcyr cebcbfnyf sbe ClPba
           <button.delete-button>
-            <img src="@{StaticR images_icon_delete_svg}"
-            alt="Delete">
+            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
       <li>
         <.task>
           <span.title>Znxr geniry neenatrzragf sbe Zbanpb
           <button.delete-button>
-            <img src="@{StaticR images_icon_delete_svg}"
-            alt="Delete">
+            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
       <li>
         <.task>
           <span.title>Svavfu ernqvat Arvy Tnvzna'f arj obbx
           <button.delete-button>
-            <img src="@{StaticR images_icon_delete_svg}"
-            alt="Delete">
+            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
       <li>
         <.task>
           <span.title>
             Qba'g zvff gur cnegl gbzbeebj (erzrzore gb oevat n tvsg, sbetbg ynfg gvzr.)
           <button.delete-button>
-            <img src="@{StaticR images_icon_delete_svg}"
-            alt="Delete">
+            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
       <li>
         <.task>
-          <img.recurring-icon src="@{StaticR images_icon_recurring_svg}"
-          alt="Recurring">
+          <hibi-icon.recurring-icon src="@{StaticR images_icon_recurring_svg}" title="Recurring">
           <span.title>Gnxr bhg gur xvgpura genfu
           <button.delete-button>
-            <img src="@{StaticR images_icon_delete_svg}"
-            alt="Delete">
+            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">

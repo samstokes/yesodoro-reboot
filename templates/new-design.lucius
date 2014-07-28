@@ -174,7 +174,7 @@ ul.tasks .task {
   border-bottom: 1px solid #eeeeee;
 }
 
-.recurring-icon {
+.recurring-icon img {
   width: 15px;
   height: 15px;
 
@@ -200,7 +200,7 @@ section.tasks button {
   cursor: pointer;
 }
 
-section.tasks button > img {
+section.tasks button hibi-icon {
   width: inherit;
   height: inherit;
 }
@@ -384,4 +384,9 @@ ul.tabs > li:last-child {
 
     margin-top: -16px; /* = height */
     border-radius: 8px;
+}
+
+hibi-icon img {
+  width: inherit;
+  height: inherit;
 }

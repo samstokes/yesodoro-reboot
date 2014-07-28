@@ -1,10 +1,16 @@
 <button.postpone-button
   ng-show="task.isTodoToday()" ng-click="postpone()">
-  <img src="@{StaticR images_icon_postpone_svg}" alt="Postpone">
+  <hibi-icon src="@{StaticR images_icon_postpone_svg}" title="Postpone">
 <.task>
-  <img.recurring-icon src="@{StaticR images_icon_recurring_svg}" alt="{{task.task.schedule}}"
-    ng-hide="task.task.schedule === '#{Once}'">
+  <div.recurring-icon ng-hide="task.task.schedule === '#{Once}'">
+    <!--
+       - Wrapper div to workaround ng-hide not working on directives with
+       - isolate scope.
+       - Unnecessary once we upgrade to 1.2.0 (fixed by
+       - https://github.com/angular/angular.js/commit/909cabd36d779598763cc358979ecd85bb40d4d7)
+       -->
+    <hibi-icon src="@{StaticR images_icon_recurring_svg}" title="{{task.task.schedule}}">
   <span.title>{{task.task.title}}
   <button.delete-button
     ng-click="delete()">
-    <img src="@{StaticR images_icon_delete_svg}" alt="Delete">
+    <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
