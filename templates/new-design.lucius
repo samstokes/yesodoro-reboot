@@ -207,6 +207,19 @@ section.tasks button hibi-icon {
 
 .task .title {
   margin-right: 1em;
+
+  transition-property: opacity;
+  transition-duration: 0.5s;
+  transition-timing-function: ease;
+}
+
+ul.tasks > li:hover .task.todo .title {
+  text-decoration: line-through;
+}
+
+.task.going .title {
+  opacity: 0.5;
+  text-decoration: line-through;
 }
 
 .postpone-button {

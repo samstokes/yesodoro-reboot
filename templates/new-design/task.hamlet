@@ -1,7 +1,9 @@
 <button.postpone-button
   ng-show="task.isTodoToday()" ng-click="postpone()">
   <hibi-icon src="@{StaticR images_icon_postpone_svg}" title="Postpone">
-<.task>
+<.task
+  ng-class="{todo:task.isTodoToday(), going: task.going}"
+  ng-click="task.isTodoToday() ? complete() : return(false)">
   <div.recurring-icon ng-hide="task.task.schedule === '#{Once}'">
     <!--
        - Wrapper div to workaround ng-hide not working on directives with
