@@ -17,7 +17,9 @@ angular.module('app.models')
   }
 
   function dateYMD(date) {
-    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    var monthNum = date.getMonth() + 1,
+        month = monthNum < 10 ? '0' + monthNum : monthNum;
+    return date.getFullYear() + '-' + month + '-' + date.getDate();
   }
 
   function Task(taskData) {

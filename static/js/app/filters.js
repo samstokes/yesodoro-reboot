@@ -51,5 +51,13 @@
       for (var i = 0; i < n; ++i) array[i] = i;
       return array;
     };
+  })
+
+
+  /* very simple filter turning a day string "YYYY-MM-DD" into a date object */
+  .filter('dateFromDay', function () {
+    return function dateFromDayFilter(day) {
+      return new Date(day);
+    };
   });
 })();

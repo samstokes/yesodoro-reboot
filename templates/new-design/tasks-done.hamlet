@@ -1,32 +1,7 @@
-<article.tasks>
+<article.tasks ng-repeat="dayTasks in tasks | filterP:'isDone' | orderBy:doneOrder:true | groupBy:'dayDone':'newTasksByDay'">
   <header>
-    <h1>Done
+    <h1>{{dayTasks.dayDone | dateFromDay | date:dateFormat}}
   <section.tasks>
     <ul.tasks>
-      <li>
-        <.task>
-          <span.title>Write a couple proposals for PyCon
-          <button.delete-button>
-            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
-      <li>
-        <.task>
-          <span.title>Make travel arrangements for Monaco
-          <button.delete-button>
-            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
-      <li>
-        <.task>
-          <span.title>Finish reading Neil Gaiman's new book
-          <button.delete-button>
-            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
-      <li>
-        <.task>
-          <span.title>
-            Don't miss the party tomorrow (remember to bring a gift, forgot last time.)
-          <button.delete-button>
-            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
-      <li>
-        <.task>
-          <hibi-icon.recurring-icon src="@{StaticR images_icon_recurring_svg}" title="Recurring">
-          <span.title>Take out the kitchen trash
-          <button.delete-button>
-            <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
+      <li ng-repeat="task in dayTasks.items">
+        <div hibi-task="task" hibi-ui="new" on-remove="removeTask(task)">
