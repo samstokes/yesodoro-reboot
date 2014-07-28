@@ -24,7 +24,6 @@ describe('TasksCtrl', function () {
       'create',
       'complete'
     ]);
-    //FakeTaskRepo.all.and.returnValue(new FakePromise(fakeTasks));
     $provide.factory('Tasks', function () { return FakeTaskRepo; });
 
     $provide.value('tasks', fakeTasks);
