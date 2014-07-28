@@ -89,6 +89,9 @@ angular.module('app.controllers')
     }
   };
 
+  $scope.taskOrder = function (task) {
+    return task.task.order;
+  };
   $scope.postponedOrder = function (task) {
     return new Date(task.task.scheduled_for);
   };
