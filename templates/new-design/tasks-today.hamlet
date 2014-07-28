@@ -1,6 +1,6 @@
 <article.tasks>
   <header>
-    <h1>Wednesday, September 20th
+    <h1>{{today | date:dateFormat}}
   <section.tasks>
     <ul.tasks>
       <li ng-repeat="task in tasks | filterP:'isTodoToday'">

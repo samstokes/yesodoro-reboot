@@ -4,6 +4,9 @@ angular.module('app.controllers')
 .controller('TasksCtrl', function ($scope, Task, Tasks, tasks, $timeout) {
   'use strict';
 
+  $scope.today = new Date();
+  $scope.dateFormat = 'EEEE, MMMM d';
+
   $scope.tasks = tasks;
   $scope.tasks.todoToday = function todoToday() {
     return this.filter(function (task) {

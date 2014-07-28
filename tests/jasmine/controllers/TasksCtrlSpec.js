@@ -35,6 +35,14 @@ describe('TasksCtrl', function () {
     $q = _$q_;
   }));
 
+  it("should expose today's date", function () {
+    expect(scope.today).toBeDefined();
+  });
+
+  it('should expose a date format', function () {
+    expect(scope.dateFormat).toBeDefined();
+  });
+
   it('should expose the provided tasks', function () {
     expect(isArray(scope.tasks)).toBeTruthy();
     expect(scope.tasks.length).toEqual(fakeTasks.length);
