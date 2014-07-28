@@ -37,16 +37,3 @@ var app = angular.module('HibiApp',
     Billboard.success(messageFromServer, {timeout: 10000});
   }
 });
-
-
-app.filter('scheduleLabel', function () {
-  var labels = {
-    #{toJSON Once}: '',
-    #{toJSON Daily}: '♳',
-    #{toJSON Weekly}: '♹',
-    #{toJSON Fortnightly}: '♹♹'
-  };
-  return function (schedule) {
-    return labels[schedule];
-  };
-});

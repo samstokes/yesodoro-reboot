@@ -2,7 +2,7 @@
   ng-show="task.isTodoToday()" ng-click="postpone()">
   <img src="@{StaticR images_icon_postpone_svg}" alt="Postpone">
 <.task>
-  <img.recurring-icon src="@{StaticR images_icon_recurring_svg}" alt="{{task.task.schedule | scheduleLabel}}"
+  <img.recurring-icon src="@{StaticR images_icon_recurring_svg}" alt="{{task.task.schedule}}"
     ng-hide="task.task.schedule === '#{Once}'">
   <span.title>{{task.task.title}}
   <button.delete-button
