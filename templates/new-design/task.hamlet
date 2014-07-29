@@ -3,7 +3,7 @@
   <hibi-icon src="@{StaticR images_icon_postpone_svg}" title="Postpone">
 <.task
   ng-class="{todo:task.isTodoToday(), going: task.going}"
-  ng-click="task.isTodoToday() ? complete() : return(false)">
+  ng-click="task.isTodoToday() ? complete() : null">
   <div.recurring-icon ng-hide="task.task.schedule === '#{Once}'">
     <!--
        - Wrapper div to workaround ng-hide not working on directives with
@@ -14,5 +14,5 @@
     <hibi-icon src="@{StaticR images_icon_recurring_svg}" title="{{task.task.schedule}}">
   <span.title>{{task.task.title}}
   <button.delete-button
-    ng-click="delete()">
+    ng-click="delete(); $event.stopPropagation()">
     <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
