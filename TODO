@@ -1,8 +1,12 @@
 Launch blockers
+	Landing page
+	Login UI
 	Lengthen session expiry
+	Support non-UK time zone?
 	Upgrade to new GoogleEmail plugin
 	Attribution for icons and backgrounds
 Post-launch
+	Notes
 	Resolve API vs Angular JSON endpoints
 	Merge wip.angular-tasks
 	favicon
