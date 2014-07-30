@@ -13,13 +13,12 @@ import Control.Monad ((>=>))
 import Data.Aeson (FromJSON, ToJSON, parseJSON, toJSON, (.:), (.:?))
 import qualified Data.Aeson as J
 import Data.Text (Text, pack, unpack)
-import Data.Time (Day, TimeZone, UTCTime, NominalDiffTime)
+import Data.Time (TimeZone, UTCTime, NominalDiffTime)
 import Database.Persist.Quasi (lowerCaseSettings)
 import Database.Persist.GenericSql (SqlPersist)
 import Database.Persist.Store (PersistValue(..), deleteCascade)
 import Control.Monad.IO.Class (MonadIO)
-import Data.Maybe (fromMaybe, isJust)
-import Data.String (IsString)
+import Data.Maybe (fromMaybe)
 import Safe (readMay)
 import Text.Blaze (ToMarkup, toMarkup)
 import Text.Julius (ToJavascript, toJavascript)
@@ -217,10 +216,6 @@ instance FromJSON NewExtTask where
       <*> (o .:? "extUrl")
       <*> (o .:? "extStatus")
   parseJSON v = fail $ "can't parse external task link: " ++ show v
-
-
-newtype TaskState = TaskState Text
-  deriving (ToMarkup, IsString)
 
 
 selectUserTasksSince :: PersistQuery SqlPersist m => UserId -> UTCTime -> [SelectOpt Task] -> SqlPersist m [Entity Task]
@@ -511,27 +506,6 @@ reorderTaskN delta tz task
   where
     reorder direction = reorderTask direction tz
 
-
-taskDone :: Task -> Bool
-taskDone = isJust . taskDoneAt
-
-
-taskTodo :: TimeZone -> UTCTime -> Task -> Bool
-taskTodo tz moment task = taskActive task && taskScheduledForDay tz task <= today
-  where today = utcToLocalDay tz moment
-
-taskOverdue :: TimeZone -> UTCTime -> Task -> Bool
-taskOverdue tz moment task = not (taskDone task) && taskActive task && taskScheduledForDay tz task < today
-  where today = utcToLocalDay tz moment
-
-taskDoneDay :: TimeZone -> Task -> Maybe Day
-taskDoneDay tz = fmap (utcToLocalDay tz) . taskDoneAt
-
-taskScheduledForDay :: TimeZone -> Task -> Day
-taskScheduledForDay tz = utcToLocalDay tz . taskScheduledFor
-
-taskState :: Task -> TaskState
-taskState task = if taskDone task then "done" else "pending"
 
 taskEstimates :: PersistQuery SqlPersist m => TaskId -> SqlPersist m [Entity Estimate]
 taskEstimates taskId = selectList [EstimateTask ==. taskId] []
