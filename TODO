@@ -1,9 +1,9 @@
 Launch blockers
-	Resolve API vs Angular JSON endpoints
 	Lengthen session expiry
 	Upgrade to new GoogleEmail plugin
 	Attribution for icons and backgrounds
 Post-launch
+	Resolve API vs Angular JSON endpoints
 	Merge wip.angular-tasks
 	favicon
 	Pre-filter tasks for today, done etc, instead of loading all and filtering on client
