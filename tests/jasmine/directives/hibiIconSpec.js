@@ -1,6 +1,6 @@
 'use strict';
 
-describe('hibiTask directive', function () {
+describe('hibiIcon directive', function () {
   beforeEach(module('app.directives'));
 
   var $compile, scope, elem, image;
