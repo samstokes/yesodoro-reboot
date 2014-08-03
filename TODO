@@ -12,12 +12,9 @@ Post-launch
 	favicon
 	Pre-filter tasks for today, done etc, instead of loading all and filtering on client
 	consistently use camelCase or snake_case
-	done plans with automagic
-	Note popup layout broken in Firefox
 	Update tasks when day ticks over
 	Prompt to refresh on backend update
 	Get test coverage to 80%
-	Hovering should not recalc ng-repeats
-	cache-control headers (not just etag) on task-tr-ng.hamlet
+	cache-control headers (not just etag) on templates
 	Update buildpack for "set -e" etc
 	Bugsnag
