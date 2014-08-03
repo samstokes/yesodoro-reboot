@@ -1,4 +1,5 @@
 Launch blockers
+	undefined, undefined NaN on completed task
 	Landing page
 	Login UI
 	Lengthen session expiry
@@ -6,6 +7,9 @@ Launch blockers
 	Upgrade to new GoogleEmail plugin
 	Attribution for icons and backgrounds
 Post-launch
+	Unpostpone, uncomplete
+	Pause?
+	Touch-friendliness?
 	Notes
 	Resolve API vs Angular JSON endpoints
 	Merge wip.angular-tasks
@@ -17,4 +21,4 @@ Post-launch
 	Get test coverage to 80%
 	cache-control headers (not just etag) on templates
 	Update buildpack for "set -e" etc
-	Bugsnag
+	Bugsnag/Yeller
