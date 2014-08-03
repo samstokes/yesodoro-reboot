@@ -4,6 +4,16 @@ angular.module('app.directives')
 .directive('hibiTask', function () {
   'use strict';
 
+  function checkUi(attrs) {
+    switch (attrs.hibiUi) {
+    case 'old':
+    case 'new':
+      return attrs.hibiUi;
+    default:
+      throw 'must specify hibi-ui attribute';
+    }
+  }
+
   return {
     restrict: 'A',
     scope: {
@@ -13,27 +23,25 @@ angular.module('app.directives')
     },
     controller: 'HibiTaskCtrl',
     templateUrl: function (tElement, tAttrs) {
-      switch (tAttrs.hibiUi) {
-      case 'old':
-        return '/templates/taskTr';
-      case 'new':
-        return '/new-design/templates/task';
-      default:
-        throw 'must specify hibi-ui attribute';
-      }
+      return {
+        'old': '/templates/taskTr',
+        'new': '/new-design/templates/task'
+      }[checkUi(tAttrs)];
     },
     link: function (scope, elem, attrs) {
-      elem.mouseenter(function () {
-        scope.$apply(function () {
-          scope.task.notes.isVisible = true;
+      if ('old' === checkUi(attrs)) {
+        elem.mouseenter(function () {
+          scope.$apply(function () {
+            scope.task.notes.isVisible = true;
+          });
         });
-      });
 
-      elem.mouseleave(function () {
-        scope.$apply(function () {
-          scope.task.notes.isVisible = false;
+        elem.mouseleave(function () {
+          scope.$apply(function () {
+            scope.task.notes.isVisible = false;
+          });
         });
-      });
+      }
     }
   };
 })
