@@ -260,6 +260,7 @@ addAppJs = do
   addScript $ StaticR js_app_directives_ngBlur_js
   addScript $ StaticR js_app_directives_hibiIcon_js
   addScript $ StaticR js_app_directives_hibiTask_js
+  addScript $ StaticR js_app_directives_hibiNote_js
 
   addScript $ StaticR js_app_filters_js
 

@@ -259,6 +259,18 @@ ul.tasks > li:hover .task.todo .ext-task a {
   text-decoration: line-through;
 }
 
+.task ol.notes {
+  list-style: none;
+}
+
+.task .note {
+  font-size: 80%;
+}
+
+.task .note .created {
+  color: #999;
+}
+
 ul.tasks > li button {
   width: 15px;
   height: 15px;

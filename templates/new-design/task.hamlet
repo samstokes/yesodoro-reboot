@@ -34,3 +34,7 @@
             {{task.task.title}}
   <button.delete-button ng-click="delete()">
     <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
+  $if has FeatureNotes
+    <ol.notes>
+      <li ng-repeat="note in task.notes">
+        <div hibi-note="note">
