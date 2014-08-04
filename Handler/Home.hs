@@ -21,7 +21,7 @@ getHomeR = maybeAuthId >>= getHomeR' where
       title <- lift appTitle
       setTitle $ toMarkup title
       $(widgetFile "homepage")
-  getHomeR' (Just _) = redirect TasksR
+  getHomeR' (Just _) = redirect NewAppR
 
 getNewAppR :: Handler RepHtml
 getNewAppR = do
