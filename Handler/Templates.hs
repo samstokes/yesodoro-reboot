@@ -51,7 +51,13 @@ getTemplateNewTasksTodayR = do
 
 getTemplateNewTasksLaterR = giveUrlRenderer $(hamletFile "templates/new-design/tasks-later.hamlet")
 getTemplateNewTasksDoneR = giveUrlRenderer $(hamletFile "templates/new-design/tasks-done.hamlet")
-getTemplateNewTaskR = giveUrlRenderer $(hamletFile "templates/new-design/task.hamlet")
+getTemplateNewTaskR = do
+  Entity _ user <- requireNgAuth
+  withDigestEtag (featuresEtag user) $ do
+    let
+      features = userFeatureSettings user
+      has feature = hasFlag feature features
+    giveUrlRenderer $(hamletFile "templates/new-design/task.hamlet")
 
 featuresEtag :: User -> Handler B.ByteString
 featuresEtag user = return . B.pack . concat $ [

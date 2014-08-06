@@ -21,15 +21,16 @@
   <span.title
     ng-click="task.isTodoToday() ? complete() : null">
     <span ng-hide="task.ext_task">{{task.task.title}}
-    <span.ext-task ng-show="task.ext_task">
-      [
-        {{task.ext_task.ext_source_name}} {{task.ext_task.ext_id}}
-        \ ({{task.ext_task.ext_status}})
-      ] 
-      <a .title
-        href="{{task.ext_task.ext_url}}"
-        ng-click="$event.stopPropagation()"
-        target=_blank>
-          {{task.task.title}}
+    $if has FeatureExtTasks
+      <span.ext-task ng-show="task.ext_task">
+        [
+          {{task.ext_task.ext_source_name}} {{task.ext_task.ext_id}}
+          \ ({{task.ext_task.ext_status}})
+        ] 
+        <a .title
+          href="{{task.ext_task.ext_url}}"
+          ng-click="$event.stopPropagation()"
+          target=_blank>
+            {{task.task.title}}
   <button.delete-button ng-click="delete()">
     <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">
