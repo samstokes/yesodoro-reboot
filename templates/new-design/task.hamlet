@@ -12,7 +12,18 @@
        - https://github.com/angular/angular.js/commit/909cabd36d779598763cc358979ecd85bb40d4d7)
        -->
     <hibi-icon src="@{StaticR images_icon_recurring_svg}" title="{{task.task.schedule}}">
-  <span.title>{{task.task.title}}
+  <span.title>
+    <span ng-hide="task.ext_task">{{task.task.title}}
+    <span.ext-task ng-show="task.ext_task">
+      [
+        {{task.ext_task.ext_source_name}} {{task.ext_task.ext_id}}
+        \ ({{task.ext_task.ext_status}})
+      ] 
+      <a .title
+        href="{{task.ext_task.ext_url}}"
+        ng-click="$event.stopPropagation()"
+        target=_blank>
+          {{task.task.title}}
   <button.delete-button
     ng-click="delete(); $event.stopPropagation()">
     <hibi-icon src="@{StaticR images_icon_delete_svg}" title="Delete">

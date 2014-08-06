@@ -217,6 +217,15 @@ ul.tasks > li:hover .task.todo .title {
   text-decoration: line-through;
 }
 
+.ext-task a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul.tasks > li:hover .task.todo .ext-task a {
+  text-decoration: underline;
+}
+
 .task.going .title {
   opacity: 0.5;
   text-decoration: line-through;
