@@ -25,6 +25,7 @@ getHomeR = maybeAuthId >>= getHomeR' where
 
 getNewAppR :: Handler RepHtml
 getNewAppR = do
+  _ <- requireAuth
   mmsgFromServer <- fmap renderMarkup <$> getMessage
   let mmsg = mmsgFromServer `orElse` "Welcome to the shiny new Hibi!"
   render <- getUrlRenderParams
