@@ -1,6 +1,9 @@
 <button.postpone-button
   ng-show="task.isTodoToday()" ng-click="postpone()">
   <hibi-icon src="@{StaticR images_icon_postpone_svg}" title="Postpone">
+<button.unpostpone-button
+  ng-show="task.isPostponed()" ng-click="unpostpone()">
+  <hibi-icon src="@{StaticR images_icon_unpostpone_svg}" title="Unpostpone">
 <.task
   ng-class="{todo:task.isTodoToday(), going: task.going}"
   ng-click="task.isTodoToday() ? complete() : null">

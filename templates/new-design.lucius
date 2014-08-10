@@ -248,7 +248,7 @@ ul.tasks > li button:hover {
   opacity: 0.5;
 }
 
-.postpone-button {
+.postpone-button, .unpostpone-button {
   position: absolute;
   right: 12.5px;
   top: 50%;
