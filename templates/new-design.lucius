@@ -231,46 +231,33 @@ ul.tasks > li:hover .task.todo .ext-task a {
   text-decoration: line-through;
 }
 
-.postpone-button {
+ul.tasks > li button {
   width: 15px;
   height: 15px;
 
+  opacity: 0;
+  visibility: hidden;
+}
+
+ul.tasks > li:hover button {
+  visibility: visible;
+  opacity: 0.2;
+}
+
+ul.tasks > li button:hover {
+  opacity: 0.5;
+}
+
+.postpone-button {
   position: absolute;
   right: 12.5px;
   top: 50%;
   -webkit-transform: translateY(-50%);
   transform: translateY(-50%);
-
-  opacity: 0;
-  visibility: hidden;
-}
-
-ul.tasks > li:hover .postpone-button {
-  visibility: visible;
-  opacity: 0.2;
-}
-
-ul.tasks > li .postpone-button:hover {
-  opacity: 0.5;
 }
 
 .delete-button {
-  width: 15px;
-  height: 15px;
-
-  opacity: 0;
-  visibility: hidden;
-
   vertical-align: -2px;
-}
-
-ul.tasks > li:hover .delete-button {
-  visibility: visible;
-  opacity: 0.2;
-}
-
-ul.tasks > li .delete-button:hover {
-  opacity: 0.5;
 }
 
 section.new-task input, section.new-task button, section.new-task label {
