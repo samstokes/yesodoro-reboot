@@ -2,7 +2,10 @@ Launch blockers
 	undefined, undefined NaN on completed task
 	Landing page
 	Login UI
+	Handle session expiry properly
+	Support drag to reorder (easier with prefiltering?)
 	Lengthen session expiry
+	Fix background resizing
 	Support non-UK time zone?
 	Upgrade to new GoogleEmail plugin
 	Attribution for icons and backgrounds
