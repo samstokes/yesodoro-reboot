@@ -19,7 +19,13 @@ angular.module('app.directives')
     scope: {
       task: '=hibiTask',
       onExtraTask: '&',
-      onRemove: '&'
+      onRemove: '&',
+      onComplete: '&',
+      onRestart: '&',
+      onPause: '&',
+      onUnpause: '&',
+      onPostpone: '&',
+      onUnpostpone: '&'
     },
     controller: 'HibiTaskCtrl',
     templateUrl: function (tElement, tAttrs) {
@@ -49,7 +55,7 @@ angular.module('app.directives')
   'use strict';
 
   function removeTask() {
-    $scope.onRemove();
+    if ($scope.onRemove) $scope.onRemove();
   }
 
   function onError() {
@@ -68,6 +74,8 @@ angular.module('app.directives')
         if (data.completed) {
           self.task.going = false;
           self.task.task = data.completed.task;
+
+          if ($scope.onComplete) $scope.onComplete();
         } else {
           onError();
         }
@@ -87,6 +95,8 @@ angular.module('app.directives')
       .then(function (restarted) {
         self.task.going = false;
         self.task.task = restarted.task;
+
+        if ($scope.onRestart) $scope.onRestart();
       }, onError);
   };
 
@@ -98,6 +108,8 @@ angular.module('app.directives')
       .then(function (postponed) {
         self.task.going = false;
         self.task.task = postponed.task;
+
+        if ($scope.onPostpone) $scope.onPostpone();
       }, onError);
   };
 
@@ -109,6 +121,8 @@ angular.module('app.directives')
       .then(function (unpostponed) {
         self.task.going = false;
         self.task.task = unpostponed.task;
+
+        if ($scope.onUnpostpone) $scope.onUnpostpone();
       }, onError);
   };
 
@@ -133,6 +147,8 @@ angular.module('app.directives')
       .then(function (paused) {
         self.task.going = false;
         self.task.task = paused.task;
+
+        if ($scope.onPause) $scope.onPause();
       }, onError);
   };
 
@@ -144,6 +160,8 @@ angular.module('app.directives')
       .then(function (unpaused) {
         self.task.going = false;
         self.task.task = unpaused.task;
+
+        if ($scope.onUnpause) $scope.onUnpause();
       }, onError);
   };
 

@@ -3,8 +3,11 @@
     <h1>{{today | date:dateFormat}}
   <section.tasks>
     <ul.tasks>
-      <li ng-repeat="task in tasks | filterP:'isTodoToday' | orderBy:taskOrder">
-        <div hibi-task="task" hibi-ui="new" on-remove="removeTask(task)">
+      <li ng-repeat="task in tasks | orderBy:taskOrder">
+        <div hibi-task="task" hibi-ui="new"
+          on-remove="removeTask(task)"
+          on-complete="removeTask(task)"
+          on-postpone="removeTask(task)">
   <section.new-task>
     <form ng-submit="addNewTask()">
       <.form-row>

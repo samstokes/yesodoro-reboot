@@ -25,7 +25,12 @@ describe('hibiTask controller', function () {
 
     scope = $rootScope.$new();
     scope.task = task;
-    scope.onExtraTask = jasmine.createSpy('onExtraTask');
+
+    [ 'onExtraTask'
+    , 'onComplete'
+    ].forEach(function (callback) {
+      scope[callback] = jasmine.createSpy(callback);
+    });
 
     $controller('HibiTaskCtrl', {$scope: scope, $element: undefined, $attrs: undefined});
   }));
@@ -70,6 +75,10 @@ describe('hibiTask controller', function () {
 
       it('should clear the "going away" flag (since the task will actually go now)', function () {
         expect(task.going).toBeFalsy();
+      });
+
+      it('should call the onComplete callback', function () {
+        expect(scope.onComplete).toHaveBeenCalled();
       });
     });
 
