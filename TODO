@@ -7,14 +7,13 @@ Launch blockers
 	Upgrade to new GoogleEmail plugin
 	Attribution for icons and backgrounds
 Post-launch
-	Unpostpone, uncomplete
+	uncomplete
 	Pause?
 	Touch-friendliness?
 	Notes
 	Resolve API vs Angular JSON endpoints
 	Merge wip.angular-tasks
 	favicon
-	Pre-filter tasks for today, done etc, instead of loading all and filtering on client
 	consistently use camelCase or snake_case
 	Update tasks when day ticks over
 	Prompt to refresh on backend update

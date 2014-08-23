@@ -48,13 +48,23 @@ stateController _ = Nothing
 
 stateResolves :: State -> [(Text, t -> Javascript)]
 stateResolves StateTasksToday = [
-    ("tasks", [julius|function (Tasks) { return Tasks.all(); }|])
+    ("tasks", [julius|function (Tasks) { return Tasks.today(); }|])
   ]
 stateResolves StateTasksLater = [
-    ("tasks", [julius|function (Tasks) { return Tasks.all(); }|])
+    ("tasks", [julius|function (Tasks) { return Tasks.later(); }|])
   ]
 stateResolves StateTasksDone = [
-    ("tasks", [julius|function (Tasks) { return Tasks.all(); }|])
+    ("tasks", [julius|function ($stateParams, Tasks) {
+      var days = $stateParams.days;
+      if (days !== null) {
+        if (/^[0-9]+$/.test(days)) {
+          return Tasks.done(Number(days));
+        } else {
+          throw "days must be numeric!";
+        }
+      }
+      return Tasks.done();
+    }|])
   ]
 stateResolves _ = []
 
@@ -74,7 +84,7 @@ instance ToJSON State where
 stateDeclJavascript :: State -> (Route App -> [param] -> Text) -> Javascript
 stateDeclJavascript state = [julius|
     .state(#{toJSON state}, {
-      url: '@{stateR state}',
+      url: '@{stateR state}?days',
       ^{controllerDecl (stateController state)}
       ^{resolvesDecl (stateResolves state)}
       templateUrl: '@{stateTemplateR state}'

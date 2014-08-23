@@ -1,7 +1,7 @@
 'use strict';
 
 describe('Tasks', function () {
-  var Tasks, $httpBackend;
+  var Tasks, $httpBackend, $rootScope;
 
   beforeEach(module('app.services'));
 
@@ -11,9 +11,10 @@ describe('Tasks', function () {
     $provide.factory('Task', function () { return FakeTask; });
   }));
 
-  beforeEach(inject(function(_Tasks_, _$httpBackend_) {
+  beforeEach(inject(function(_Tasks_, _$httpBackend_, _$rootScope_) {
     Tasks = _Tasks_;
     $httpBackend = _$httpBackend_;
+    $rootScope = _$rootScope_;
   }));
 
   afterEach(function() {
@@ -52,6 +53,91 @@ describe('Tasks', function () {
         return task.constructor !== FakeTask;
       });
       expect(tasksThatAreNotTasks).toBeEmpty();
+    });
+  });
+
+  describe('.today()', function () {
+    beforeEach(function () {
+      $httpBackend.whenGET('/tasks_json?q=today').respond([
+        'foo', 'bar', 'baz'
+      ]);
+    });
+
+    it('should request the tasks from the server', function () {
+      $httpBackend.expectGET('/tasks_json?q=today');
+      Tasks.today();
+    });
+
+    it('should return a promise of an array of tasks', function () {
+      var todayTasks = Tasks.today();
+      expect(todayTasks.then).toBeDefined();
+
+      var tasks;
+      todayTasks.then(function (_tasks) { tasks = _tasks; });
+      $httpBackend.flush();
+
+      expect(isArray(tasks)).toBeTruthy();
+    });
+
+    it('should construct Task objects from the task data', function () {
+      var tasks;
+      Tasks.today().then(function (_tasks) { tasks = _tasks; });
+      $httpBackend.flush();
+
+      var tasksThatAreNotTasks = tasks.filter(function (task) {
+        return task.constructor !== FakeTask;
+      });
+      expect(tasksThatAreNotTasks).toBeEmpty();
+    });
+  });
+
+  describe('.later()', function () {
+    beforeEach(function () {
+      $httpBackend.whenGET('/tasks_json?q=postponed').respond([
+        'foo', 'bar', 'baz'
+      ]);
+    });
+
+    it('should request the tasks from the server', function () {
+      $httpBackend.expectGET('/tasks_json?q=postponed');
+      Tasks.later();
+    });
+  });
+
+  describe('.done()', function () {
+    beforeEach(function () {
+      $httpBackend.whenGET('/tasks_json?q=done').respond([
+        'foo', 'bar', 'baz'
+      ]);
+    });
+
+    it('should request the tasks from the server', function () {
+      $httpBackend.expectGET('/tasks_json?q=done');
+      Tasks.done();
+    });
+  });
+
+  describe('done(days)', function () {
+    beforeEach(function () {
+      $httpBackend.whenGET(/\/tasks_json\?.*q=done/).respond([
+        'foo', 'bar', 'baz'
+      ]);
+    });
+
+    it('should request the tasks from the server', function () {
+      $httpBackend.expectGET(/q=done&days=42|days=42&q=done/);
+      Tasks.done(42);
+    });
+
+    it('should error if days is a string', function () {
+      var error;
+      Tasks.done('42').then(null, function (_error) { error = _error; });
+
+      $httpBackend.verifyNoOutstandingRequest();
+
+      $rootScope.$digest();
+      expect(error).toBeDefined();
+      expect(error).toMatch(/days/);
     });
   });
 

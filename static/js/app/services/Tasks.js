@@ -25,12 +25,15 @@ angular.module('app.services')
 
   var Tasks = {};
 
-  Tasks.all = function (opts) {
-    var config;
-    if (opts !== undefined && opts.days) {
-      if ('number' !== typeof(opts.days))
-        return $q.reject("days must be a number!");
-      config = {params: {days: opts.days}};
+  function getTasks(q, days) {
+    var config, params = {};
+    if (typeof(q) !== 'undefined') {
+      params.q = q;
+      config = {params: params};
+    }
+    if (typeof(days) !== 'undefined') {
+      params.days = days;
+      config = {params: params};
     }
 
     return $http.get('/tasks_json', config)
@@ -38,6 +41,32 @@ angular.module('app.services')
       .then(function (taskData) {
         return taskData.map(newTask);
       });
+  }
+
+  Tasks.all = function (opts) {
+    var days;
+    if (opts !== undefined && opts.days) {
+      if ('number' !== typeof(opts.days))
+        return $q.reject("days must be a number!");
+      days = opts.days;
+    }
+
+    return getTasks(undefined, days);
+  };
+
+  Tasks.today = function () {
+    return getTasks('today');
+  };
+
+  Tasks.later = function () {
+    return getTasks('postponed');
+  };
+
+  Tasks.done = function (days) {
+    if ('undefined' !== typeof(days) && 'number' !== typeof(days))
+      return $q.reject("days must be a number!");
+
+    return getTasks('done', days);
   };
 
   Tasks.create = function (task) {

@@ -28,17 +28,26 @@ instance ToJSON TaskWithChildren where
     , "estimates" .= estimates, "notes" .= notes]
 
 
+parseTaskSet :: Handler TaskSet
+parseTaskSet = mkTaskSet <*> horizonFromParams where
+  mkTaskSet :: Handler (UTCTime -> TaskSet)
+  mkTaskSet = do
+    query <- lookup "q" . reqGetParams <$> getRequest
+    return $ case query of
+      Just "today" -> const TasksToday
+      Just "postponed" -> const TasksPostponed
+      Just "done" -> TasksDoneSince
+      Just q -> error $ "unknown task set " ++ show q
+      Nothing -> TasksAllSince
+
+
 getJsonTasksR :: Handler RepJson
 getJsonTasksR = do
-  Entity userId user <- requireNgAuth
-  horizon <- horizonFromParams
-  tasks <- userTasksSince userId horizon
-  tasksWithChildren <- fetchTaskChildren user tasks
+  query <- taskSetQuery <$> parseTaskSet
+  user <- requireNgAuth
+  tasks <- runDB $ query user
+  tasksWithChildren <- fetchTaskChildren (entityVal user) tasks
   jsonToRepJson tasksWithChildren
-
-
-userTasksSince :: UserId -> UTCTime -> Handler [Entity Task]
-userTasksSince userId horizon = runDB $ selectUserTasksSince userId horizon [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
 
 
 fetchTaskChildren :: User -> [Entity Task] -> Handler [TaskWithChildren]

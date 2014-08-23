@@ -13,7 +13,7 @@ import Control.Monad ((>=>))
 import Data.Aeson (FromJSON, ToJSON, parseJSON, toJSON, (.:), (.:?))
 import qualified Data.Aeson as J
 import Data.Text (Text, pack, unpack)
-import Data.Time (TimeZone, UTCTime, NominalDiffTime)
+import Data.Time (Day, TimeZone, UTCTime, NominalDiffTime)
 import Database.Persist.Quasi (lowerCaseSettings)
 import Database.Persist.GenericSql (SqlPersist)
 import Database.Persist.Store (PersistValue(..), deleteCascade)
@@ -200,6 +200,30 @@ instance ToJavascript PersistValue where
   toJavascript _ = undefined
 
 
+data TaskSet = TasksToday | TasksPostponed | TasksDoneSince { tasksDoneHorizon :: UTCTime } | TasksAllSince { tasksAllHorizon :: UTCTime }
+
+
+taskSetQuery :: (MonadIO m, PersistQuery SqlPersist m) => TaskSet -> Entity User -> SqlPersist m [Entity Task]
+taskSetQuery TasksToday (Entity userId user) = filterTodo <*> selectUserTasks userId [TaskDoneAt ==. Nothing] [Asc TaskScheduledFor]
+  -- for now, filter in code - push into SQL once we can do more complex queries
+  where filterTodo = do
+          moment <- now
+          let tz = userTimeZone user
+          return $ filter $ taskTodo tz moment . entityVal
+
+taskSetQuery TasksPostponed (Entity userId user) = filterPostponed <*> selectUserTasks userId [TaskDoneAt ==. Nothing] [Asc TaskScheduledFor]
+  -- for now, filter in code - push into SQL once we can do more complex queries
+  where filterPostponed = do
+          moment <- now
+          let tz = userTimeZone user
+          return $ filter $ taskPostponed tz moment . entityVal
+
+taskSetQuery (TasksDoneSince horizon) (Entity userId _) = selectUserTasks userId [TaskDoneAt >=. Just horizon] [Desc TaskDoneAt]
+taskSetQuery (TasksAllSince horizon) (Entity userId _) = selectUserTasks userId doneSinceLimit [Asc TaskScheduledFor, Desc TaskDoneAt] -- must specify sorts backwards...
+  where
+    doneSinceLimit = [TaskDoneAt ==. Nothing] ||. [TaskDoneAt >=. Just horizon]
+
+
 data NewExtTask = NewExtTask
                    { newExtTaskExtId :: ExternalIdent
                    , newExtTaskExtSourceName :: ExternalSourceName
@@ -218,11 +242,9 @@ instance FromJSON NewExtTask where
   parseJSON v = fail $ "can't parse external task link: " ++ show v
 
 
-selectUserTasksSince :: PersistQuery SqlPersist m => UserId -> UTCTime -> [SelectOpt Task] -> SqlPersist m [Entity Task]
-selectUserTasksSince userId doneSince = selectList (belongsToUser ++ doneSinceLimit)
-  where
-    belongsToUser = [TaskUser ==. userId]
-    doneSinceLimit = [TaskDoneAt ==. Nothing] ||. [TaskDoneAt >=. Just doneSince]
+selectUserTasks :: PersistQuery SqlPersist m => UserId -> [Filter Task] -> [SelectOpt Task] -> SqlPersist m [Entity Task]
+selectUserTasks userId conditions = selectList (belongsToUser : conditions)
+  where belongsToUser = TaskUser ==. userId
 
 
 data NewTask = NewTask
@@ -505,6 +527,17 @@ reorderTaskN delta tz task
   | otherwise = return False
   where
     reorder direction = reorderTask direction tz
+
+
+taskTodo :: TimeZone -> UTCTime -> Task -> Bool
+taskTodo tz moment task = taskActive task && taskScheduledForDay tz task <= today
+  where today = utcToLocalDay tz moment
+
+taskPostponed :: TimeZone -> UTCTime -> Task -> Bool
+taskPostponed tz moment = not . taskTodo tz moment
+
+taskScheduledForDay :: TimeZone -> Task -> Day
+taskScheduledForDay tz = utcToLocalDay tz . taskScheduledFor
 
 
 taskEstimates :: PersistQuery SqlPersist m => TaskId -> SqlPersist m [Entity Estimate]
