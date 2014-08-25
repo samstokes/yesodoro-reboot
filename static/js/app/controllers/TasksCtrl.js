@@ -58,7 +58,7 @@ angular.module('app.controllers')
     update: function (event, ui) {
       var startPos = ui.item.data('startPos'),
           endPos = ui.item.index(),
-          taskToMove = $scope.tasks[startPos],
+          taskToMove = ui.item.scope().task,
           taskAtEnd = $scope.tasks[endPos],
 
           /*
@@ -74,6 +74,8 @@ angular.module('app.controllers')
 
           delta = todoIndexEnd - todoIndexStart;
 
+      if (!taskToMove)
+        throw "Couldn't identify task to move! " + JSON.stringify(ui.item);
       if (todoIndexStart < 0 || todoIndexEnd < 0) {
         taskToMove.broken = true;
         throw "Something got out of sync, couldn't reorder tasks!";
