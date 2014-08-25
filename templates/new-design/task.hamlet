@@ -5,7 +5,7 @@
   ng-show="task.isPostponed()" ng-click="unpostpone()">
   <hibi-icon src="@{StaticR images_icon_unpostpone_svg}" title="Unpostpone">
 <.task
-  ng-class="{todo:task.isTodoToday(), going: task.going}">
+  ng-class="{todo:task.isTodoToday(), going: task.going, dragging: task.dragging}">
   <.recurring-icon ng-hide="task.task.schedule === '#{Once}'">
     <!--
        - Wrapper div to workaround ng-hide not working on directives with
@@ -14,7 +14,9 @@
        - https://github.com/angular/angular.js/commit/909cabd36d779598763cc358979ecd85bb40d4d7)
        -->
     <hibi-icon src="@{StaticR images_icon_recurring_svg}" title="{{task.task.schedule}}">
-  <.reorder-handle ng-show="task.isTodoToday()">
+  <.reorder-handle ng-show="task.isTodoToday()"
+    ng-mousedown="task.dragging = true"
+    ng-mouseup="task.dragging = false">
     <hibi-icon src="@{StaticR images_icon_drag_svg}" title="Drag to reorder">
   <span.title
     ng-click="task.isTodoToday() ? complete() : null">

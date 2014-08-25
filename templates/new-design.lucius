@@ -210,6 +210,10 @@ ul.tasks > li:hover .todo .recurring-icon img {
   cursor: grab;
 }
 
+.task.dragging .reorder-handle img {
+  cursor: grabbing;
+}
+
 ul.tasks > li:hover .reorder-handle img {
   opacity: 0.2;
 }
