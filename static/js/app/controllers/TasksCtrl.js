@@ -4,6 +4,8 @@ angular.module('app.controllers')
 .controller('TasksCtrl', function ($scope, Task, Tasks, tasks, hibiUi, $timeout) {
   'use strict';
 
+  var isOldUi = 'old' === hibiUi;
+
   $scope.today = new Date();
   $scope.dateFormat = 'EEEE, MMMM d';
 
@@ -49,33 +51,49 @@ angular.module('app.controllers')
     return sum;
   };
 
+  function calculateDeltaOld(startPos, endPos, taskToMove) {
+    /*
+     * ui-sortable gets its item indices from the ng-model we specify,
+     * which is the overall tasks list, so startPos and endPos are
+     * indices into that list.  However, what we're sorting is just the
+     * tasks that are todo today, so to calculate the delta we need the
+     * tasks' indices into just the todo tasks.
+     */
+    var taskAtEnd = $scope.tasks[endPos],
+        todoTasks = $scope.tasks.todoToday(),
+        todoIndexStart = todoTasks.indexOf(taskToMove),
+        todoIndexEnd = todoTasks.indexOf(taskAtEnd),
+        delta = todoIndexEnd - todoIndexStart;
+
+    if (todoIndexStart < 0 || todoIndexEnd < 0) {
+      taskToMove.broken = true;
+      throw "Something got out of sync, couldn't reorder tasks!";
+    }
+
+    return delta;
+  }
+
+  function calculateDeltaNew(startPos, endPos, taskToMove) {
+    return endPos - startPos;
+  }
+
+  var calculateDelta = isOldUi ? calculateDeltaOld : calculateDeltaNew;
+
   $scope.sortableOptions = {
     handle: '.reorder-handle',
+    start: function (event, ui) {
+      var startPos = ui.item.index();
+      ui.item.data('startPos', startPos);
+    },
     update: function (event, ui) {
-      var endPos = ui.item.index(),
-          taskToMove = ui.item.scope().task,
-          taskAtEnd = $scope.tasks[endPos],
-
-          /*
-           * ui-sortable gets its item indices from the ng-model we specify,
-           * which is the overall tasks list, so startPos and endPos are
-           * indices into that list.  However, what we're sorting is just the
-           * tasks that are todo today, so to calculate the delta we need the
-           * tasks' indices into just the todo tasks.
-           */
-          todoTasks = $scope.tasks.todoToday(),
-          todoIndexStart = todoTasks.indexOf(taskToMove),
-          todoIndexEnd = todoTasks.indexOf(taskAtEnd),
-
-          delta = todoIndexEnd - todoIndexStart;
+      var startPos = ui.item.data('startPos'),
+          endPos = ui.item.index(),
+          taskToMove = ui.item.scope().task;
 
       if (!taskToMove)
         throw "Couldn't identify task to move! " + JSON.stringify(ui.item);
-      if (todoIndexStart < 0 || todoIndexEnd < 0) {
-        taskToMove.broken = true;
-        throw "Something got out of sync, couldn't reorder tasks!";
-      }
 
+      var delta = calculateDelta(startPos, endPos, taskToMove);
       $scope.reorderTask(taskToMove, delta);
     }
   };

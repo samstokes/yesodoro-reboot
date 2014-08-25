@@ -14,6 +14,8 @@
        - https://github.com/angular/angular.js/commit/909cabd36d779598763cc358979ecd85bb40d4d7)
        -->
     <hibi-icon src="@{StaticR images_icon_recurring_svg}" title="{{task.task.schedule}}">
+  <.reorder-handle ng-show="task.isTodoToday()">
+    <hibi-icon src="@{StaticR images_icon_drag_svg}" title="Drag to reorder">
   <span.title
     ng-click="task.isTodoToday() ? complete() : null">
     <span ng-hide="task.ext_task">{{task.task.title}}

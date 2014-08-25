@@ -3,7 +3,6 @@ Launch blockers
 	Landing page
 	Login UI
 	Handle session expiry properly
-	Support drag to reorder (easier with prefiltering?)
 	Lengthen session expiry
 	Fix background resizing
 	Support non-UK time zone?

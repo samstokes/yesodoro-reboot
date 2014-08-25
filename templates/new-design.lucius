@@ -187,6 +187,27 @@ ul.tasks .task {
   opacity: 0.3;
 }
 
+.reorder-handle img {
+  width: 15px;
+  height: 15px;
+
+  position: absolute;
+  left: 12.5px;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: 0.5s;
+
+  cursor: grab;
+}
+
+ul.tasks > li:hover .reorder-handle img {
+  opacity: 0.2;
+}
+
 section.tasks button {
   border: 0;
   outline: none;
