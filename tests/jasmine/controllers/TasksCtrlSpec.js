@@ -26,6 +26,7 @@ describe('TasksCtrl', function () {
     ]);
     $provide.factory('Tasks', function () { return FakeTaskRepo; });
 
+    $provide.value('hibiUi', 'new');
     $provide.value('tasks', fakeTasks);
   }));
 

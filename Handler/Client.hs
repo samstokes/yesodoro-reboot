@@ -92,11 +92,11 @@ stateDeclJavascript state = [julius|
 |] where
   controllerDecl (Just ctrl) = [julius|controller: #{toJSON ctrl},|]
   controllerDecl Nothing = mempty
-  resolvesDecl [] = mempty
   resolvesDecl resolves = [julius|resolve: {
         ^{foldMap resolveDecl resolves}
+        hibiUi: function () { return 'new'; }
       },|]
-  resolveDecl (key, resolve) = [julius|#{key}: ^{resolve}|]
+  resolveDecl (key, resolve) = [julius|#{key}: ^{resolve},|]
 
 statesDeclJavascript :: (Route App -> [param] -> Text) -> Text -> Javascript
 statesDeclJavascript render stateProvider = header <> foldMap decl states

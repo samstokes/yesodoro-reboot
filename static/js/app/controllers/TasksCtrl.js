@@ -1,7 +1,7 @@
 /*global angular */
 
 angular.module('app.controllers')
-.controller('TasksCtrl', function ($scope, Task, Tasks, tasks, $timeout) {
+.controller('TasksCtrl', function ($scope, Task, Tasks, tasks, hibiUi, $timeout) {
   'use strict';
 
   $scope.today = new Date();
