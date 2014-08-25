@@ -3,7 +3,7 @@
     <h1>{{today | date:dateFormat}}
   <section.tasks>
     <ul.tasks>
-      <li ng-repeat="task in tasks | orderBy:taskOrder">
+      <li ng-repeat="task in tasks">
         <div hibi-task="task" hibi-ui="new"
           on-remove="removeTask(task)"
           on-complete="removeTask(task)"

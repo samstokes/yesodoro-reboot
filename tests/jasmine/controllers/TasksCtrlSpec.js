@@ -48,11 +48,6 @@ describe('TasksCtrl', function () {
     expect(scope.tasks.length).toEqual(fakeTasks.length);
   });
 
-  it('should sort the tasks', function () {
-    expect(scope.tasks[0].id).toBe(4);
-    expect(scope.tasks[3].id).toBe(1);
-  });
-
   it('should provide a blank task', function () {
     expect(scope.newTask).toBeDefined();
   });

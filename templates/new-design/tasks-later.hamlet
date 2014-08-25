@@ -3,7 +3,7 @@
     <h1>For later
   <section.tasks>
     <ul.tasks>
-      <li ng-repeat="task in tasks | orderBy:postponedOrder">
+      <li ng-repeat="task in tasks">
         <div hibi-task="task" hibi-ui="new"
           on-remove="removeTask(task)"
           on-unpostpone="removeTask(task)">

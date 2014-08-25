@@ -28,12 +28,6 @@ angular.module('app.controllers')
       return task.isDone();
     });
   };
-  $scope.tasks.sort(function (task1, task2) {
-    var order1 = task1.task.order, order2 = task2.task.order;
-    if (order1 < order2) return -1;
-    if (order1 > order2) return 1;
-    return 0;
-  });
 
 
   $scope.newTask = new Task();

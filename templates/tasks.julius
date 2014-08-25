@@ -29,7 +29,15 @@ var app = angular.module('HibiApp',
               throw "days must be numeric!";
             }
           }
-          return Tasks.all(params);
+          return Tasks.all(params).then(function (tasks) {
+            tasks.sort(function (task1, task2) {
+              var order1 = task1.task.order, order2 = task2.task.order;
+              if (order1 < order2) return -1;
+              if (order1 > order2) return 1;
+              return 0;
+            });
+            return tasks;
+          });
         }
       },
       templateUrl: '@{TemplateOldTasksR}'

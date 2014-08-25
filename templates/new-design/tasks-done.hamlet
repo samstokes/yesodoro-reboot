@@ -1,4 +1,4 @@
-<article.tasks ng-repeat="dayTasks in tasks | orderBy:doneOrder:true | groupBy:'dayDone':'newTasksByDay'">
+<article.tasks ng-repeat="dayTasks in tasks | groupBy:'dayDone':'newTasksByDay'">
   <header>
     <h1>{{dayTasks.dayDone | dateFromDay | date:dateFormat}}
   <section.tasks>
