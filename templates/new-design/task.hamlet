@@ -6,7 +6,7 @@
   <hibi-icon src="@{StaticR images_icon_unpostpone_svg}" title="Unpostpone">
 <.task
   ng-class="{todo:task.isTodoToday(), going: task.going}">
-  <div.recurring-icon ng-hide="task.task.schedule === '#{Once}'">
+  <.recurring-icon ng-hide="task.task.schedule === '#{Once}'">
     <!--
        - Wrapper div to workaround ng-hide not working on directives with
        - isolate scope.
