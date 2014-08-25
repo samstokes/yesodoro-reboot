@@ -51,13 +51,8 @@ angular.module('app.controllers')
 
   $scope.sortableOptions = {
     handle: '.reorder-handle',
-    start: function (event, ui) {
-      var startPos = ui.item.index();
-      ui.item.data('startPos', startPos);
-    },
     update: function (event, ui) {
-      var startPos = ui.item.data('startPos'),
-          endPos = ui.item.index(),
+      var endPos = ui.item.index(),
           taskToMove = ui.item.scope().task,
           taskAtEnd = $scope.tasks[endPos],
 
