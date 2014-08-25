@@ -185,6 +185,12 @@ ul.tasks .task {
   transform: translateY(-50%);
 
   opacity: 0.3;
+  transition-property: opacity;
+  transition-duration: 0.5s;
+}
+
+ul.tasks > li:hover .todo .recurring-icon img {
+  opacity: 0;
 }
 
 .reorder-handle img {
