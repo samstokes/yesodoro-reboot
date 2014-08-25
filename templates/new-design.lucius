@@ -213,7 +213,7 @@ section.tasks button hibi-icon {
   transition-timing-function: ease;
 }
 
-ul.tasks > li:hover .task.todo .title {
+.task.todo .title:hover {
   text-decoration: line-through;
 }
 
