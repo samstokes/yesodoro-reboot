@@ -204,7 +204,7 @@ data TaskSet = TasksToday | TasksPostponed | TasksDoneSince { tasksDoneHorizon :
 
 
 taskSetQuery :: (MonadIO m, PersistQuery SqlPersist m) => TaskSet -> Entity User -> SqlPersist m [Entity Task]
-taskSetQuery TasksToday (Entity userId user) = filterTodo <*> selectUserTasks userId [TaskDoneAt ==. Nothing, TaskActive ==. True] [Asc TaskScheduledFor]
+taskSetQuery TasksToday (Entity userId user) = filterTodo <*> selectUserTasks userId [TaskDoneAt ==. Nothing, TaskActive ==. True] [Asc TaskOrder]
   -- for now, filter in code - push into SQL once we can do more complex queries
   where filterTodo = do
           moment <- now
