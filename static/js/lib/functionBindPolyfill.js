@@ -4,6 +4,9 @@
  *
  * This polyfill should make our tests work.  It's taken from
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind#Compatibility
+ *
+ * This doesn't get jslinted since it should only be used for testing.
+ * (Old browsers might see it, but they're probably horribly broken anyway.)
  */
 
 if (!Function.prototype.bind) {
