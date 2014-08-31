@@ -22,6 +22,10 @@ function url(path) {
   return root + path;
 }
 
+casper.on('page.error', function (message, trace) {
+  this.test.fail('page threw an exception: ' + message + '\n' + JSON.stringify(trace));
+});
+
 var shotNumber = 0;
 function shot(name) {
   return casper.capture('smoke-' + (shotNumber++) + '-' + name + '.png');
