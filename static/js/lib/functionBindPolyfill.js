@@ -7,6 +7,8 @@
  */
 
 if (!Function.prototype.bind) {
+  console.log("Polyfilling Function.prototype.bind");
+
   Function.prototype.bind = function (oThis) {
     if (typeof this !== "function") {
       // closest thing possible to the ECMAScript 5 internal IsCallable function

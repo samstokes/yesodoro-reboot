@@ -214,6 +214,7 @@ addThirdPartyJs = do
 
 addAppJs :: GWidget sub App ()
 addAppJs = do
+  addScript $ StaticR js_lib_functionBindPolyfill_js
   addScript $ StaticR js_lib_util_js
 
   addScript $ StaticR js_lib_expandy_js
