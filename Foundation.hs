@@ -169,26 +169,26 @@ instance Yesod App where
 
 newLayout :: Widget -> Handler RepHtml
 newLayout widget = do
-    authed <- isJust <$> maybeAuthId
-    when authed setXsrfCookie
+  authed <- isJust <$> maybeAuthId
+  when authed setXsrfCookie
 
-    mmsg <- getMessage
-    title <- appTitle
+  mmsg <- getMessage
+  title <- appTitle
 
-    -- We break up the layout into two components:
-    -- new-layout is the contents of the body tag, and
-    -- new-layout-wrapper is the entire page. Since the final
-    -- value passed to hamletToRepHtml cannot be a widget, this allows
-    -- you to use normal widget features in new-layout.
+  -- We break up the layout into two components:
+  -- new-layout is the contents of the body tag, and
+  -- new-layout-wrapper is the entire page. Since the final
+  -- value passed to hamletToRepHtml cannot be a widget, this allows
+  -- you to use normal widget features in new-layout.
 
-    pc <- widgetToPageContent $ do
-        $(widgetFile "new-layout")
+  pc <- widgetToPageContent $ do
+      $(widgetFile "new-layout")
 
-        addThirdPartyJs
+      addThirdPartyJs
 
-        addAppJs
+      addAppJs
 
-    hamletToRepHtml $(hamletFile "templates/new-layout-wrapper.hamlet")
+  hamletToRepHtml $(hamletFile "templates/new-layout-wrapper.hamlet")
 
 
 addDefaultLayoutCss :: GWidget sub App ()
