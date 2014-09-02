@@ -34,7 +34,7 @@ function shot(name) {
 casper.test.begin('Front page should load', 1, function (test) {
   casper.start(url(), function () {
     shot('front-page');
-    test.assertSelectorHasText('h1', 'Hibi');
+    test.assertSelectorHasText('header', 'Hibi');
   });
 
   casper.run(function () {
