@@ -1,4 +1,4 @@
-<#content>
+<.content>
   <a.settings-holder ui-sref="#{StateSettings}" ui-sref-active="settings-active">
     <hibi-icon.settings-icon src="@{StaticR images_icon_settings_svg}"
       title="Settings">

@@ -40,3 +40,12 @@ body > header {
 
   width: 460px; /* = 500px - 2x padding */
 }
+
+.content {
+  padding: 20px;
+
+  background: white;
+
+  border-radius: 8px;
+  box-shadow: #222 0 2px 5px;
+}
