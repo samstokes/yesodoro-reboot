@@ -1,16 +1,17 @@
-<.content>
-  <a.settings-holder ui-sref="#{StateSettings}" ui-sref-active="settings-active">
-    <hibi-icon.settings-icon src="@{StaticR images_icon_settings_svg}"
-      title="Settings">
-    <.settings-pagecurl>
-  <billboard>
-  < ui-view>
-<.tabshield>
-<nav>
-  <ul.tabs>
-    <li ui-sref-active="tab-selected">
-      <a ui-sref="#{StateTasksToday}">Today
-    <li ui-sref-active="tab-selected">
-      <a ui-sref="#{StateTasksLater}">Later
-    <li ui-sref-active="tab-selected">
-      <a ui-sref="#{StateTasksDone}">Recently Done
+< ng-app="HibiApp">
+  <.content>
+    <a.settings-holder ui-sref="#{StateSettings}" ui-sref-active="settings-active">
+      <hibi-icon.settings-icon src="@{StaticR images_icon_settings_svg}"
+        title="Settings">
+      <.settings-pagecurl>
+    <billboard>
+    < ui-view>
+  <.tabshield>
+  <nav>
+    <ul.tabs>
+      <li ui-sref-active="tab-selected">
+        <a ui-sref="#{StateTasksToday}">Today
+      <li ui-sref-active="tab-selected">
+        <a ui-sref="#{StateTasksLater}">Later
+      <li ui-sref-active="tab-selected">
+        <a ui-sref="#{StateTasksDone}">Recently Done
