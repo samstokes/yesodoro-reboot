@@ -75,6 +75,14 @@ casper.test.begin('Can log in, and add and complete a task', 3, function (test) 
       shot('logged-in');
       test.assertSelectorHasText('header', 'Hibi');
 
+      function countTasks() {
+        return casper.evaluate(function () {
+          return $('ul.tasks > li').length;
+        });
+      }
+
+      var numTasks = countTasks();
+
       var form = '.new-task form';
 
       casper.fill(form, {
@@ -82,7 +90,7 @@ casper.test.begin('Can log in, and add and complete a task', 3, function (test) 
       }, true);
 
       casper.waitFor(function () {
-        return casper.fetchText(form + ' *[name=title]').length == 0;
+        return countTasks() > numTasks;
       }, function () {
         shot('added-task');
         var lastTask = 'ul.tasks > *:last-child .task';
