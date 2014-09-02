@@ -1,17 +1,23 @@
-Launch blockers
+Bugs
 	undefined, undefined NaN on completed task
+	Sunday showing as Saturday?!
+	postponed task showing up as today (daylight savings issue?)
+	Fix background resizing
+Launch blockers
 	Landing page
 	Login UI
 	Handle session expiry properly
 	Lengthen session expiry
-	Fix background resizing
 	Support non-UK time zone?
 	Upgrade to new GoogleEmail plugin
 	Attribution for icons and backgrounds
+	Jigger routes around (no /new-design)
 Post-launch
+	Fix on Codeship Trusty
+		http://blog.codeship.io/2014/08/12/ubuntu-14-04-trusty-tahr-on-codeship.html
+		Cabal resolution error, because of ghc 7.6?
 	uncomplete
 	Pause?
-	Touch-friendliness?
 	Notes
 	Resolve API vs Angular JSON endpoints
 	Merge wip.angular-tasks
@@ -22,4 +28,5 @@ Post-launch
 	Get test coverage to 80%
 	cache-control headers (not just etag) on templates
 	Update buildpack for "set -e" etc
+	Google Analytics
 	Bugsnag/Yeller
