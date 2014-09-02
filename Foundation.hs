@@ -247,12 +247,14 @@ addAppJs = do
   addScript $ StaticR js_app_services_billboard_js
   addScript $ StaticR js_app_services_exceptionHandler_js
   addScript $ StaticR js_app_services_httpErrorHandler_js
+  addScript $ StaticR js_app_services_Settings_js
   addScript $ StaticR js_app_services_Tasks_js
 
   addScript $ StaticR js_app_controllers_js
   addScript $ StaticR js_app_controllers_PlansCtrl_js
   addScript $ StaticR js_app_controllers_TasksCtrl_js
   addScript $ StaticR js_app_controllers_NotesCtrl_js
+  addScript $ StaticR js_app_controllers_SettingsCtrl_js
 
   addScript $ StaticR js_app_directives_js
   addScript $ StaticR js_app_directives_billboard_js

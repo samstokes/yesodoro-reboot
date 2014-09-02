@@ -13,6 +13,7 @@ Launch blockers
 	Attribution for icons and backgrounds
 	Jigger routes around (no /new-design)
 	Deuglify Billboard (or at least remove welcome message)
+	Style logout button
 Post-launch
 	delete old UI
 	GHC 7.8
@@ -31,7 +32,6 @@ Post-launch
 	cache-control headers (not just etag) on templates
 	Google Analytics
 	Bugsnag/Yeller
-	Logout button
 	Handle timezones generally better
 		client-side (e.g. moment.js)
 		allow choice of timezone

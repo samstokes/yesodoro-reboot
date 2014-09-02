@@ -40,12 +40,15 @@ stateR :: State -> Route App
 stateR = ClientR . stateClientR
 
 stateController :: State -> Maybe Text
+stateController StateSettings = Just "SettingsCtrl"
 stateController StateTasksToday = Just "TasksCtrl"
 stateController StateTasksLater = Just "TasksCtrl"
 stateController StateTasksDone = Just "TasksCtrl"
-stateController _ = Nothing
 
 stateResolves :: State -> [(Text, (url -> [(Text, Text)] -> Text) -> Javascript)]
+stateResolves StateSettings = [
+    ("loggedIn", [julius|function (Settings) { return Settings.isAuthed(); }|])
+  ]
 stateResolves StateTasksToday = [
     ("tasks", [julius|function (Tasks) { return Tasks.today(); }|])
   ]
@@ -65,7 +68,6 @@ stateResolves StateTasksDone = [
       return Tasks.done();
     }|])
   ]
-stateResolves _ = []
 
 stateTemplateR :: State -> Route App
 stateTemplateR StateSettings = TemplateNewSettingsR
