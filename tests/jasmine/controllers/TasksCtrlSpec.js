@@ -18,13 +18,13 @@ describe('TasksCtrl', function () {
   var FakeTaskRepo;
 
   beforeEach(module(function ($provide) {
-    $provide.factory('Task', function () { return FakeTask; });
+    $provide.value('Task', FakeTask);
 
     FakeTaskRepo = jasmine.createSpyObj('Tasks', [
       'create',
       'complete'
     ]);
-    $provide.factory('Tasks', function () { return FakeTaskRepo; });
+    $provide.value('Tasks', FakeTaskRepo);
 
     $provide.value('hibiUi', 'new');
     $provide.value('tasks', fakeTasks);
