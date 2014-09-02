@@ -60,7 +60,7 @@ getTasksR = do
     featureButtonLabel (feature, False) = Text.pack $ "Enable " ++ featureDescription feature
     featureButtonLabel (feature, True) = Text.pack $ "Disable " ++ featureDescription feature
   title <- appTitle
-  defaultLayout $ do
+  oldLayout $ do
     setTitle $ toMarkup title
     addWidget $(widgetFile "tasks") where
 

@@ -10,6 +10,7 @@ module Foundation
     , maybeAuth
     , requireAuth
     , putR, deleteR
+    , oldLayout
     , newLayout
     , appTitle
     , module Settings
@@ -114,29 +115,7 @@ instance Yesod App where
         key <- getKey "config/client_session_key.aes"
         return . Just $ secureClientSessionBackend key 120
 
-    defaultLayout widget = do
-        authed <- isJust <$> maybeAuthId
-        when authed setXsrfCookie
-
-        master <- getYesod
-        mmsg <- getMessage
-
-        -- We break up the default layout into two components:
-        -- default-layout is the contents of the body tag, and
-        -- default-layout-wrapper is the entire page. Since the final
-        -- value passed to hamletToRepHtml cannot be a widget, this allows
-        -- you to use normal widget features in default-layout.
-
-        pc <- widgetToPageContent $ do
-            addDefaultLayoutCss
-
-            $(widgetFile "default-layout")
-
-            addThirdPartyJs
-
-            addAppJs
-
-        hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
+    defaultLayout = newLayout
 
     -- This is done to provide an optimization for serving static files from
     -- a separate domain. Please see the staticRoot setting in Settings.hs
@@ -166,8 +145,33 @@ instance Yesod App where
     jsLoader _ = BottomOfHeadBlocking
 
 
+oldLayout :: GWidget sub App () -> GHandler sub App RepHtml
+oldLayout widget = do
+  authed <- isJust <$> maybeAuthId
+  when authed setXsrfCookie
 
-newLayout :: Widget -> Handler RepHtml
+  master <- getYesod
+  mmsg <- getMessage
+
+  -- We break up the default layout into two components:
+  -- default-layout is the contents of the body tag, and
+  -- default-layout-wrapper is the entire page. Since the final
+  -- value passed to hamletToRepHtml cannot be a widget, this allows
+  -- you to use normal widget features in default-layout.
+
+  pc <- widgetToPageContent $ do
+      addDefaultLayoutCss
+
+      $(widgetFile "default-layout")
+
+      addThirdPartyJs
+
+      addAppJs
+
+  hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
+
+
+newLayout :: GWidget sub App () -> GHandler sub App RepHtml
 newLayout widget = do
   authed <- isJust <$> maybeAuthId
   when authed setXsrfCookie
@@ -246,7 +250,7 @@ addAppJs = do
   addScript $ StaticR js_app_filters_js
 
 
-appTitle :: Handler Text
+appTitle :: GHandler sub App Text
 appTitle = fmap (extraTitle . appExtra . settings) getYesod
 
 
