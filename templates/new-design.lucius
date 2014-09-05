@@ -237,6 +237,10 @@ section.tasks button hibi-icon {
   transition-timing-function: ease;
 }
 
+.task.todo .title {
+  cursor: pointer;
+}
+
 .task.todo .title:hover {
   text-decoration: line-through;
 }
