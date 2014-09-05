@@ -1,0 +1,45 @@
+#splash {
+  text-align: center;
+
+  color: #898989;
+}
+
+article {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-right: 20px;
+}
+
+article > header {
+  color: #393939;
+}
+
+a.button {
+  background: green;
+  border-radius: 8px;
+
+  text-align: center;
+  text-decoration: none;
+
+  padding: 20px;
+}
+
+input.cta, button.cta, .button.cta {
+  display: block;
+
+  margin-top: 40px;
+  margin-bottom: 20px;
+
+  font-size: 120%;
+
+  background: #f8f4c5;
+  color: #393939;
+}
+
+input.cta:hover, button.cta:hover, .button.cta:hover {
+  background: #ebe7bc;
+}
+
+input.cta:active, button.cta:active, .button.cta:active {
+  background: #dfdbb1;
+}
