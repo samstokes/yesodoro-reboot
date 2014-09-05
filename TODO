@@ -30,3 +30,4 @@ Post-launch
 	Update buildpack for "set -e" etc
 	Google Analytics
 	Bugsnag/Yeller
+	Logout button
