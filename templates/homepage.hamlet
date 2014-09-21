@@ -1,9 +1,9 @@
 <.content>
   <article#splash>
     <header>
-      <h1>Plan your day
+      <h1>What do you want to do today?
     <p>
-      #{title} lets you plan your tasks for the day without distraction. #
-      Postpone things you won't get to today, and #{title} will remind you #
+      #{title} helps you focus on today's tasks. #
+      Won't get to something today?  Postpone it, and #{title} will remind you #
       tomorrow.
     <a.button.cta href=@{AuthR LoginR}>Sign up or log in
