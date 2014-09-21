@@ -20,7 +20,6 @@ var app = angular.module('HibiApp',
       url: '/tasks?days',
       controller: 'TasksCtrl',
       resolve: {
-        hibiUi: function () { return 'old'; },
         tasks: function ($stateParams, Tasks) {
           var params = {}, days = $stateParams.days;
           if (days !== null) {
@@ -49,6 +48,7 @@ var app = angular.module('HibiApp',
     Billboard.error(error, {timeout: 10000});
   });
 })
+.value('hibiUi', 'old')
 .value('messageFromServer', #{toJSON mmsg})
 .value('defaultTaskSchedule', #{toJSON Once})
 .run(function (Billboard, messageFromServer) {

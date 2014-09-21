@@ -30,6 +30,7 @@ var app = angular.module('HibiApp',
     Billboard.error('Error changing to state ' + toState.name + ': ' + message, {timeout: 10000});
   });
 })
+.value('hibiUi', 'new')
 .value('messageFromServer', #{toJSON mmsg})
 .value('defaultTaskSchedule', #{toJSON Once})
 .run(function (Billboard, messageFromServer) {

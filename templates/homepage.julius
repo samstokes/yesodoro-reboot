@@ -13,4 +13,5 @@ var homepage = angular.module('HibiHomepage',
       templateUrl: '@{TemplateHomeR}'
     })
     ;
-});
+})
+.value('hibiUi', 'new');
