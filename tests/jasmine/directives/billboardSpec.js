@@ -1,6 +1,7 @@
 'use strict';
 
 describe('billboard directive', function () {
+  beforeEach(module('app.services'));
   beforeEach(module('app.directives'));
 
   var $window,
