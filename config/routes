@@ -35,6 +35,7 @@
 
 /templates/tasks TemplateOldTasksR GET
 /templates/taskTr TemplateTaskTrR GET
+/templates/home TemplateHomeR GET
 /new-design/templates/settings TemplateNewSettingsR GET
 /new-design/templates/tasks-today TemplateNewTasksTodayR GET
 /new-design/templates/tasks-later TemplateNewTasksLaterR GET

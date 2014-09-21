@@ -1,0 +1,16 @@
+'use strict';
+
+var homepage = angular.module('HibiHomepage',
+  [ 'ui.router'
+  ])
+.config(function ($locationProvider, $urlRouterProvider, $stateProvider) {
+  $locationProvider.html5Mode(true);
+
+  $stateProvider
+    // TODO type-safe-ify this
+    .state('home', {
+      url: '/',
+      templateUrl: '@{TemplateHomeR}'
+    })
+    ;
+});

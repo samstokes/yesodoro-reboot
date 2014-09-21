@@ -1,9 +1,12 @@
-<.content>
-  <article#splash>
-    <header>
-      <h1>What do you want to do today?
-    <p>
-      #{title} helps you focus on today's tasks. #
-      Won't get to something today?  Postpone it, and #{title} will remind you #
-      tomorrow.
-    <a.button.cta href=@{AuthR LoginR}>Sign up or log in
+< ng-app="HibiHomepage">
+  <.content>
+    <article#splash>
+      <header>
+        <h1>What do you want to do today?
+      <p>
+        #{title} helps you focus on today's tasks. #
+        Won't get to something today?  Postpone it, and #{title} will remind you #
+        tomorrow.
+      <a.button.cta href=@{AuthR LoginR}>Sign up or log in
+
+  < ui-view>

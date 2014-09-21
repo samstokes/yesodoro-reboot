@@ -10,12 +10,15 @@ import Data.Monoid ((<>))
 import Text.Blaze (Markup, toMarkup)
 
 
-getTemplateOldTasksR, getTemplateTaskTrR, getTemplateNewSettingsR, getTemplateNewTasksTodayR, getTemplateNewTasksLaterR, getTemplateNewTasksDoneR, getTemplateNewTaskR :: Handler Html
+getTemplateOldTasksR, getTemplateTaskTrR, getTemplateHomeR, getTemplateNewSettingsR, getTemplateNewTasksTodayR, getTemplateNewTasksLaterR, getTemplateNewTasksDoneR, getTemplateNewTaskR :: Handler Html
 
 
 getTemplateOldTasksR = $(wtemplateScheduleOptions "tasks/tasks-old")
 
 getTemplateTaskTrR = $(templateFeatures "tasks/task-tr-ng")
+
+
+getTemplateHomeR = $(template "homepage/home")
 
 
 getTemplateNewSettingsR = $(template "new-design/settings")
