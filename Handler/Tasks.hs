@@ -61,7 +61,7 @@ fetchTaskChildren user tasks = zipWith4 TaskWithChildren tasks <$> extTasks <*> 
            then runDB $ mapM (taskNotes [Asc NoteCreatedAt] . entityKey) tasks
            else return $ map (const []) tasks
   has feature = hasFlag feature features
-  features = userFeatureSettings user
+  features = featureSettings $ Just user
 
 
 postTasksR :: Handler Value

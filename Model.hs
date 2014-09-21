@@ -13,6 +13,7 @@ import Yesod
 import Control.Applicative (Applicative, (<$>), (<*>))
 import Control.Monad ((>=>))
 import Data.Aeson ((.:?))
+import Data.Monoid (mempty)
 import Data.Text (Text)
 import Data.Time (Day, NominalDiffTime, TimeZone, UTCTime)
 import Data.Typeable (Typeable)
@@ -475,8 +476,12 @@ allExtTasksForSource userId source = selectList [
   ] []
 
 
-userFeatureSettings :: User -> Flags Feature
-userFeatureSettings = defaultMissing . userFeatures
+featureSettings :: Maybe User -> Flags Feature
+featureSettings = defaultMissing . maybe defaultFeatureSettings userFeatures
+
+
+defaultFeatureSettings :: Flags Feature
+defaultFeatureSettings = mempty
 
 
 toggleUserFeature :: PersistQuery (SqlPersistT m) => Feature -> Entity User -> SqlPersistT m ()

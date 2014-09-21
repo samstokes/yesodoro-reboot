@@ -43,23 +43,18 @@ templateWithSettings ts name = tws $ tsComplexity ts
     -- TODO serve some caching header here too
     tws Mild = templateToHtml
     tws HasFeatures = [|do
-      Entity _ user <- requireNgAuth
-      withDigestEtag (featuresEtag user) $ do
-        let
-          features = userFeatureSettings user
-          has feature = hasFlag feature features
-        $templateToHtml
+      features <- featureSettings . fmap entityVal <$> maybeNgAuth
+      let has feature = hasFlag feature features
+      withDigestEtag (featuresEtag features) $templateToHtml
       |]
     tws HasScheduleOptions = [|do
-      Entity _ user <- requireNgAuth
-      withDigestEtag (featuresEtag user) $ do
-        let
-          features = userFeatureSettings user
-          has feature = hasFlag feature features
-          scheduleOptions = if has FeatureNonDailySchedules
-            then schedules
-            else filter (not . nonDaily) schedules
-        $templateToHtml
+      features <- featureSettings . fmap entityVal <$> maybeNgAuth
+      let
+        has feature = hasFlag feature features
+        scheduleOptions = if has FeatureNonDailySchedules
+          then schedules
+          else filter (not . nonDaily) schedules
+      withDigestEtag (featuresEtag features) $templateToHtml
       |]
     filePath = "templates/" ++ name ++ ".hamlet"
     templateToHtml | tsHasWidgets ts = [|do
@@ -68,8 +63,8 @@ templateWithSettings ts name = tws $ tsComplexity ts
       |]
                    | otherwise       = [|giveUrlRenderer $(hamletFile filePath)|]
 
-featuresEtag :: User -> Handler B.ByteString
-featuresEtag user = return . B.pack . concat $ [
+featuresEtag :: Flags Feature -> Handler B.ByteString
+featuresEtag features = return . B.pack . concat $ [
     show estimateOptions
-  , show (userFeatures user)
+  , show features
   ]

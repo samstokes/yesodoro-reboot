@@ -1,6 +1,7 @@
 module Util.Angular
   ( requireNgAuthId
   , requireNgAuth
+  , maybeNgAuth
   , setXsrfCookie
   , validXsrfHeader
   ) where
@@ -23,7 +24,7 @@ import Yesod.Core
 import Yesod.Form.Types (FormMessage(MsgCsrfWarning))
 import Yesod.Persist
 
-import Util (passthru)
+import Util (maybeM, passthru)
 
 
 setXsrfCookie :: MonadHandler m => m ()
@@ -82,3 +83,14 @@ requireNgAuth ::
   , PersistMonadBackend (YesodPersistBackend site (HandlerT site IO)) ~ PersistEntityBackend auth
   ) => HandlerT site IO (Entity auth)
 requireNgAuth = maybeAuth >>= maybe respondUnauthorized return >>= passthru validateXsrfHeader
+
+maybeNgAuth ::
+  ( YesodPersist site
+  , YesodAuth site
+  , PersistEntity auth
+  , Typeable auth
+  , PersistStore (YesodPersistBackend site (HandlerT site IO))
+  , AuthId site ~ Key auth
+  , PersistMonadBackend (YesodPersistBackend site (HandlerT site IO)) ~ PersistEntityBackend auth
+  ) => HandlerT site IO (Maybe (Entity auth))
+maybeNgAuth = maybeAuth >>= maybeM Nothing (passthru validateXsrfHeader . Just)

@@ -53,7 +53,7 @@ getTasksR = do
   Entity userId user <- requireAuth
   mmsg <- fmap renderMarkup <$> getMessage
   let
-    features = userFeatureSettings user
+    features = featureSettings $ Just user
     has feature = hasFlag feature features
     toggleableFeatures = sort $ filter ((/= FeatureSettings) . fst) features
     featureButtonLabel (feature, False) = Text.pack $ "Enable " ++ featureDescription feature
