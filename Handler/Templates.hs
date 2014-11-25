@@ -4,21 +4,22 @@ module Handler.Templates where
 import Import
 import Util
 import Util.Templates
+import Widget.TaskList
 
 import qualified Data.Char as Char
 import Data.Monoid ((<>))
 import Text.Blaze (Markup, toMarkup)
 
 
-getTemplateOldTasksR, getTemplateTaskTrR, getTemplateHomeR, getTemplateNewSettingsR, getTemplateNewTasksTodayR, getTemplateNewTasksLaterR, getTemplateNewTasksDoneR, getTemplateNewTaskR :: Handler Html
+getTemplateOldTasksR, getTemplateOldTaskTrR, getTemplateHomeR, getTemplateNewSettingsR, getTemplateNewTasksTodayR, getTemplateNewTasksLaterR, getTemplateNewTasksDoneR, getTemplateNewTaskR :: HandlerT Templates Handler Html
 
 
 getTemplateOldTasksR = $(wtemplateScheduleOptions "tasks/tasks-old")
 
-getTemplateTaskTrR = $(templateFeatures "tasks/task-tr-ng")
+getTemplateOldTaskTrR = $(templateFeatures "tasks/task-tr-ng")
 
 
-getTemplateHomeR = $(template "homepage/home")
+getTemplateHomeR = $(wtemplate "homepage/home")
 
 
 getTemplateNewSettingsR = $(template "new-design/settings")

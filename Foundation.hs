@@ -1,9 +1,11 @@
 module Foundation
     ( App (..)
+    , Templates (..)
     , Client (..)
     , Route (..)
     , AppMessage (..)
     , resourcesApp
+    , resourcesTemplates
     , Handler
     , Widget
     , maybeAuth
@@ -67,8 +69,12 @@ data App = App
     , connPool :: Database.Persist.PersistConfigPool Settings.PersistConfig -- ^ Database connection pool.
     , httpManager :: Manager
     , persistConfig :: Settings.PersistConfig
+    , getTemplates :: Templates
     , getClient :: Client
     }
+
+-- Dummy? subsite so our template URLs can be type-safe too.
+data Templates = Templates -- TODO?
 
 -- Dummy subsite so our client-side routing can be type-safe too.
 data Client = Client
@@ -95,6 +101,7 @@ mkMessage "App" "messages" "en"
 -- for our application to be in scope. However, the handler functions
 -- usually require access to the AppRoute datatype. Therefore, we
 -- split these actions into two functions and place them in separate files.
+mkYesodSubData "Templates" $(parseRoutesFile "config/routes-templates")
 mkYesodSubData "Client" $(parseRoutesFile "config/routes-client")
 mkYesodData "App" $(parseRoutesFile "config/routes")
 
@@ -207,6 +214,8 @@ newLayout widget = do
       addThirdPartyJs
 
       addAppJs
+
+      addScript (StaticR js_homepage_services_js)
 
   giveUrlRenderer $(hamletFile "templates/new-layout-wrapper.hamlet")
 

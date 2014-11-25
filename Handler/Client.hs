@@ -31,10 +31,10 @@ stateName StateTasksLater = "tasks-later"
 stateName StateTasksDone = "tasks-done"
 
 stateClientR :: State -> Route Client
-stateClientR StateSettings = NewSettingsR
-stateClientR StateTasksToday = NewTasksTodayR
-stateClientR StateTasksLater = NewTasksLaterR
-stateClientR StateTasksDone = NewTasksDoneR
+stateClientR StateSettings = ClientNewSettingsR
+stateClientR StateTasksToday = ClientNewTasksTodayR
+stateClientR StateTasksLater = ClientNewTasksLaterR
+stateClientR StateTasksDone = ClientNewTasksDoneR
 
 stateR :: State -> Route App
 stateR = ClientR . stateClientR
@@ -69,11 +69,15 @@ stateResolves StateTasksDone = [
     }|])
   ]
 
-stateTemplateR :: State -> Route App
+stateTemplateR :: State -> Route Templates
 stateTemplateR StateSettings = TemplateNewSettingsR
 stateTemplateR StateTasksToday = TemplateNewTasksTodayR
 stateTemplateR StateTasksLater = TemplateNewTasksLaterR
 stateTemplateR StateTasksDone = TemplateNewTasksDoneR
+
+templateR :: State -> Route App
+templateR = TemplatesR . stateTemplateR
+
 
 instance ToMarkup State where
   toMarkup = stateName
@@ -88,7 +92,7 @@ stateDeclJavascript state = [julius|
       url: '@{stateR state}?days',
       ^{controllerDecl (stateController state)}
       ^{resolvesDecl (stateResolves state)}
-      templateUrl: '@{stateTemplateR state}'
+      templateUrl: '@{templateR state}'
     })
 |] where
   controllerDecl (Just ctrl) = [julius|controller: #{toJSON ctrl},|]

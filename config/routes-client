@@ -1,4 +1,4 @@
-/settings    NewSettingsR
-/tasks/today NewTasksTodayR
-/tasks/later NewTasksLaterR
-/tasks/done NewTasksDoneR
+/settings    ClientNewSettingsR
+/tasks/today ClientNewTasksTodayR
+/tasks/later ClientNewTasksLaterR
+/tasks/done ClientNewTasksDoneR

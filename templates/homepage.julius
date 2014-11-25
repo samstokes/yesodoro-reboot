@@ -2,6 +2,12 @@
 
 var homepage = angular.module('HibiHomepage',
   [ 'ui.router'
+  , 'ui.sortable'
+  , 'homepage.services'
+  , 'app.models'
+  , 'app.controllers'
+  , 'app.directives'
+  , 'app.filters'
   ])
 .config(function ($locationProvider, $urlRouterProvider, $stateProvider) {
   $locationProvider.html5Mode(true);
@@ -10,8 +16,10 @@ var homepage = angular.module('HibiHomepage',
     // TODO type-safe-ify this
     .state('home', {
       url: '/',
-      templateUrl: '@{TemplateHomeR}'
+      controller: 'TasksCtrl',
+      templateUrl: '@{TemplatesR TemplateHomeR}'
     })
     ;
 })
-.value('hibiUi', 'new');
+.value('hibiUi', 'new')
+.value('defaultTaskSchedule', #{toJSON Once});

@@ -31,7 +31,7 @@ angular.module('app.directives')
     templateUrl: function (tElement, tAttrs) {
       return {
         'old': '/templates/taskTr',
-        'new': '/new-design/templates/task'
+        'new': '/templates/new-design/task'
       }[checkUi(tAttrs)];
     },
     link: function (scope, elem, attrs) {

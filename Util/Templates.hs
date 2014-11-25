@@ -43,12 +43,12 @@ templateWithSettings ts name = tws $ tsComplexity ts
     -- TODO serve some caching header here too
     tws Mild = templateToHtml
     tws HasFeatures = [|do
-      features <- featureSettings . fmap entityVal <$> maybeNgAuth
+      features <- featureSettings . fmap entityVal <$> tem_maybeNgAuth
       let has feature = hasFlag feature features
       withDigestEtag (featuresEtag features) $templateToHtml
       |]
     tws HasScheduleOptions = [|do
-      features <- featureSettings . fmap entityVal <$> maybeNgAuth
+      features <- featureSettings . fmap entityVal <$> tem_maybeNgAuth
       let
         has feature = hasFlag feature features
         scheduleOptions = if has FeatureNonDailySchedules
@@ -58,12 +58,16 @@ templateWithSettings ts name = tws $ tsComplexity ts
       |]
     filePath = "templates/" ++ name ++ ".hamlet"
     templateToHtml | tsHasWidgets ts = [|do
-        pc <- widgetToPageContent $(whamletFile filePath)
-        giveUrlRenderer [hamlet|^{pageBody pc}|]
+        pc <- lift $ widgetToPageContent $(whamletFile filePath)
+        lift $ giveUrlRenderer [hamlet|^{pageBody pc}|]
       |]
-                   | otherwise       = [|giveUrlRenderer $(hamletFile filePath)|]
+                   | otherwise       = [|lift $ giveUrlRenderer $(hamletFile filePath)|]
 
-featuresEtag :: Flags Feature -> Handler B.ByteString
+-- signature of maybeNgAuth is too generic and TH gets confused, so specialise it
+tem_maybeNgAuth :: HandlerT Templates Handler (Maybe (Entity User))
+tem_maybeNgAuth = lift maybeNgAuth
+
+featuresEtag :: Monad m => Flags Feature -> m B.ByteString
 featuresEtag features = return . B.pack . concat $ [
     show estimateOptions
   , show features

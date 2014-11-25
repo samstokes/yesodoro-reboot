@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ViewPatterns #-} -- for Heroku config parsing
 
 module Application
@@ -51,6 +52,9 @@ import Handler.Templates
 -- the comments there for more details.
 mkYesodDispatch "App" resourcesApp
 
+instance YesodSubDispatch Templates (HandlerT App IO) where
+  yesodSubDispatch = $(mkYesodSubDispatch resourcesTemplates)
+
 instance (YesodDispatch site) => YesodSubDispatch Client (HandlerT site m) where
   yesodSubDispatch = error "Dummy endpoint"
 
@@ -91,7 +95,7 @@ makeFoundation conf clientId clientSecret = do
     (getter, _) <- clockDateCacher
 
     let logger = Yesod.Core.Types.Logger loggerSet' getter
-        foundation = App conf clientId clientSecret logger s p manager dbconf Client
+        foundation = App conf clientId clientSecret logger s p manager dbconf Templates Client
 
     -- Perform database migration using our application's logging settings.
     runLoggingT

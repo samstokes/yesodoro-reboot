@@ -1,0 +1,12 @@
+/tasks TemplateOldTasksR GET
+/taskTr TemplateOldTaskTrR GET
+
+/home TemplateHomeR GET
+
+/new-design/settings TemplateNewSettingsR GET
+
+/new-design/tasks-today TemplateNewTasksTodayR GET
+/new-design/tasks-later TemplateNewTasksLaterR GET
+/new-design/tasks-done TemplateNewTasksDoneR GET
+
+/new-design/task TemplateNewTaskR GET

@@ -44,6 +44,10 @@ describe('Task', function () {
       expect(task.isDone()).toBeFalsy();
     });
 
+    it('should not have a dayDone', function () {
+      expect(task.dayDone()).not.toBeTruthy();
+    });
+
     it('should have no external task link', function () {
       expect(task.ext_task).toBeUndefined();
     });

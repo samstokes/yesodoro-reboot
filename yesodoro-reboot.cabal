@@ -49,6 +49,7 @@ library
                      Util.HiddenAuthEmail
                      Util.Templates
                      Widget.Expandy
+                     Widget.TaskList
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
