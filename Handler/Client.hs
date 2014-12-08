@@ -9,7 +9,7 @@ import Data.Monoid ((<>))
 import Data.Foldable (foldMap)
 import Data.String (IsString)
 import Text.Blaze (ToMarkup(..))
-import Text.Julius (Javascript)
+import Text.Julius (Javascript, rawJS)
 
 import Import
 import Prelude
@@ -100,5 +100,5 @@ stateDeclJavascript state = [julius|
 statesDeclJavascript :: (Route App -> [(Text, Text)] -> Text) -> Text -> Javascript
 statesDeclJavascript render stateProvider = header <> foldMap decl states
   where
-    header = [julius|#{toJSON stateProvider}|] render -- TODO probably wrong
+    header = [julius|#{rawJS stateProvider}|] render
     decl = flip stateDeclJavascript render

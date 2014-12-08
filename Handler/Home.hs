@@ -5,7 +5,7 @@ import Data.List (sort)
 import qualified Data.Text as Text
 import Text.Blaze (toMarkup)
 import Text.Blaze.Renderer.Text (renderMarkup)
-import Text.Julius (renderJavascript)
+import Text.Julius (renderJavascript, rawJS)
 import Yesod.Auth
 
 import Handler.Client
