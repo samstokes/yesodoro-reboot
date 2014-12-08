@@ -135,6 +135,13 @@ instance Yesod App where
     -- The page to be redirected to when authentication is required.
     authRoute _ = Just $ AuthR LoginR
 
+    -- What messages should be logged. The following includes all messages when
+    -- in development, and warnings and errors in production.
+    shouldLog _ _source level =
+        development || level == LevelWarn || level == LevelError
+
+    makeLogger = return . getLogger
+
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
     -- expiration dates to be set far in the future without worry of
