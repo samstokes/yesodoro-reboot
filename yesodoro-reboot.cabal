@@ -126,6 +126,7 @@ executable         yesodoro-reboot
     hs-source-dirs:    dist
     build-depends:     base
                      , yesodoro-reboot
+                     , yesod
                      , yesod-default
 
 test-suite test
