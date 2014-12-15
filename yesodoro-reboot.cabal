@@ -130,6 +130,32 @@ executable         yesodoro-reboot
                      , yesod
                      , yesod-default
 
+executable         yesodoro-reboot-create-test-account
+    if flag(library-only)
+        Buildable: False
+
+    if flag(dev)
+      ghc-options:   -Wall -threaded -O0
+    else
+      ghc-options:   -Wall -Werror -threaded -O0
+
+    extensions:        OverloadedStrings
+                       TypeFamilies
+
+    main-is:           ../create-test-account.hs
+    hs-source-dirs:    dist
+    build-depends:     base
+                     , yesodoro-reboot
+                     , monad-logger
+                     , persistent
+                     , resourcet
+                     , safe
+                     , text
+                     , time
+                     , transformers
+                     , yesod
+                     , yesod-auth
+
 test-suite test
     type:              exitcode-stdio-1.0
     main-is:           main.hs
