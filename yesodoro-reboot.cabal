@@ -46,6 +46,7 @@ library
                      Util
                      Util.Http
                      Util.Angular
+                     Util.HiddenAuthEmail
                      Widget.Expandy
 
     if flag(dev) || flag(library-only)

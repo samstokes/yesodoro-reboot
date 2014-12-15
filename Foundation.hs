@@ -52,6 +52,7 @@ import Data.Text (Text, isPrefixOf)
 import Data.Time (TimeZone(..))
 import Util
 import Util.Angular
+import Util.HiddenAuthEmail
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -301,7 +302,7 @@ instance YesodAuth App where
                   fmap Just $ insert $ User (credsIdent creds) Nothing defaultTimeZone noFlags
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = authGoogleEmail : ifDev [authEmail] []
+    authPlugins _ = authGoogleEmail : authHiddenEmail : ifDev [authEmail] []
 
     authHttpManager = httpManager
 
