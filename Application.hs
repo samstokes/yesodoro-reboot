@@ -2,6 +2,7 @@
 module Application
     ( makeApplication
     , getApplicationDev
+    , makeDatabasePool
     , makeFoundation
     ) where
 
@@ -18,7 +19,7 @@ import Network.Wai.Middleware.RequestLogger
 import Network.Wai.Middleware.MethodOverride (methodOverride)
 import qualified Network.Wai.Middleware.RequestLogger as RequestLogger
 import qualified Database.Persist
-import Database.Persist.Sql (runMigration)
+import Database.Persist.Sql (ConnectionPool, runMigration)
 import Network.HTTP.Client.Conduit (newManager)
 import Control.Monad.Logger (runLoggingT)
 import System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize)
@@ -83,11 +84,8 @@ makeFoundation :: AppConfig DefaultEnv Extra -> IO App
 makeFoundation conf = do
     manager <- newManager
     s <- staticSite
-    heroku <- loadHerokuConfig conf
-    dbconf <- withYamlEnvironment "config/postgresql.yml" (appEnv conf)
-              (Database.Persist.loadConfig . combineMappings heroku) >>=
-              Database.Persist.applyEnv
-    p <- Database.Persist.createPoolConfig (dbconf :: Settings.PersistConfig)
+    heroku <- Just <$> loadHerokuConfig conf
+    (dbconf, p) <- makeDatabasePool (appEnv conf) heroku
 
     loggerSet' <- newStdoutLoggerSet defaultBufSize
     (getter, _) <- clockDateCacher
@@ -101,6 +99,15 @@ makeFoundation conf = do
         (messageLoggerSource foundation logger)
 
     return foundation
+
+makeDatabasePool :: DefaultEnv -> Maybe Aeson.Value
+  -> IO (Settings.PersistConfig, ConnectionPool)
+makeDatabasePool env mHeroku = do
+  dbconf <- withYamlEnvironment "config/postgresql.yml" env
+            (Database.Persist.loadConfig . maybe id combineMappings mHeroku) >>=
+            Database.Persist.applyEnv
+  pool <- Database.Persist.createPoolConfig (dbconf :: Settings.PersistConfig)
+  return (dbconf, pool)
 
 -- for yesod devel
 getApplicationDev :: IO (Int, Application)
