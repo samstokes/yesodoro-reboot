@@ -356,5 +356,6 @@ Please go to #{verurl}.
                 , emailCredsAuthId = emailUser e
                 , emailCredsStatus = isJust $ emailUser e
                 , emailCredsVerkey = emailVerkey e
+                , emailCredsEmail = email
                 }
     getEmail = runDB . fmap (fmap emailEmail) . get
