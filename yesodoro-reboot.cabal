@@ -105,6 +105,7 @@ library
                  , blaze-markup
                  , aeson
                  , transformers
+                 , transformers-compat
                  , old-locale
                  , pureMD5
                  , base64-bytestring
