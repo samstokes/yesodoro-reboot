@@ -55,6 +55,7 @@ library
     else
       if flag(ci)
         ghc-options:   -Wall -Werror -threaded -O0
+        cpp-options:   -DDEVELOPMENT
       else
         ghc-options:   -Wall -Werror -threaded -O2
 
