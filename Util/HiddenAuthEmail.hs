@@ -1,3 +1,5 @@
+{-# LANGUAGE NoCPP #-}
+
 module Util.HiddenAuthEmail (
     authHiddenEmail
   ) where
