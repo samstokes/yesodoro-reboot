@@ -50,7 +50,7 @@ getLoginPopupR = do
 
 getTasksR :: Handler Html
 getTasksR = do
-  Entity userId user <- requireAuth
+  Entity _ user <- requireAuth
   mmsg <- fmap renderMarkup <$> getMessage
   let
     features = userFeatureSettings user

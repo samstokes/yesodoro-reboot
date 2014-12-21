@@ -12,7 +12,6 @@ import Text.Blaze (ToMarkup(..))
 import Text.Julius (Javascript, rawJS)
 
 import Import
-import Prelude
 
 data State =
     StateSettings

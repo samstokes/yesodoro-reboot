@@ -4,6 +4,7 @@ module Foundation
     , Route (..)
     , AppMessage (..)
     , resourcesApp
+    , resourcesClient
     , Handler
     , Widget
     , maybeAuth
@@ -165,7 +166,6 @@ oldLayout widget = do
   when authed setXsrfCookie
 
   master <- getYesod
-  mmsg <- getMessage
 
   -- We break up the default layout into two components:
   -- default-layout is the contents of the body tag, and
@@ -190,7 +190,6 @@ newLayout widget = do
   authed <- isJust <$> maybeAuthId
   when authed setXsrfCookie
 
-  mmsg <- getMessage
   title <- appTitle
 
   -- We break up the layout into two components:
@@ -325,7 +324,6 @@ instance YesodAuthEmail App where
         runDB $ insert $ Email email Nothing $ Just verkey
 
     sendVerifyEmail email _ verurl = do
-        y <- getYesod
         -- Just log the verification URL for now, rather than emailing it...
         -- this is insecure and user-unfriendly, but only used in dev
         $logInfo [st|
