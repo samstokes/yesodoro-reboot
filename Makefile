@@ -2,7 +2,7 @@ PROJECT=yesodoro-reboot
 ENVIRONMENT=Production
 DEPLOY_DIR=/var/keter/incoming
 FIX=fix
-CASPERJS=casperjs
+CASPERJS=casperjs --ssl-protocol=tlsv1
 KARMA=node_modules/karma/bin/karma
 JSHINT=node_modules/.bin/jshint
 ROOT_URL=http://localhost:3000/
