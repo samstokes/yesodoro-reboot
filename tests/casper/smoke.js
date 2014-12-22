@@ -26,6 +26,10 @@ casper.on('page.error', function (message, trace) {
   this.test.fail('page threw an exception: ' + message + '\n' + JSON.stringify(trace));
 });
 
+casper.on('resource.error', function (resourceError) {
+  this.test.fail('page failed to load a resource: ' + JSON.stringify(resourceError));
+});
+
 var shotNumber = 0;
 function shot(name) {
   return casper.capture('smoke-' + (shotNumber++) + '-' + name + '.png');
