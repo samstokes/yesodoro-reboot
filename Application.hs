@@ -1,4 +1,8 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#ifndef DEVELOPMENT
+{-# LANGUAGE ViewPatterns #-} -- for Heroku config parsing
+#endif
+
 module Application
     ( makeApplication
     , getApplicationDev
@@ -32,8 +36,8 @@ import Yesod.Core.Types (loggerSet, Logger (Logger))
 
 #ifndef DEVELOPMENT
 -- stuff for Heroku config parsing
-import Control.Arrow (second)
 import qualified Web.Heroku
+import Data.Text.Read (decimal)
 #endif
 
 -- Import all relevant handler modules here.
@@ -125,7 +129,12 @@ canonicalizeKey ("dbname", val) = ("database", val)
 canonicalizeKey pair = pair
 
 toMapping :: [(Text, Text)] -> Aeson.Value
-toMapping xs = Aeson.object $ map (second Aeson.String) xs
+toMapping xs = Aeson.object $ map mungeValue xs
+  where
+    mungeValue :: (Text, Text) -> (Text, Aeson.Value)
+    mungeValue ("port", decimal -> Right (port, "")) = ("port", Aeson.Number $ fromInteger port)
+    mungeValue ("port", badPort) = error $ "Bad Heroku postgres port: " ++ show badPort
+    mungeValue (key, value) = (key, Aeson.String value)
 #endif
 
 combineMappings :: Aeson.Value -> Aeson.Value -> Aeson.Value
