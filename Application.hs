@@ -1,7 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-#ifndef DEVELOPMENT
 {-# LANGUAGE ViewPatterns #-} -- for Heroku config parsing
-#endif
 
 module Application
     ( makeApplication
@@ -34,11 +32,9 @@ import qualified Data.Aeson.Types as Aeson.Types
 import qualified Data.HashMap.Strict as HashMap
 import Yesod.Core.Types (loggerSet, Logger (Logger))
 
-#ifndef DEVELOPMENT
 -- stuff for Heroku config parsing
 import qualified Web.Heroku
 import Data.Text.Read (decimal)
-#endif
 
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
@@ -123,7 +119,6 @@ getApplicationDev =
         }
 
 
-#ifndef DEVELOPMENT
 canonicalizeKey :: (Text, val) -> (Text, val)
 canonicalizeKey ("dbname", val) = ("database", val)
 canonicalizeKey pair = pair
@@ -135,17 +130,12 @@ toMapping xs = Aeson.object $ map mungeValue xs
     mungeValue ("port", decimal -> Right (port, "")) = ("port", Aeson.Number $ fromInteger port)
     mungeValue ("port", badPort) = error $ "Bad Heroku postgres port: " ++ show badPort
     mungeValue (key, value) = (key, Aeson.String value)
-#endif
 
 combineMappings :: Aeson.Value -> Aeson.Value -> Aeson.Value
 combineMappings (Aeson.Object m1) (Aeson.Object m2) = Aeson.Object $ HashMap.union m1 m2
 combineMappings _ _ = error "not a mapping!"
 
 loadHerokuConfig :: AppConfig DefaultEnv Extra -> IO Aeson.Value
-#ifdef DEVELOPMENT
-loadHerokuConfig _ = return Aeson.Types.emptyObject
-#else
 loadHerokuConfig conf
   | extraIsHeroku (appExtra conf) = Web.Heroku.dbConnParams >>= return . toMapping . map canonicalizeKey
   | otherwise = return Aeson.Types.emptyObject
-#endif
