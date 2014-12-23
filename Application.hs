@@ -84,8 +84,7 @@ makeFoundation :: AppConfig DefaultEnv Extra -> IO App
 makeFoundation conf = do
     manager <- newManager
     s <- staticSite
-    heroku <- Just <$> loadHerokuConfig conf
-    (dbconf, p) <- makeDatabasePool (appEnv conf) heroku
+    (dbconf, p) <- makeDatabasePool conf
 
     loggerSet' <- newStdoutLoggerSet defaultBufSize
     (getter, _) <- clockDateCacher
@@ -100,11 +99,12 @@ makeFoundation conf = do
 
     return foundation
 
-makeDatabasePool :: DefaultEnv -> Maybe Aeson.Value
+makeDatabasePool :: AppConfig DefaultEnv Extra
   -> IO (Settings.PersistConfig, ConnectionPool)
-makeDatabasePool env mHeroku = do
-  dbconf <- withYamlEnvironment "config/postgresql.yml" env
-            (Database.Persist.loadConfig . maybe id combineMappings mHeroku) >>=
+makeDatabasePool conf = do
+  heroku <- loadHerokuConfig conf
+  dbconf <- withYamlEnvironment "config/postgresql.yml" (appEnv conf)
+            (Database.Persist.loadConfig . combineMappings heroku) >>=
             Database.Persist.applyEnv
   pool <- Database.Persist.createPoolConfig (dbconf :: Settings.PersistConfig)
   return (dbconf, pool)

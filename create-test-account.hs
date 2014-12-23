@@ -16,12 +16,14 @@ import qualified Yesod.Default.Config as Y
 
 import Application (makeDatabasePool)
 import Model
+import Settings (parseExtra)
 import Types
 
 main :: IO ()
 main = do
     (env, email, plainPassword) <- parseArgs
-    (dbconf, pool) <- makeDatabasePool env Nothing
+    conf <- Y.loadConfig (Y.configSettings env) { Y.csParseExtra = parseExtra }
+    (dbconf, pool) <- makeDatabasePool conf
     saltedPassword <- AuthEmail.saltPass plainPassword
     run $ DB.runPool dbconf (createTestUser email saltedPassword) pool
   where
