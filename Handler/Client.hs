@@ -96,10 +96,10 @@ stateDeclJavascript state = [julius|
         ^{foldMap resolveDecl resolves}
         hibiUi: function () { return 'new'; }
       },|]
-  resolveDecl (key, resolve) = [julius|#{key}: ^{resolve},|]
+  resolveDecl (key, resolve) = [julius|#{toJSON key}: ^{resolve},|]
 
 statesDeclJavascript :: (Route App -> [(Text, Text)] -> Text) -> Text -> Javascript
 statesDeclJavascript render stateProvider = header <> foldMap decl states
   where
-    header = [julius|#{stateProvider}|] render
+    header = [julius|#{toJSON stateProvider}|] render -- TODO probably wrong
     decl = flip stateDeclJavascript render

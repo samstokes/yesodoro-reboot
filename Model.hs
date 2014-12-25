@@ -96,7 +96,7 @@ instance ToMarkup PersistValue where
   toMarkup _ = undefined
 
 instance ToJavascript PersistValue where
-  toJavascript (PersistInt64 i) = toJavascript $ show i
+  toJavascript (PersistInt64 i) = toJavascript $ toJSON i
   toJavascript _ = undefined
 
 
