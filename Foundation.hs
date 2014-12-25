@@ -268,6 +268,8 @@ instance YesodJquery App where
 instance YesodPersist App where
     type YesodPersistBackend App = SqlPersist
     runDB = defaultRunDB persistConfig connPool
+instance YesodPersistRunner App where
+    getDBRunner = defaultGetDBRunner connPool
 
 
 defaultTimeZone :: TimeZone
