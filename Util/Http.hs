@@ -31,4 +31,4 @@ withEtag getEtag handler = do
   then
     sendResponseStatus HTTP.notModified304 $ RepPlain $ toContent T.empty
   else
-    setHeader "ETag" (etag) >> handler
+    addHeader "ETag" (etag) >> handler

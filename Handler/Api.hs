@@ -42,7 +42,7 @@ getApiExtTasksForSourceR source = do
 setLocation :: Route App -> Handler ()
 setLocation url = do
   r <- getUrlRender
-  setHeader "Location" $ r url
+  addHeader "Location" $ r url
 
 
 data AuthError = AuthCredentialsNotSupplied
@@ -62,7 +62,7 @@ httpBasicAuth = do
       Right userId -> return userId
 
       Left AuthCredentialsNotSupplied -> do
-        setHeader "WWW-Authenticate" $ T.concat ["Basic Realm=\"", root, "\""]
+        addHeader "WWW-Authenticate" $ T.concat ["Basic Realm=\"", root, "\""]
         permissionDenied "Authentication required"
       Left (AuthMalformedCredentials err) ->
         sendResponseStatus HTTP.badRequest400 $ RepPlain $ toContent $ T.pack err
