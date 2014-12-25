@@ -5,8 +5,6 @@ Bugs
 	Fix background resizing
 	Check box sizing on non-retina screens
 Launch blockers
-	Finish porting to new Yesod
-		Clean up codebase
 	Landing page
 	Login UI
 	Handle session expiry properly
@@ -17,6 +15,7 @@ Launch blockers
 	Jigger routes around (no /new-design)
 Post-launch
 	GHC 7.8
+	Latest Yesod
 	Replace n+1 query with join for task details
 	uncomplete
 	Pause?
