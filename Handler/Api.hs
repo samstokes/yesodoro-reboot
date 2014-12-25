@@ -3,7 +3,7 @@ module Handler.Api where
 import Import
 import Util
 
-import Control.Monad.Trans.Error
+import Control.Monad.Trans.Except
 import Control.Monad.Trans.Maybe
 import qualified Data.Text as T
 import qualified Network.HTTP.Types as HTTP
@@ -52,14 +52,11 @@ data AuthError = AuthCredentialsNotSupplied
                | AuthErrorOther String
   deriving (Show)
 
-instance Error AuthError where
-  strMsg = AuthErrorOther
-
 
 httpBasicAuth :: Handler UserId
 httpBasicAuth = do
     root <- (appRoot . settings) <$> getYesod
-    auth <- runErrorT handleBasicAuth
+    auth <- runExceptT handleBasicAuth
     $logDebug $ T.pack $ "HTTP Basic auth: " ++ show auth
     case auth of
       Right userId -> return userId
@@ -75,17 +72,17 @@ httpBasicAuth = do
         $logWarn $ T.pack $ "unexpected auth error: " ++ err
         unauthorized "credentials not recognised"
   where
-  handleBasicAuth :: ErrorT AuthError Handler UserId
+  handleBasicAuth :: ExceptT AuthError Handler UserId
   handleBasicAuth = do
     request <- lift waiRequest
-    auth <- toErrorT $ maybeToEither AuthCredentialsNotSupplied $ lookup "Authorization" (requestHeaders request)
-    (email, clearPassword) <- toErrorT $ mapLeft AuthMalformedCredentials $ parseAuthorizationHeader auth
-    Entity _ email' <- ErrorT $ fmap (maybeToEither AuthCredentialsNotRecognised) $ runDB $ getBy $ UniqueEmail email
-    userId <- toErrorT $ maybeToEither (AuthErrorOther "email has no associated user account!") $ emailUser email'
-    user <- ErrorT $ fmap (maybeToEither $ AuthErrorOther "user account missing!") $ runDB $ get userId
+    auth <- toExceptT $ maybeToEither AuthCredentialsNotSupplied $ lookup "Authorization" (requestHeaders request)
+    (email, clearPassword) <- toExceptT $ mapLeft AuthMalformedCredentials $ parseAuthorizationHeader auth
+    Entity _ email' <- ExceptT $ fmap (maybeToEither AuthCredentialsNotRecognised) $ runDB $ getBy $ UniqueEmail email
+    userId <- toExceptT $ maybeToEither (AuthErrorOther "email has no associated user account!") $ emailUser email'
+    user <- ExceptT $ fmap (maybeToEither $ AuthErrorOther "user account missing!") $ runDB $ get userId
     if maybe False (isValidPass clearPassword) (userPassword user)
       then return userId
-      else throwError AuthCredentialsInvalid
+      else throwE AuthCredentialsInvalid
 
 
 unauthorized :: String -> Handler a

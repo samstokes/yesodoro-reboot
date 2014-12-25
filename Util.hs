@@ -7,7 +7,7 @@ import Control.Applicative
 import Control.Arrow (Arrow, (&&&), (>>>), first, second)
 import Control.Monad (foldM, unless)
 import Control.Monad.IO.Class (MonadIO, liftIO)
-import Control.Monad.Trans.Error
+import Control.Monad.Trans.Except
 import Control.Monad.Trans.Maybe
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as B
@@ -166,8 +166,8 @@ toMaybeT :: Monad m => Maybe a -> MaybeT m a
 toMaybeT = MaybeT . return
 
 
-toErrorT :: (Error e, Monad m) => Either e a -> ErrorT e m a
-toErrorT = ErrorT . return
+toExceptT :: Monad m => Either e a -> ExceptT e m a
+toExceptT = ExceptT . return
 
 
 type BasicAuthCredentials = (Text, Text)
