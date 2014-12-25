@@ -13,6 +13,7 @@ module Foundation
     , newLayout
     , appTitle
     , module Settings
+    , module Types
     , module Model
     , module Model.Note
     , module Model.Plan
@@ -35,6 +36,7 @@ import Settings.Development
 import Settings.StaticFiles
 import Database.Persist.Sql (SqlPersist)
 import Settings (widgetFile, Extra (..))
+import Types
 import Model
 import Model.Note
 import Model.Plan

@@ -27,6 +27,7 @@ library
     exposed-modules: Application
                      Foundation
                      Import
+                     Types
                      Model
                      Model.Note
                      Model.Plan
