@@ -12,3 +12,4 @@ node_modules
 coverage
 tmp
 cabal.sandbox.config
+yesod-devel
