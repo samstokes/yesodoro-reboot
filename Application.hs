@@ -11,18 +11,23 @@ import Yesod.Auth
 import Yesod.Default.Config
 import Yesod.Default.Main
 import Yesod.Default.Handlers
-import Yesod.Logger (Logger, logBS, toProduction, flushLogger)
 import qualified Network.Wai.Middleware.Gzip as GZ
-import Network.Wai.Middleware.RequestLogger (logCallback, logCallbackDev)
+import Network.Wai.Middleware.RequestLogger
+    ( mkRequestLogger, outputFormat, OutputFormat (..), IPAddrSource (..), destination
+    )
 import Network.Wai.Middleware.MethodOverride (methodOverride)
-import qualified Database.Persist.Store
-import Database.Persist.GenericSql (runMigration)
-import Network.HTTP.Conduit (newManager, def)
-import Control.Concurrent (forkIO, threadDelay)
-import Control.Monad (forever)
+import qualified Network.Wai.Middleware.RequestLogger as RequestLogger
+import qualified Database.Persist
+import Database.Persist.Sql (runMigration)
+import Network.HTTP.Client.Conduit (newManager)
+import Control.Monad.Logger (runLoggingT)
+import System.Log.FastLogger (newStdoutLoggerSet, defaultBufSize)
+import Network.Wai.Logger (clockDateCacher)
+import Data.Default (def)
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Types as Aeson.Types
 import qualified Data.HashMap.Strict as HashMap
+import Yesod.Core.Types (loggerSet, Logger (Logger))
 
 #ifndef DEVELOPMENT
 -- stuff for Heroku config parsing
@@ -52,43 +57,57 @@ instance YesodDispatch Client App where
 -- performs initialization and creates a WAI application. This is also the
 -- place to put your migrate statements to have automatic database
 -- migrations handled by Yesod.
-makeApplication :: AppConfig DefaultEnv Extra -> Logger -> IO Application
-makeApplication conf logger = do
-    foundation <- makeFoundation conf setLogger
+makeApplication :: AppConfig DefaultEnv Extra -> IO (Application, LogFunc)
+makeApplication conf = do
+    foundation <- makeFoundation conf
+
+    -- Initialize the logging middleware
+    logWare <- mkRequestLogger def
+        { outputFormat =
+            if development
+                then Detailed True
+                else Apache FromSocket
+        , destination = RequestLogger.Logger $ loggerSet $ getLogger foundation
+        }
+
     app <- toWaiAppPlain foundation
-    return $ foldr ($) app middlewares
-  where
-    middlewares = [
+    let logFunc = messageLoggerSource foundation (getLogger foundation)
+    return (foldr ($) app [
         methodOverride
       , logWare
       , GZ.gzip GZ.def
-      ]
-    setLogger = if development then logger else toProduction logger
-    logWare   = if development then logCallbackDev (logBS setLogger)
-                               else logCallback    (logBS setLogger)
+      ],
+      logFunc)
 
-makeFoundation :: AppConfig DefaultEnv Extra -> Logger -> IO App
-makeFoundation conf setLogger = do
-    _ <- forkIO $ forever $ do
-        threadDelay $ 1000 * 1000
-        flushLogger setLogger
-
-    manager <- newManager def
+makeFoundation :: AppConfig DefaultEnv Extra -> IO App
+makeFoundation conf = do
+    manager <- newManager
     s <- staticSite
     heroku <- loadHerokuConfig conf
     dbconf <- withYamlEnvironment "config/postgresql.yml" (appEnv conf)
-              (Database.Persist.Store.loadConfig . combineMappings heroku) >>=
-              Database.Persist.Store.applyEnv
-    p <- Database.Persist.Store.createPoolConfig (dbconf :: Settings.PersistConfig)
-    Database.Persist.Store.runPool dbconf (runMigration migrateAll) p
-    return $ App conf setLogger s p manager dbconf Client
+              (Database.Persist.loadConfig . combineMappings heroku) >>=
+              Database.Persist.applyEnv
+    p <- Database.Persist.createPoolConfig (dbconf :: Settings.PersistConfig)
+
+    loggerSet' <- newStdoutLoggerSet defaultBufSize
+    (getter, _) <- clockDateCacher
+
+    let logger = Yesod.Core.Types.Logger loggerSet' getter
+        foundation = App conf logger s p manager dbconf Client
+
+    -- Perform database migration using our application's logging settings.
+    runLoggingT
+        (Database.Persist.runPool dbconf (runMigration migrateAll) p)
+        (messageLoggerSource foundation logger)
+
+    return foundation
 
 -- for yesod devel
 getApplicationDev :: IO (Int, Application)
 getApplicationDev =
-    defaultDevelApp loader makeApplication
+    defaultDevelApp loader (fmap fst . makeApplication)
   where
-    loader = loadConfig (configSettings Development)
+    loader = Yesod.Default.Config.loadConfig (configSettings Development)
         { csParseExtra = parseExtra
         }
 

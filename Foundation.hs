@@ -24,16 +24,16 @@ import Yesod.Static
 import Yesod.Auth
 import Yesod.Auth.Email
 import Yesod.Auth.GoogleEmail
+import Yesod.Core.Types (Logger)
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
 import Yesod.Form.Jquery (YesodJquery(..))
-import Yesod.Logger (Logger, logMsg, formatLogText, logLazyText)
 import Network.HTTP.Conduit (Manager)
 import qualified Settings
-import qualified Database.Persist.Store
+import qualified Database.Persist
 import Settings.Development
 import Settings.StaticFiles
-import Database.Persist.GenericSql
+import Database.Persist.Sql (SqlPersist)
 import Settings (widgetFile, Extra (..))
 import Model
 import Model.Note
@@ -59,7 +59,7 @@ data App = App
     { settings :: AppConfig DefaultEnv Extra
     , getLogger :: Logger
     , getStatic :: Static -- ^ Settings for static file serving.
-    , connPool :: Database.Persist.Store.PersistConfigPool Settings.PersistConfig -- ^ Database connection pool.
+    , connPool :: Database.Persist.PersistConfigPool Settings.PersistConfig -- ^ Database connection pool.
     , httpManager :: Manager
     , persistConfig :: Settings.PersistConfig
     , getClient :: Client
@@ -126,9 +126,6 @@ instance Yesod App where
 
     -- The page to be redirected to when authentication is required.
     authRoute _ = Just $ AuthR LoginR
-
-    messageLogger y loc level msg =
-      formatLogText (getLogger y) loc level msg >>= logMsg (getLogger y)
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
@@ -258,12 +255,7 @@ instance YesodJquery App where
 -- How to run database actions.
 instance YesodPersist App where
     type YesodPersistBackend App = SqlPersist
-    runDB f = do
-        master <- getYesod
-        Database.Persist.Store.runPool
-            (persistConfig master)
-            f
-            (connPool master)
+    runDB = defaultRunDB persistConfig connPool
 
 
 defaultTimeZone :: TimeZone
