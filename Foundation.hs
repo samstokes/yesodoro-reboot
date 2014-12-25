@@ -47,7 +47,7 @@ import Text.Jasmine (minifym)
 import Web.ClientSession (getKey)
 import Web.Cookie (SetCookie(..))
 import Text.Hamlet (hamletFile)
-import Text.Shakespeare.Text (stext)
+import Text.Shakespeare.Text (st)
 import Data.Text (Text, isPrefixOf)
 import Data.Time (TimeZone(..))
 import Util
@@ -320,7 +320,7 @@ instance YesodAuthEmail App where
         y <- getYesod
         -- Just log the verification URL for now, rather than emailing it...
         -- this is insecure and user-unfriendly, but only used in dev
-        liftIO $ logLazyText (getLogger y) [stext|
+        $logInfo [st|
 Hello #{email}!
 Please go to #{verurl}.
 |]
