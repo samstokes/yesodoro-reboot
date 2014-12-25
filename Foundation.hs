@@ -360,3 +360,4 @@ Please go to #{verurl}.
                 , emailCredsEmail = email
                 }
     getEmail = runDB . fmap (fmap emailEmail) . get
+    afterPasswordRoute _ = HomeR
