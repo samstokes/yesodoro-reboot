@@ -10,16 +10,14 @@ import Types
 import Prelude
 import Yesod
 
-import Control.Applicative ((<$>), (<*>))
+import Control.Applicative (Applicative, (<$>), (<*>))
 import Control.Monad ((>=>))
 import Data.Aeson ((.:?))
 import Data.Text (Text)
-import Data.Time (Day, TimeZone, UTCTime)
+import Data.Time (Day, NominalDiffTime, TimeZone, UTCTime)
 import Data.Typeable (Typeable)
 import Database.Persist.Quasi (lowerCaseSettings)
-import Database.Persist.GenericSql (SqlPersist)
-import Database.Persist.Store (PersistValue(..), deleteCascade)
-import Control.Monad.IO.Class (MonadIO)
+import Database.Persist.Sql (SqlPersistT)
 import Data.Maybe (fromMaybe)
 import Text.Blaze (ToMarkup, toMarkup)
 import Text.Julius (ToJavascript, toJavascript)
@@ -30,7 +28,7 @@ import Util
 -- You can find more information on persistent and how to declare entities
 -- at:
 -- http://www.yesodweb.com/book/persistent/
-share [mkPersist sqlSettings, mkMigrate "migrateAll", mkDeleteCascade]
+share [mkPersist sqlOnlySettings, mkMigrate "migrateAll", mkDeleteCascade sqlOnlySettings]
     $(persistFileWith lowerCaseSettings "config/models")
 
 
@@ -103,7 +101,7 @@ instance ToJavascript PersistValue where
 data TaskSet = TasksToday | TasksPostponed | TasksDoneSince { tasksDoneHorizon :: UTCTime } | TasksAllSince { tasksAllHorizon :: UTCTime }
 
 
-taskSetQuery :: (MonadIO m, PersistQuery SqlPersist m) => TaskSet -> Entity User -> SqlPersist m [Entity Task]
+taskSetQuery :: (Applicative m, MonadIO m, PersistQuery (SqlPersistT m)) => TaskSet -> Entity User -> SqlPersistT m [Entity Task]
 taskSetQuery TasksToday (Entity userId user) = filterTodo <*> selectUserTasks userId [TaskDoneAt ==. Nothing, TaskActive ==. True] [Asc TaskOrder]
   -- for now, filter in code - push into SQL once we can do more complex queries
   where filterTodo = do
@@ -142,7 +140,7 @@ instance FromJSON NewExtTask where
   parseJSON v = fail $ "can't parse external task link: " ++ show v
 
 
-selectUserTasks :: PersistQuery SqlPersist m => UserId -> [Filter Task] -> [SelectOpt Task] -> SqlPersist m [Entity Task]
+selectUserTasks :: PersistQuery (SqlPersistT m) => UserId -> [Filter Task] -> [SelectOpt Task] -> SqlPersistT m [Entity Task]
 selectUserTasks userId conditions = selectList (belongsToUser : conditions)
   where belongsToUser = TaskUser ==. userId
 
@@ -211,7 +209,7 @@ ownedTask userId (OwnedTask
   }
 
 
-createTask :: PersistStore SqlPersist m => UserId -> UTCTime -> Int -> NewTask -> SqlPersist m (Entity Task)
+createTask :: (Functor m, PersistStore (SqlPersistT m)) => UserId -> UTCTime -> Int -> NewTask -> SqlPersistT m (Entity Task)
 createTask uid scheduledFor order (NewTask title schedule mExt) = do
   mExtId <- maybeM Nothing (fmap Just . insert) $ newExtTask uid <$> mExt
   let task = Task {
@@ -239,19 +237,19 @@ newExtTask uid (NewExtTask extId sourceName url status) = ExtTask {
 
 
 class GetExtTask a where
-  getExtTask :: PersistUnique SqlPersist m => UserId -> a -> SqlPersist m (Maybe (Entity ExtTask))
+  getExtTask :: PersistUnique (SqlPersistT m) => UserId -> a -> SqlPersistT m (Maybe (Entity ExtTask))
 
 instance GetExtTask NewExtTask where
   getExtTask userId (NewExtTask extId source _ _) = getBy $ UniqueExtTaskSourceId userId source extId
 
 
-syncExtTask :: (PersistQuery SqlPersist m, PersistUnique SqlPersist m) => UserId -> NewExtTask -> SqlPersist m Bool
+syncExtTask :: (Functor m, PersistQuery (SqlPersistT m), PersistUnique (SqlPersistT m)) => UserId -> NewExtTask -> SqlPersistT m Bool
 syncExtTask userId extTask = do
   existingExtTaskId <- fmap entityKey <$> getExtTask userId extTask
   maybeM False (fmap fst . updateExtTask extTask) existingExtTaskId
 
 
-updateExtTask :: PersistQuery SqlPersist m => NewExtTask -> ExtTaskId -> SqlPersist m (Bool, Maybe ExtTask)
+updateExtTask :: (Functor m, PersistQuery (SqlPersistT m)) => NewExtTask -> ExtTaskId -> SqlPersistT m (Bool, Maybe ExtTask)
 updateExtTask newExt extTaskId = do
     mExtTask <- get extTaskId
     case mExtTask of
@@ -268,7 +266,7 @@ updateExtTask newExt extTaskId = do
       | otherwise = return False
 
 
-createTaskAtBottom :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> NewTask -> SqlPersist m (Entity Task)
+createTaskAtBottom :: (Functor m, MonadIO m, PersistQuery (SqlPersistT m)) => UserId -> NewTask -> SqlPersistT m (Entity Task)
 createTaskAtBottom userId task = do
   time <- now
   maybeLastTask <- selectFirst [TaskUser ==. userId] [Desc TaskOrder]
@@ -276,7 +274,7 @@ createTaskAtBottom userId task = do
   createTask userId time (succ lastOrder) task
 
 
-findTaskByExtTask :: (PersistUnique SqlPersist m, PersistQuery SqlPersist m, GetExtTask extTask) => UserId -> extTask -> SqlPersist m (Maybe (Entity Task))
+findTaskByExtTask :: (PersistUnique (SqlPersistT m), PersistQuery (SqlPersistT m), GetExtTask extTask) => UserId -> extTask -> SqlPersistT m (Maybe (Entity Task))
 findTaskByExtTask userId extTask = do
   mExtTask <- getExtTask userId extTask
   case mExtTask of
@@ -284,14 +282,14 @@ findTaskByExtTask userId extTask = do
     Nothing -> return Nothing
 
 
-completeTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> Entity Task -> SqlPersist m (Maybe (Entity Task), Maybe (Entity Task))
+completeTask :: (Functor m, MonadIO m, PersistQuery (SqlPersistT m)) => TimeZone -> Entity Task -> SqlPersistT m (Maybe (Entity Task), Maybe (Entity Task))
 completeTask tz taskEntity = do
     time <- now
     maybeNextTime <- recurTask tz time taskEntity
     completed <- updateReturningNew (entityKey taskEntity) [TaskDoneAt =. Just time]
     return (completed, maybeNextTime)
 
-restartTask :: TaskId -> PersistQuery SqlPersist m => SqlPersist m (Maybe (Entity Task))
+restartTask :: (Functor m, PersistQuery (SqlPersistT m)) => TaskId -> SqlPersistT m (Maybe (Entity Task))
 restartTask = flip updateReturningNew [TaskDoneAt =. Nothing]
 
 
@@ -309,7 +307,7 @@ cloneTask order task = Task {
   }
 
 
-duplicateTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> UTCTime -> Entity Task -> SqlPersist m TaskId
+duplicateTask :: (Functor m, MonadIO m, PersistQuery (SqlPersistT m)) => TimeZone -> UTCTime -> Entity Task -> SqlPersistT m TaskId
 duplicateTask tz scheduledFor taskEntity = do
     let (taskId, task) = (entityKey taskEntity, entityVal taskEntity)
 
@@ -326,26 +324,26 @@ duplicateTask tz scheduledFor taskEntity = do
 
     return dupeTaskId
   where
-    copyFirstEstimate :: PersistQuery SqlPersist m => TaskId -> TaskId -> SqlPersist m [EstimateId]
+    copyFirstEstimate :: (Functor m, PersistQuery (SqlPersistT m)) => TaskId -> TaskId -> SqlPersistT m [EstimateId]
     copyFirstEstimate taskId newTaskId = do
       firstEstimate <- take 1 <$> taskEstimates taskId
       mapM (copyEstimate newTaskId . entityVal) firstEstimate
-    copyEstimate :: PersistQuery SqlPersist m => TaskId -> Estimate -> SqlPersist m EstimateId
+    copyEstimate :: PersistQuery (SqlPersistT m) => TaskId -> Estimate -> SqlPersistT m EstimateId
     copyEstimate newTaskId (Estimate _ pomos) = insert $ Estimate newTaskId pomos
 
 
-deleteTask :: PersistQuery SqlPersist m => Entity Task -> SqlPersist m ()
+deleteTask :: PersistQuery (SqlPersistT m) => Entity Task -> SqlPersistT m ()
 deleteTask (Entity taskId task) = do
   deleteCascade taskId
   maybeM () delete $ taskExtTask task
 
 
-recurTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> UTCTime -> Entity Task -> SqlPersist m (Maybe (Entity Task))
+recurTask :: (Functor m, MonadIO m, PersistQuery (SqlPersistT m)) => TimeZone -> UTCTime -> Entity Task -> SqlPersistT m (Maybe (Entity Task))
 recurTask tz time taskEntity = do
     let recurrence = scheduleRecurrence $ taskSchedule (entityVal taskEntity)
     maybe (return Nothing) (applyRecurrence >=> return . Just) recurrence
   where
-    applyRecurrence :: (MonadIO m, PersistQuery SqlPersist m) => NominalDiffTime -> SqlPersist m (Entity Task)
+    applyRecurrence :: (Functor m, MonadIO m, PersistQuery (SqlPersistT m)) => NominalDiffTime -> SqlPersistT m (Entity Task)
     applyRecurrence recurrence = do
       newTaskId <- duplicateTask tz time taskEntity
       mNewRecurrence <- postponeTask recurrence newTaskId
@@ -370,7 +368,7 @@ instance FromJSON TaskEdit where
   parseJSON v = fail $ "can't parse task edit: " ++ show v
 
 
-updateTask :: (MonadIO m, PersistQuery SqlPersist m) => TimeZone -> TaskEdit -> TaskId -> SqlPersist m (Bool, Maybe (Entity Task))
+updateTask :: (Functor m, MonadIO m, PersistQuery (SqlPersistT m)) => TimeZone -> TaskEdit -> TaskId -> SqlPersistT m (Bool, Maybe (Entity Task))
 updateTask tz edit taskId = do
     mtask <- get taskId
     case mtask of
@@ -390,7 +388,7 @@ updateTask tz edit taskId = do
 
 data Direction = Up | Down deriving (Show, Enum, Bounded)
 
-nextTask :: (MonadIO m, PersistQuery SqlPersist m) => Direction -> TimeZone -> Task -> SqlPersist m (Maybe (Entity Task))
+nextTask :: (MonadIO m, PersistQuery (SqlPersistT m)) => Direction -> TimeZone -> Task -> SqlPersistT m (Maybe (Entity Task))
 nextTask direction tz task = do
   endOfDay <- liftIO $ endOfToday tz
   selectFirst
@@ -408,7 +406,7 @@ nextTask direction tz task = do
     scheduledForConstraint endOfDay | taskScheduledFor task <= endOfDay = (<=. endOfDay)
                                     | otherwise                           = (>. endOfDay)
 
-reorderTask :: (MonadIO m, PersistQuery SqlPersist m) => Direction -> TimeZone -> (TaskId, Task) -> SqlPersist m (TaskId, Task)
+reorderTask :: (MonadIO m, PersistQuery (SqlPersistT m)) => Direction -> TimeZone -> (TaskId, Task) -> SqlPersistT m (TaskId, Task)
 reorderTask direction tz (taskId, task) = do
   maybeNext <- nextTask direction tz task
   case maybeNext of
@@ -420,7 +418,7 @@ reorderTask direction tz (taskId, task) = do
       return (taskId, task { taskOrder = taskOrder next })
 
 
-reorderTaskN :: (MonadIO m, PersistQuery SqlPersist m) => Int -> TimeZone -> (TaskId, Task) -> SqlPersist m Bool
+reorderTaskN :: (MonadIO m, PersistQuery (SqlPersistT m)) => Int -> TimeZone -> (TaskId, Task) -> SqlPersistT m Bool
 reorderTaskN delta tz task
   | delta > 0 = foldTimesM delta (reorder Down) task >> return True
   | delta < 0 = foldTimesM (-delta) (reorder Up) task >> return True
@@ -440,37 +438,37 @@ taskScheduledForDay :: TimeZone -> Task -> Day
 taskScheduledForDay tz = utcToLocalDay tz . taskScheduledFor
 
 
-taskEstimates :: PersistQuery SqlPersist m => TaskId -> SqlPersist m [Entity Estimate]
+taskEstimates :: PersistQuery (SqlPersistT m) => TaskId -> SqlPersistT m [Entity Estimate]
 taskEstimates taskId = selectList [EstimateTask ==. taskId] []
 
 estimateOptions :: [Int]
 estimateOptions = 0 : [2 ^ x | x <- [0 .. 3] :: [Int]]
 
 
-postponeTask :: (MonadIO m, PersistQuery SqlPersist m) => NominalDiffTime -> TaskId -> SqlPersist m (Maybe (Entity Task))
+postponeTask :: (Functor m, MonadIO m, PersistQuery (SqlPersistT m)) => NominalDiffTime -> TaskId -> SqlPersistT m (Maybe (Entity Task))
 postponeTask postponement taskId = do
   postponed <- hence postponement
   updateReturningNew taskId [TaskScheduledFor =. postponed]
 
 
-unpostponeTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m (Maybe (Entity Task))
+unpostponeTask :: (Functor m, MonadIO m, PersistQuery (SqlPersistT m)) => TaskId -> SqlPersistT m (Maybe (Entity Task))
 unpostponeTask taskId = do
   time <- now
   updateReturningNew taskId [TaskScheduledFor =. time]
 
 
-pauseTask :: PersistQuery SqlPersist m => TaskId -> SqlPersist m (Maybe (Entity Task))
+pauseTask :: (Functor m, PersistQuery (SqlPersistT m)) => TaskId -> SqlPersistT m (Maybe (Entity Task))
 pauseTask taskId = updateReturningNew taskId [TaskActive =. False]
 
-unpauseTask :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> SqlPersist m (Maybe (Entity Task))
+unpauseTask :: (Functor m, MonadIO m, PersistQuery (SqlPersistT m)) => TaskId -> SqlPersistT m (Maybe (Entity Task))
 unpauseTask taskId = update taskId [TaskActive =. True] >> unpostponeTask taskId
 
 
-taskGetExtTask :: PersistStore SqlPersist m => Task -> SqlPersist m (Maybe ExtTask)
+taskGetExtTask :: PersistStore (SqlPersistT m) => Task -> SqlPersistT m (Maybe ExtTask)
 taskGetExtTask task = maybeM Nothing get $ taskExtTask task
 
 
-allExtTasksForSource :: PersistQuery SqlPersist m => UserId -> ExternalSourceName -> SqlPersist m [Entity ExtTask]
+allExtTasksForSource :: PersistQuery (SqlPersistT m) => UserId -> ExternalSourceName -> SqlPersistT m [Entity ExtTask]
 allExtTasksForSource userId source = selectList [
     ExtTaskUser ==. userId
   , ExtTaskExtSourceName ==. source
@@ -481,7 +479,7 @@ userFeatureSettings :: User -> Flags Feature
 userFeatureSettings = defaultMissing . userFeatures
 
 
-toggleUserFeature :: PersistQuery SqlPersist m => Feature -> Entity User -> SqlPersist m ()
+toggleUserFeature :: PersistQuery (SqlPersistT m) => Feature -> Entity User -> SqlPersistT m ()
 toggleUserFeature feature (Entity userId user) = do
   let features = toggleFlag feature $ userFeatures user
   update userId [UserFeatures =. features]

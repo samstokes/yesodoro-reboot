@@ -34,7 +34,7 @@ import qualified Settings
 import qualified Database.Persist
 import Settings.Development
 import Settings.StaticFiles
-import Database.Persist.Sql (SqlPersist)
+import Database.Persist.Sql (SqlPersistT)
 import Settings (widgetFile, Extra (..))
 import Types
 import Model
@@ -266,7 +266,7 @@ instance YesodJquery App where
 
 -- How to run database actions.
 instance YesodPersist App where
-    type YesodPersistBackend App = SqlPersist
+    type YesodPersistBackend App = SqlPersistT
     runDB = defaultRunDB persistConfig connPool
 instance YesodPersistRunner App where
     getDBRunner = defaultGetDBRunner connPool

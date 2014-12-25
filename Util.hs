@@ -19,8 +19,7 @@ import Data.Monoid (Monoid, mempty)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import Data.Time
-import Database.Persist (Entity(..), Key, PersistEntity, PersistEntityBackend, PersistQuery, get, update)
-import Database.Persist.Query.Internal (Update)
+import Database.Persist (Entity(..), Key, PersistEntity, PersistEntityBackend, PersistMonadBackend, PersistQuery, Update, get, update)
 import Text.Blaze (ToMarkup(..))
 
 
@@ -183,5 +182,5 @@ parseAuthorizationHeader auth = case B.splitAt (B.length "Basic ") auth of
   where colon = B.head ":" -- WTF
 
 
-updateReturningNew :: (PersistQuery b m, PersistEntity val, b ~ PersistEntityBackend val) => Key b val -> [Update val] -> b m (Maybe (Entity val))
+updateReturningNew :: (Functor m, PersistQuery m, PersistEntity val, PersistMonadBackend m ~ PersistEntityBackend val) => Key val -> [Update val] -> m (Maybe (Entity val))
 updateReturningNew key updates = update key updates >> fmap (Entity key) <$> get key

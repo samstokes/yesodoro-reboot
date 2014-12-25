@@ -10,16 +10,14 @@ import Prelude
 import Yesod
 
 import Control.Applicative
-import Control.Monad.IO.Class (MonadIO)
-import Data.Aeson.Types (FromJSON, ToJSON, (.:), parseJSON, toJSON)
 import Data.Text (Text)
 import Data.Time (UTCTime)
-import Database.Persist.GenericSql (SqlPersist)
+import Database.Persist.Sql (SqlPersistT)
 import Model
 import Util
 
 
-taskNotes :: PersistQuery SqlPersist m => [SelectOpt Note] -> TaskId -> SqlPersist m [Entity Note]
+taskNotes :: PersistQuery (SqlPersistT m) => [SelectOpt Note] -> TaskId -> SqlPersistT m [Entity Note]
 taskNotes opts taskId = selectList [NoteTask ==. taskId] opts
 
 
@@ -32,7 +30,7 @@ newNote taskId createdAt (NewNote body) = Note {
   , noteCreatedAt = createdAt
   }
 
-createNote :: (MonadIO m, PersistQuery SqlPersist m) => TaskId -> NewNote -> SqlPersist m (Entity Note)
+createNote :: (MonadIO m, PersistQuery (SqlPersistT m)) => TaskId -> NewNote -> SqlPersistT m (Entity Note)
 createNote taskId note = do
   time <- now
   let note' = newNote taskId time note
