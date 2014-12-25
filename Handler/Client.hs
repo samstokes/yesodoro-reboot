@@ -46,7 +46,7 @@ stateController StateTasksLater = Just "TasksCtrl"
 stateController StateTasksDone = Just "TasksCtrl"
 stateController _ = Nothing
 
-stateResolves :: State -> [(Text, t -> Javascript)]
+stateResolves :: State -> [(Text, (url -> [(Text, Text)] -> Text) -> Javascript)]
 stateResolves StateTasksToday = [
     ("tasks", [julius|function (Tasks) { return Tasks.today(); }|])
   ]
@@ -81,7 +81,7 @@ instance ToJSON State where
   toJSON = stateName
 
 
-stateDeclJavascript :: State -> (Route App -> [param] -> Text) -> Javascript
+stateDeclJavascript :: State -> (Route App -> [(Text, Text)] -> Text) -> Javascript
 stateDeclJavascript state = [julius|
     .state(#{toJSON state}, {
       url: '@{stateR state}?days',
@@ -98,7 +98,7 @@ stateDeclJavascript state = [julius|
       },|]
   resolveDecl (key, resolve) = [julius|#{key}: ^{resolve},|]
 
-statesDeclJavascript :: (Route App -> [param] -> Text) -> Text -> Javascript
+statesDeclJavascript :: (Route App -> [(Text, Text)] -> Text) -> Text -> Javascript
 statesDeclJavascript render stateProvider = header <> foldMap decl states
   where
     header = [julius|#{stateProvider}|] render
