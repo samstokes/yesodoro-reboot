@@ -3,7 +3,7 @@ module Handler.Notes where
 import Import
 import Util.Angular
 
-postTaskNotesR :: TaskId -> Handler RepJson
+{-postTaskNotesR :: TaskId -> Handler RepJson-}
 postTaskNotesR taskId = do
   _ <- authedTask taskId
   newNote <- parseJsonBody_ -- TODO error page is HTML, not friendly!

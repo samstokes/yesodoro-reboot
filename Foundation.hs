@@ -92,7 +92,7 @@ mkMessage "App" "messages" "en"
 -- for our application to be in scope. However, the handler functions
 -- usually require access to the AppRoute datatype. Therefore, we
 -- split these actions into two functions and place them in separate files.
-mkYesodSubData "Client" [] $(parseRoutesFile "config/routes-client")
+mkYesodSubData "Client" $(parseRoutesFile "config/routes-client")
 mkYesodData "App" $(parseRoutesFile "config/routes")
 
 
@@ -151,7 +151,7 @@ isSecure :: App -> Bool
 isSecure = isPrefixOf "https://" . appRoot . settings
 
 
-oldLayout :: GWidget sub App () -> GHandler sub App RepHtml
+oldLayout :: Widget -> Handler RepHtml
 oldLayout widget = do
   authed <- isJust <$> maybeAuthId
   when authed setXsrfCookie
@@ -177,7 +177,7 @@ oldLayout widget = do
   hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 
 
-newLayout :: GWidget sub App () -> GHandler sub App RepHtml
+newLayout :: Widget -> Handler RepHtml
 newLayout widget = do
   authed <- isJust <$> maybeAuthId
   when authed setXsrfCookie
@@ -201,15 +201,15 @@ newLayout widget = do
   hamletToRepHtml $(hamletFile "templates/new-layout-wrapper.hamlet")
 
 
-addDefaultLayoutCss :: GWidget sub App ()
+addDefaultLayoutCss :: Widget
 addDefaultLayoutCss = do
   $(widgetFile "normalize")
   addStylesheet $ StaticR css_bootstrap_css
 
 
-addThirdPartyJs :: GWidget sub App ()
+addThirdPartyJs :: Widget
 addThirdPartyJs = do
-  master <- lift getYesod
+  master <- getYesod
 
   addScriptEither $ urlJqueryJs master
   addScriptEither $ urlJqueryUiJs master
@@ -222,7 +222,7 @@ addThirdPartyJs = do
   addScript $ StaticR bower_components_ng_group_src_ngGroup_js
 
 
-addAppJs :: GWidget sub App ()
+addAppJs :: Widget
 addAppJs = do
   addScript $ StaticR js_lib_functionBindPolyfill_js
   addScript $ StaticR js_lib_util_js
@@ -256,7 +256,7 @@ addAppJs = do
   addScript $ StaticR js_app_filters_js
 
 
-appTitle :: GHandler sub App Text
+appTitle :: Handler Text
 appTitle = fmap (extraTitle . appExtra . settings) getYesod
 
 

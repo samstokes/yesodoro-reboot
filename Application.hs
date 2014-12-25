@@ -50,8 +50,8 @@ import Handler.Templates
 -- the comments there for more details.
 mkYesodDispatch "App" resourcesApp
 
-instance YesodDispatch Client App where
-  yesodDispatch = error "Dummy endpoint"
+instance (YesodDispatch site) => YesodSubDispatch Client (HandlerT site m) where
+  yesodSubDispatch = error "Dummy endpoint"
 
 -- This function allocates resources (such as a database connection pool),
 -- performs initialization and creates a WAI application. This is also the

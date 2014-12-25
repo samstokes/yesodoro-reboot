@@ -17,8 +17,8 @@ import Util
 getHomeR :: Handler RepHtml
 getHomeR = maybeAuthId >>= getHomeR' where
   getHomeR' :: Maybe UserId -> Handler RepHtml
-  getHomeR' Nothing = defaultLayout $ do
-      title <- lift appTitle
+  getHomeR' Nothing = appTitle >>= \title -> defaultLayout $ do
+      {-title <- lift appTitle-}
       setTitle $ toMarkup title
       $(widgetFile "homepage")
   getHomeR' (Just _) = redirect NewAppR
@@ -62,7 +62,7 @@ getTasksR = do
   title <- appTitle
   oldLayout $ do
     setTitle $ toMarkup title
-    addWidget $(widgetFile "tasks") where
+    $(widgetFile "tasks") where
 
 
 oneButton :: Text -> Text -> Route App -> Widget

@@ -13,10 +13,11 @@ import Control.Monad (unless)
 import Data.Aeson
 import Data.Default (def)
 import Data.Text.Encoding (decodeUtf8, encodeUtf8)
+import Data.Typeable (Typeable)
 import qualified Network.HTTP.Types as HTTP
 import Network.Wai (Request(..))
 import Web.Cookie (SetCookie(..))
-import Database.Persist.Store
+import Database.Persist
 import Yesod.Auth
 import Yesod.Core
 import Yesod.Form.Types (FormMessage(MsgCsrfWarning))
@@ -26,7 +27,7 @@ import Yesod.Persist
 import Util (passthru)
 
 
-setXsrfCookie :: GHandler s m ()
+setXsrfCookie :: MonadHandler m => m ()
 setXsrfCookie = do
     request <- getRequest
     let token = reqToken request
@@ -46,14 +47,14 @@ setXsrfCookie = do
     }
 
 
-validXsrfHeader :: GHandler s m Bool
+validXsrfHeader :: MonadHandler m => m Bool
 validXsrfHeader = do
   token <- fmap reqToken getRequest
   mSuppliedToken <- fmap (fmap decodeUtf8 . lookup "X-XSRF-Token" . requestHeaders) waiRequest
   return $ token == mSuppliedToken
 
 
-validateXsrfHeader :: RenderMessage m FormMessage => GHandler s m ()
+validateXsrfHeader :: (MonadHandler m, RenderMessage (HandlerSite m) FormMessage) => m ()
 validateXsrfHeader = do
   valid <- validXsrfHeader
   unless valid $ do
@@ -62,22 +63,23 @@ validateXsrfHeader = do
     sendResponseStatus HTTP.badRequest400 $ RepPlain $ toContent $ renderMessage m langs MsgCsrfWarning
 
 
-respondUnauthorized :: GHandler s m a
+respondUnauthorized :: MonadHandler m => m b
 respondUnauthorized = do
   errorJson <- jsonToRepJson $ object ["message" .= ("Please log in." :: String)]
   sendResponseStatus HTTP.unauthorized401 errorJson
 
 
-requireNgAuthId :: YesodAuth m => GHandler s m (AuthId m)
+requireNgAuthId :: YesodAuth site => HandlerT site IO (AuthId site)
 requireNgAuthId = maybeAuthId >>= maybe respondUnauthorized return >>= passthru validateXsrfHeader
 
 
 requireNgAuth ::
-  ( YesodPersist m
-  , YesodAuth m
+  ( YesodPersist site
+  , YesodAuth site
   , PersistEntity auth
-  , PersistStore (PersistEntityBackend auth) (GHandler s m)
-  , AuthId m ~ Key (PersistEntityBackend auth) auth
-  , YesodPersistBackend m ~ PersistEntityBackend auth
-  ) => GHandler s m (Entity auth)
+  , Typeable auth
+  , PersistStore (YesodPersistBackend site (HandlerT site IO))
+  , AuthId site ~ Key auth
+  , PersistMonadBackend (YesodPersistBackend site (HandlerT site IO)) ~ PersistEntityBackend auth
+  ) => HandlerT site IO (Entity auth)
 requireNgAuth = maybeAuth >>= maybe respondUnauthorized return >>= passthru validateXsrfHeader

@@ -11,7 +11,7 @@ import Network.Wai (requestHeaders)
 import Yesod.Auth.Email (isValidPass)
 import Yesod.Default.Config (AppConfig(..))
 
-postApiTasksR :: Handler RepJson
+{-postApiTasksR :: Handler RepJson-}
 postApiTasksR = do
   userId <- httpBasicAuth
   newTask <- parseJsonBody_ -- TODO error page is HTML, not friendly!
@@ -32,14 +32,14 @@ postApiTasksR = do
       sendResponseCreated $ TaskR taskId
 
 
-getApiExtTasksForSourceR :: ExternalSourceName -> Handler RepJson
+{-getApiExtTasksForSourceR :: ExternalSourceName -> Handler RepJson-}
 getApiExtTasksForSourceR source = do
   userId <- httpBasicAuth
   extTasks <- runDB $ allExtTasksForSource userId source
   jsonToRepJson $ map entityVal extTasks
 
 
-setLocation :: Route master -> GHandler sub master ()
+setLocation :: Route App -> Handler ()
 setLocation url = do
   r <- getUrlRender
   setHeader "Location" $ r url
@@ -88,5 +88,5 @@ httpBasicAuth = do
       else throwError AuthCredentialsInvalid
 
 
-unauthorized :: String -> GHandler sub master a
+unauthorized :: String -> Handler a
 unauthorized err = sendResponseStatus HTTP.unauthorized401 $ RepPlain $ toContent $ T.pack err

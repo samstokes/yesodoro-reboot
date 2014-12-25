@@ -20,7 +20,7 @@ postPlansR = do
   jsonToRepJson planEntity
 
 
-postCompletePlanR :: PlanId -> Handler RepJson
+postCompletePlanR :: PlanId -> Handler Value
 postCompletePlanR planId = do
   Entity _ plan <- authedPlan planId
   time <- now
@@ -28,7 +28,7 @@ postCompletePlanR planId = do
   jsonToRepJson $ Entity planId plan { planDoneAt = Just time }
 
 
-putPlanR :: PlanId -> Handler RepJson
+putPlanR :: PlanId -> Handler Value
 putPlanR planId = do
   _ <- authedPlan planId
   editedPlan <- parseJsonBody_ -- TODO error page is HTML, not friendly!
