@@ -113,6 +113,10 @@ library
                  , unordered-containers
                  , heroku
                  , cereal
+                 , exceptions
+                 , monad-logger
+                 , fast-logger
+                 , wai-logger
 
 executable         yesodoro-reboot
     if flag(library-only)
