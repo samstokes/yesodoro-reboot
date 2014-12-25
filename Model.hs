@@ -84,10 +84,10 @@ instance ToJSON ExtTask where
     ]
 
 
-instance ToMarkup (Key a b) where
+instance ToMarkup (KeyBackend a b) where
   toMarkup = toMarkup . unKey
 
-instance ToJavascript (Key a b) where
+instance ToJavascript (KeyBackend a b) where
   toJavascript = toJavascript . unKey
 
 
