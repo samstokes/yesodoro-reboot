@@ -6,7 +6,6 @@ module Foundation
     , resourcesApp
     , Handler
     , Widget
-    , Form
     , maybeAuth
     , requireAuth
     , putR, deleteR
@@ -101,8 +100,6 @@ putR = overrideMethodR "PUT"
 deleteR :: Route App -> (Route App, [(Text, Text)])
 deleteR = overrideMethodR "DELETE"
 
-
-type Form x = Html -> MForm App App (FormResult x, Widget)
 
 -- Please see the documentation for the Yesod typeclass. There are a number
 -- of settings which can be configured by overriding methods here.
