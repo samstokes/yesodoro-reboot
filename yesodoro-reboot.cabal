@@ -46,7 +46,6 @@ library
                      Util
                      Util.Http
                      Util.Angular
-                     Util.SessionBackend
                      Widget.Expandy
 
     if flag(dev) || flag(library-only)

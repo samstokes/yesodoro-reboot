@@ -45,13 +45,13 @@ import Control.Monad (join, when)
 import Data.Maybe (isJust)
 import Text.Jasmine (minifym)
 import Web.ClientSession (getKey)
+import Web.Cookie (SetCookie(..))
 import Text.Hamlet (hamletFile)
 import Text.Shakespeare.Text (stext)
-import Data.Text (Text)
+import Data.Text (Text, isPrefixOf)
 import Data.Time (TimeZone(..))
 import Util
 import Util.Angular
-import Util.SessionBackend
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -110,9 +110,15 @@ instance Yesod App where
 
     -- Store session data on the client in encrypted cookies,
     -- default session idle timeout is 120 minutes
-    makeSessionBackend _ = do
+    makeSessionBackend app = do
         key <- getKey "config/client_session_key.aes"
-        return . Just $ secureClientSessionBackend key 120
+        let timeout = 120 * 60
+        (getCachedDate, _closeDateCacher) <- clientSessionDateCacher timeout
+        let backend = clientSessionBackend key getCachedDate
+        let securify cookie = cookie { setCookieSecure = True }
+        return $ Just $ if isSecure app
+          then customizeSessionCookies securify backend
+          else backend
 
     defaultLayout = newLayout
 
@@ -139,6 +145,10 @@ instance Yesod App where
 
     -- Place Javascript at bottom of the body tag so the rest of the page loads first
     jsLoader _ = BottomOfHeadBlocking
+
+
+isSecure :: App -> Bool
+isSecure = isPrefixOf "https://" . appRoot . settings
 
 
 oldLayout :: GWidget sub App () -> GHandler sub App RepHtml
