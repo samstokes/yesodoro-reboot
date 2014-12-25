@@ -6,7 +6,6 @@ module Foundation
     , resourcesApp
     , Handler
     , Widget
-    , Form
     , maybeAuth
     , requireAuth
     , putR, deleteR
@@ -14,6 +13,7 @@ module Foundation
     , newLayout
     , appTitle
     , module Settings
+    , module Types
     , module Model
     , module Model.Note
     , module Model.Plan
@@ -25,17 +25,18 @@ import Yesod.Static
 import Yesod.Auth
 import Yesod.Auth.Email
 import Yesod.Auth.GoogleEmail
+import Yesod.Core.Types (Logger)
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
 import Yesod.Form.Jquery (YesodJquery(..))
-import Yesod.Logger (Logger, logMsg, formatLogText, logLazyText)
 import Network.HTTP.Conduit (Manager)
 import qualified Settings
-import qualified Database.Persist.Store
+import qualified Database.Persist
 import Settings.Development
 import Settings.StaticFiles
-import Database.Persist.GenericSql
+import Database.Persist.Sql (SqlPersistT)
 import Settings (widgetFile, Extra (..))
+import Types
 import Model
 import Model.Note
 import Model.Plan
@@ -44,13 +45,14 @@ import Control.Monad (join, when)
 import Data.Maybe (isJust)
 import Text.Jasmine (minifym)
 import Web.ClientSession (getKey)
+import Web.Cookie (SetCookie(..))
 import Text.Hamlet (hamletFile)
-import Text.Shakespeare.Text (stext)
-import Data.Text (Text)
+import Text.Shakespeare.Text (st)
+import Data.Text (Text, isPrefixOf)
 import Data.Time (TimeZone(..))
 import Util
 import Util.Angular
-import Util.SessionBackend
+import Util.HiddenAuthEmail
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -60,7 +62,7 @@ data App = App
     { settings :: AppConfig DefaultEnv Extra
     , getLogger :: Logger
     , getStatic :: Static -- ^ Settings for static file serving.
-    , connPool :: Database.Persist.Store.PersistConfigPool Settings.PersistConfig -- ^ Database connection pool.
+    , connPool :: Database.Persist.PersistConfigPool Settings.PersistConfig -- ^ Database connection pool.
     , httpManager :: Manager
     , persistConfig :: Settings.PersistConfig
     , getClient :: Client
@@ -91,7 +93,7 @@ mkMessage "App" "messages" "en"
 -- for our application to be in scope. However, the handler functions
 -- usually require access to the AppRoute datatype. Therefore, we
 -- split these actions into two functions and place them in separate files.
-mkYesodSubData "Client" [] $(parseRoutesFile "config/routes-client")
+mkYesodSubData "Client" $(parseRoutesFile "config/routes-client")
 mkYesodData "App" $(parseRoutesFile "config/routes")
 
 
@@ -102,8 +104,6 @@ deleteR :: Route App -> (Route App, [(Text, Text)])
 deleteR = overrideMethodR "DELETE"
 
 
-type Form x = Html -> MForm App App (FormResult x, Widget)
-
 -- Please see the documentation for the Yesod typeclass. There are a number
 -- of settings which can be configured by overriding methods here.
 instance Yesod App where
@@ -111,9 +111,15 @@ instance Yesod App where
 
     -- Store session data on the client in encrypted cookies,
     -- default session idle timeout is 120 minutes
-    makeSessionBackend _ = do
+    makeSessionBackend app = do
         key <- getKey "config/client_session_key.aes"
-        return . Just $ secureClientSessionBackend key 120
+        let timeout = 120 * 60
+        (getCachedDate, _closeDateCacher) <- clientSessionDateCacher timeout
+        let backend = clientSessionBackend key getCachedDate
+        let securify cookie = cookie { setCookieSecure = True }
+        return $ Just $ if isSecure app
+          then customizeSessionCookies securify backend
+          else backend
 
     defaultLayout = newLayout
 
@@ -130,8 +136,12 @@ instance Yesod App where
     -- The page to be redirected to when authentication is required.
     authRoute _ = Just $ AuthR LoginR
 
-    messageLogger y loc level msg =
-      formatLogText (getLogger y) loc level msg >>= logMsg (getLogger y)
+    -- What messages should be logged. The following includes all messages when
+    -- in development, and warnings and errors in production.
+    shouldLog _ _source level =
+        development || level == LevelWarn || level == LevelError
+
+    makeLogger = return . getLogger
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows
@@ -145,7 +155,11 @@ instance Yesod App where
     jsLoader _ = BottomOfHeadBlocking
 
 
-oldLayout :: GWidget sub App () -> GHandler sub App RepHtml
+isSecure :: App -> Bool
+isSecure = isPrefixOf "https://" . appRoot . settings
+
+
+oldLayout :: Widget -> Handler Html
 oldLayout widget = do
   authed <- isJust <$> maybeAuthId
   when authed setXsrfCookie
@@ -156,7 +170,7 @@ oldLayout widget = do
   -- We break up the default layout into two components:
   -- default-layout is the contents of the body tag, and
   -- default-layout-wrapper is the entire page. Since the final
-  -- value passed to hamletToRepHtml cannot be a widget, this allows
+  -- value passed to giveUrlRenderer cannot be a widget, this allows
   -- you to use normal widget features in default-layout.
 
   pc <- widgetToPageContent $ do
@@ -168,10 +182,10 @@ oldLayout widget = do
 
       addAppJs
 
-  hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
+  giveUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
 
-newLayout :: GWidget sub App () -> GHandler sub App RepHtml
+newLayout :: Widget -> Handler Html
 newLayout widget = do
   authed <- isJust <$> maybeAuthId
   when authed setXsrfCookie
@@ -182,7 +196,7 @@ newLayout widget = do
   -- We break up the layout into two components:
   -- new-layout is the contents of the body tag, and
   -- new-layout-wrapper is the entire page. Since the final
-  -- value passed to hamletToRepHtml cannot be a widget, this allows
+  -- value passed to giveUrlRenderer cannot be a widget, this allows
   -- you to use normal widget features in new-layout.
 
   pc <- widgetToPageContent $ do
@@ -192,18 +206,18 @@ newLayout widget = do
 
       addAppJs
 
-  hamletToRepHtml $(hamletFile "templates/new-layout-wrapper.hamlet")
+  giveUrlRenderer $(hamletFile "templates/new-layout-wrapper.hamlet")
 
 
-addDefaultLayoutCss :: GWidget sub App ()
+addDefaultLayoutCss :: Widget
 addDefaultLayoutCss = do
   $(widgetFile "normalize")
   addStylesheet $ StaticR css_bootstrap_css
 
 
-addThirdPartyJs :: GWidget sub App ()
+addThirdPartyJs :: Widget
 addThirdPartyJs = do
-  master <- lift getYesod
+  master <- getYesod
 
   addScriptEither $ urlJqueryJs master
   addScriptEither $ urlJqueryUiJs master
@@ -216,7 +230,7 @@ addThirdPartyJs = do
   addScript $ StaticR bower_components_ng_group_src_ngGroup_js
 
 
-addAppJs :: GWidget sub App ()
+addAppJs :: Widget
 addAppJs = do
   addScript $ StaticR js_lib_functionBindPolyfill_js
   addScript $ StaticR js_lib_util_js
@@ -250,7 +264,7 @@ addAppJs = do
   addScript $ StaticR js_app_filters_js
 
 
-appTitle :: GHandler sub App Text
+appTitle :: Handler Text
 appTitle = fmap (extraTitle . appExtra . settings) getYesod
 
 
@@ -260,13 +274,10 @@ instance YesodJquery App where
 
 -- How to run database actions.
 instance YesodPersist App where
-    type YesodPersistBackend App = SqlPersist
-    runDB f = do
-        master <- getYesod
-        Database.Persist.Store.runPool
-            (persistConfig master)
-            f
-            (connPool master)
+    type YesodPersistBackend App = SqlPersistT
+    runDB = defaultRunDB persistConfig connPool
+instance YesodPersistRunner App where
+    getDBRunner = defaultGetDBRunner connPool
 
 
 defaultTimeZone :: TimeZone
@@ -291,7 +302,7 @@ instance YesodAuth App where
                   fmap Just $ insert $ User (credsIdent creds) Nothing defaultTimeZone noFlags
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = authGoogleEmail : ifDev [authEmail] []
+    authPlugins _ = authGoogleEmail : authHiddenEmail : ifDev [authEmail] []
 
     authHttpManager = httpManager
 
@@ -317,7 +328,7 @@ instance YesodAuthEmail App where
         y <- getYesod
         -- Just log the verification URL for now, rather than emailing it...
         -- this is insecure and user-unfriendly, but only used in dev
-        liftIO $ logLazyText (getLogger y) [stext|
+        $logInfo [st|
 Hello #{email}!
 Please go to #{verurl}.
 |]
@@ -346,5 +357,7 @@ Please go to #{verurl}.
                 , emailCredsAuthId = emailUser e
                 , emailCredsStatus = isJust $ emailUser e
                 , emailCredsVerkey = emailVerkey e
+                , emailCredsEmail = email
                 }
     getEmail = runDB . fmap (fmap emailEmail) . get
+    afterPasswordRoute _ = HomeR

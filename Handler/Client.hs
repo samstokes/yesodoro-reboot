@@ -6,11 +6,10 @@ module Handler.Client (
 ) where
 
 import Data.Monoid ((<>))
-import Data.Aeson (ToJSON(..))
 import Data.Foldable (foldMap)
 import Data.String (IsString)
 import Text.Blaze (ToMarkup(..))
-import Text.Julius (Javascript)
+import Text.Julius (Javascript, rawJS)
 
 import Import
 import Prelude
@@ -46,7 +45,7 @@ stateController StateTasksLater = Just "TasksCtrl"
 stateController StateTasksDone = Just "TasksCtrl"
 stateController _ = Nothing
 
-stateResolves :: State -> [(Text, t -> Javascript)]
+stateResolves :: State -> [(Text, (url -> [(Text, Text)] -> Text) -> Javascript)]
 stateResolves StateTasksToday = [
     ("tasks", [julius|function (Tasks) { return Tasks.today(); }|])
   ]
@@ -81,7 +80,7 @@ instance ToJSON State where
   toJSON = stateName
 
 
-stateDeclJavascript :: State -> (Route App -> [param] -> Text) -> Javascript
+stateDeclJavascript :: State -> (Route App -> [(Text, Text)] -> Text) -> Javascript
 stateDeclJavascript state = [julius|
     .state(#{toJSON state}, {
       url: '@{stateR state}?days',
@@ -96,10 +95,10 @@ stateDeclJavascript state = [julius|
         ^{foldMap resolveDecl resolves}
         hibiUi: function () { return 'new'; }
       },|]
-  resolveDecl (key, resolve) = [julius|#{key}: ^{resolve},|]
+  resolveDecl (key, resolve) = [julius|#{toJSON key}: ^{resolve},|]
 
-statesDeclJavascript :: (Route App -> [param] -> Text) -> Text -> Javascript
+statesDeclJavascript :: (Route App -> [(Text, Text)] -> Text) -> Text -> Javascript
 statesDeclJavascript render stateProvider = header <> foldMap decl states
   where
-    header = [julius|#{stateProvider}|] render
+    header = [julius|#{rawJS stateProvider}|] render
     decl = flip stateDeclJavascript render

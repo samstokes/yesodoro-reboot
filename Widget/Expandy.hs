@@ -5,11 +5,11 @@ module Widget.Expandy
 
 import Prelude
 
+import Data.Default (def)
 import Data.Text (Text)
-import Yesod (GWidget, addScriptEither, getYesod, newIdent)
+import Yesod (WidgetT, addScriptEither, getYesod, newIdent)
 import Yesod.Default.Util (widgetFileNoReload)
 import Yesod.Form.Jquery (YesodJquery (..))
-import Yesod.Handler (lift)
 
 
 data ExpandyState = Collapsed | Expanded
@@ -20,11 +20,11 @@ expandyIndicator Collapsed = "☞"
 expandyIndicator Expanded = "☟"
 
 
-expandy :: YesodJquery master => ExpandyState -> Text -> Text -> GWidget sub master ()
+expandy :: YesodJquery site => ExpandyState -> Text -> Text -> WidgetT site IO ()
 expandy initialState handleSelector targetSelector = do
-  master <- lift getYesod
+  master <- getYesod
   addScriptEither $ urlJqueryJs master
 
-  widgetId <- lift newIdent
+  widgetId <- newIdent
 
-  $(widgetFileNoReload "expandy")
+  $(widgetFileNoReload def "expandy")

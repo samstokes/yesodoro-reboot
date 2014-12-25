@@ -15,12 +15,11 @@ import Prelude
 import Yesod
 
 import Control.Applicative
-import Control.Monad.IO.Class (MonadIO)
-import Data.Aeson (FromJSON, parseJSON, (.:), ToJSON, toJSON)
+{-import Control.Monad.IO.Class (MonadIO)-}
 import Data.Maybe (isJust)
 import Data.Text (Text)
 import Data.Time (Day, TimeZone, UTCTime)
-import Database.Persist.GenericSql (SqlPersist)
+import Database.Persist.Sql (SqlPersistT)
 import Model
 import Util
 
@@ -36,7 +35,7 @@ instance ToJSON (Entity Plan) where
   toJSON (Entity k p) = object ["id" .= k, "plan" .= p]
 
 
-selectUserPlansSince :: PersistQuery SqlPersist m => UserId -> UTCTime -> [SelectOpt Plan] -> SqlPersist m [Entity Plan]
+selectUserPlansSince :: PersistQuery (SqlPersistT m) => UserId -> UTCTime -> [SelectOpt Plan] -> SqlPersistT m [Entity Plan]
 selectUserPlansSince userId doneSince = selectList (belongsToUser ++ doneSinceLimit)
   where
     belongsToUser = [PlanUser ==. userId]
@@ -57,7 +56,7 @@ newPlan uid createdAt (NewPlan body) = Plan {
   , planDoneAt = Nothing
   }
 
-createPlan :: (MonadIO m, PersistQuery SqlPersist m) => UserId -> NewPlan -> SqlPersist m (Entity Plan)
+createPlan :: (MonadIO m, PersistQuery (SqlPersistT m)) => UserId -> NewPlan -> SqlPersistT m (Entity Plan)
 createPlan uid plan = do
   time <- now
   let plan' = newPlan uid time plan
@@ -71,7 +70,7 @@ planDoneDay :: TimeZone -> Plan -> Maybe Day
 planDoneDay tz = fmap (utcToLocalDay tz) . planDoneAt
 
 
-updatePlan :: PersistQuery SqlPersist m => NewPlan -> PlanId -> SqlPersist m (Bool, Maybe Plan)
+updatePlan :: (Functor m, PersistQuery (SqlPersistT m)) => NewPlan -> PlanId -> SqlPersistT m (Bool, Maybe Plan)
 updatePlan editedPlan planId = do
   mplan <- get planId
   case mplan of

@@ -26,6 +26,10 @@ casper.on('page.error', function (message, trace) {
   this.test.fail('page threw an exception: ' + message + '\n' + JSON.stringify(trace));
 });
 
+casper.on('resource.error', function (resourceError) {
+  this.test.fail('page failed to load a resource: ' + JSON.stringify(resourceError));
+});
+
 var shotNumber = 0;
 function shot(name) {
   return casper.capture('smoke-' + (shotNumber++) + '-' + name + '.png');
@@ -42,36 +46,21 @@ casper.test.begin('Front page should load', 1, function (test) {
   });
 });
 
-casper.test.begin('Can log in, and add and complete a task', 3, function (test) {
+casper.test.begin('Can log in, and add and complete a task', 2, function (test) {
   casper.start(url(), function () {
     casper.click('a[href$="/auth/login"]');
 
     casper.then(function () {
       shot('login-page');
-      casper.click('a[href$="/googleemail/forward"]');
-    });
-
-    casper.then(function () {
-      shot('google-login');
-      test.assertTextExists('Sign in with your Google Account');
-
-      casper.fill('form#gaia_loginform', {
-        Email: testerEmail,
-        Passwd: testerPassword
+      casper.fill('form#hidden-auth-email', {
+        email: testerEmail,
+        password: testerPassword
       }, true);
-    });
-
-    casper.then(function () {
-      var approvalForm = document.querySelector('form#connect-approve');
-      if (approvalForm) {
-        shot('google-approval-form');
-        approvalForm.submit();
-      }
     });
 
     var taskId = (Math.random() * 10000000).toFixed();
 
-    casper.then(function () {
+    casper.waitForSelector('ul.tasks', function () {
       shot('logged-in');
       test.assertSelectorHasText('header', 'Hibi');
 

@@ -12,16 +12,16 @@ import qualified Data.Text as T
 import Data.Text.Encoding (encodeUtf8)
 import qualified Network.HTTP.Types as HTTP
 import Network.Wai (requestHeaders)
-import Yesod.Core (GHandler, RepPlain(..), sendResponseStatus, setHeader, toContent, waiRequest)
+import Yesod.Core (MonadHandler, RepPlain(..), sendResponseStatus, addHeader, toContent, waiRequest)
 
 
-withDigestEtag :: GHandler sub master BL.ByteString -> GHandler sub master a -> GHandler sub master a
+withDigestEtag :: MonadHandler m => m BL.ByteString -> m a -> m a
 withDigestEtag getEtagMatter = withEtag (fmap digestEtag getEtagMatter)
   -- hackily get a string out of the MD5Digest via 'show'
   where digestEtag = T.pack . show . md5
 
 
-withEtag :: GHandler sub master Text -> GHandler sub master a -> GHandler sub master a
+withEtag :: MonadHandler m => m Text -> m a -> m a
 withEtag getEtag handler = do
   etag <- getEtag
   request <- waiRequest
@@ -31,4 +31,4 @@ withEtag getEtag handler = do
   then
     sendResponseStatus HTTP.notModified304 $ RepPlain $ toContent T.empty
   else
-    setHeader "ETag" (etag) >> handler
+    addHeader "ETag" (etag) >> handler

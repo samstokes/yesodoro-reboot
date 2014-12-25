@@ -13,7 +13,7 @@ import Text.Blaze (Markup, toMarkup)
 import Text.Hamlet (hamletFile)
 
 
-getTemplateOldTasksR, getTemplateTaskTrR, getTemplateNewSettingsR, getTemplateNewTasksTodayR, getTemplateNewTasksLaterR, getTemplateNewTasksDoneR, getTemplateNewTaskR :: Handler RepHtml
+getTemplateOldTasksR, getTemplateTaskTrR, getTemplateNewSettingsR, getTemplateNewTasksTodayR, getTemplateNewTasksLaterR, getTemplateNewTasksDoneR, getTemplateNewTaskR :: Handler Html
 
 
 getTemplateOldTasksR = do
@@ -26,7 +26,7 @@ getTemplateOldTasksR = do
         then schedules
         else filter (not . nonDaily) schedules
     pc <- widgetToPageContent $(whamletFile "templates/tasks/tasks-old.hamlet")
-    hamletToRepHtml [hamlet|^{pageBody pc}|]
+    giveUrlRenderer [hamlet|^{pageBody pc}|]
 
 getTemplateTaskTrR = do
   Entity _ user <- requireNgAuth
@@ -34,10 +34,10 @@ getTemplateTaskTrR = do
     let
       features = userFeatureSettings user
       has feature = hasFlag feature features
-    hamletToRepHtml $(hamletFile "templates/tasks/task-tr-ng.hamlet")
+    giveUrlRenderer $(hamletFile "templates/tasks/task-tr-ng.hamlet")
 
 
-getTemplateNewSettingsR = hamletToRepHtml $(hamletFile "templates/new-design/settings.hamlet")
+getTemplateNewSettingsR = giveUrlRenderer $(hamletFile "templates/new-design/settings.hamlet")
 getTemplateNewTasksTodayR = do
   Entity _ user <- requireNgAuth
   withDigestEtag (featuresEtag user) $ do
@@ -47,11 +47,11 @@ getTemplateNewTasksTodayR = do
       scheduleOptions = if has FeatureNonDailySchedules
         then schedules
         else filter (not . nonDaily) schedules
-    hamletToRepHtml $(hamletFile "templates/new-design/tasks-today.hamlet")
+    giveUrlRenderer $(hamletFile "templates/new-design/tasks-today.hamlet")
 
-getTemplateNewTasksLaterR = hamletToRepHtml $(hamletFile "templates/new-design/tasks-later.hamlet")
-getTemplateNewTasksDoneR = hamletToRepHtml $(hamletFile "templates/new-design/tasks-done.hamlet")
-getTemplateNewTaskR = hamletToRepHtml $(hamletFile "templates/new-design/task.hamlet")
+getTemplateNewTasksLaterR = giveUrlRenderer $(hamletFile "templates/new-design/tasks-later.hamlet")
+getTemplateNewTasksDoneR = giveUrlRenderer $(hamletFile "templates/new-design/tasks-done.hamlet")
+getTemplateNewTaskR = giveUrlRenderer $(hamletFile "templates/new-design/task.hamlet")
 
 featuresEtag :: User -> Handler B.ByteString
 featuresEtag user = return . B.pack . concat $ [

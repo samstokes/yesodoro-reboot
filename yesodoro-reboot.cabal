@@ -27,6 +27,7 @@ library
     exposed-modules: Application
                      Foundation
                      Import
+                     Types
                      Model
                      Model.Note
                      Model.Plan
@@ -45,7 +46,7 @@ library
                      Util
                      Util.Http
                      Util.Angular
-                     Util.SessionBackend
+                     Util.HiddenAuthEmail
                      Widget.Expandy
 
     if flag(dev) || flag(library-only)
@@ -54,6 +55,7 @@ library
     else
       if flag(ci)
         ghc-options:   -Wall -Werror -threaded -O0
+        cpp-options:   -DDEVELOPMENT
       else
         ghc-options:   -Wall -Werror -threaded -O2
 
@@ -69,42 +71,42 @@ library
                 FlexibleContexts
                 EmptyDataDecls
                 NoMonomorphismRestriction
+                DeriveDataTypeable
                 DoAndIfThenElse
 
     build-depends: base                          >= 4          && < 5
-                 , yesod-platform                >= 1.0        && < 1.1
-                 , yesod                         >= 1.0        && < 1.1
-                 , yesod-core                    >= 1.0        && < 1.1
-                 , yesod-auth                    >= 1.0        && < 1.1
-                 , yesod-static                  >= 1.0        && < 1.1
-                 , yesod-default                 >= 1.0        && < 1.1
-                 , yesod-form                    >= 1.0        && < 1.1
-                 , yesod-test                    >= 0.2        && < 0.3
-                 , clientsession                 >= 0.7.3      && < 0.8
-                 , bytestring                    >= 0.9        && < 0.10
-                 , text                          >= 0.11       && < 0.12
-                 , persistent                    >= 0.9        && < 0.10
+                 , yesod-platform
+                 , yesod
+                 , yesod-core
+                 , yesod-auth
+                 , yesod-static
+                 , yesod-default
+                 , yesod-form
+                 , yesod-test
+                 , clientsession
+                 , bytestring
+                 , text
+                 , persistent
                  , yesod-persistent
                  , yesod-json
-                 , persistent-postgresql     >= 0.9        && < 0.10
+                 , persistent-postgresql
                  , template-haskell
-                 , hamlet                        >= 1.0        && < 1.1
-                 , shakespeare-css               >= 1.0        && < 1.1
-                 , shakespeare-js                >= 1.0        && < 1.1
-                 , shakespeare-text              >= 1.0        && < 1.1
-                 , hjsmin                        >= 0.1        && < 0.2
-                 , monad-control                 >= 0.3        && < 0.4
+                 , hamlet
+                 , shakespeare
+                 , hjsmin
+                 , monad-control
                  , wai
-                 , wai-extra                     >= 1.2        && < 1.3
-                 , yaml                          >= 0.7        && < 0.8
-                 , http-conduit                  >= 1.4        && < 1.5
-                 , directory                     >= 1.1        && < 1.2
-                 , warp                          >= 1.2        && < 1.3
-                 , time                          >= 1.2        && < 1.3
-                 , blaze-markup                  >= 0.5        && < 0.6
-                 , aeson                         >= 0.6        && < 0.7
-                 , transformers                  >= 0.3        && < 0.4
-                 , old-locale                    >= 1.0        && < 1.1
+                 , wai-extra
+                 , yaml
+                 , http-conduit
+                 , directory
+                 , warp
+                 , time
+                 , blaze-markup
+                 , aeson
+                 , transformers
+                 , transformers-compat
+                 , old-locale
                  , pureMD5
                  , base64-bytestring
                  , http-types
@@ -114,6 +116,10 @@ library
                  , unordered-containers
                  , heroku
                  , cereal
+                 , exceptions
+                 , monad-logger
+                 , fast-logger
+                 , wai-logger
 
 executable         yesodoro-reboot
     if flag(library-only)
@@ -123,7 +129,34 @@ executable         yesodoro-reboot
     hs-source-dirs:    dist
     build-depends:     base
                      , yesodoro-reboot
+                     , yesod
                      , yesod-default
+
+executable         yesodoro-reboot-create-test-account
+    if flag(library-only)
+        Buildable: False
+
+    if flag(dev)
+      ghc-options:   -Wall -threaded -O0
+    else
+      ghc-options:   -Wall -Werror -threaded -O0
+
+    extensions:        OverloadedStrings
+                       TypeFamilies
+
+    main-is:           ../create-test-account.hs
+    hs-source-dirs:    dist
+    build-depends:     base
+                     , yesodoro-reboot
+                     , monad-logger
+                     , persistent
+                     , resourcet
+                     , safe
+                     , text
+                     , time
+                     , transformers
+                     , yesod
+                     , yesod-auth
 
 test-suite test
     type:              exitcode-stdio-1.0

@@ -1,12 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Handler.Home where
 
-import Data.Aeson.Types (toJSON)
 import Data.List (sort)
 import qualified Data.Text as Text
 import Text.Blaze (toMarkup)
 import Text.Blaze.Renderer.Text (renderMarkup)
-import Text.Julius (renderJavascript)
+import Text.Julius (renderJavascript, rawJS)
 import Yesod.Auth
 
 import Handler.Client
@@ -14,16 +13,16 @@ import Import
 import Util
 
 
-getHomeR :: Handler RepHtml
+getHomeR :: Handler Html
 getHomeR = maybeAuthId >>= getHomeR' where
-  getHomeR' :: Maybe UserId -> Handler RepHtml
-  getHomeR' Nothing = defaultLayout $ do
-      title <- lift appTitle
+  getHomeR' :: Maybe UserId -> Handler Html
+  getHomeR' Nothing = appTitle >>= \title -> defaultLayout $ do
+      {-title <- lift appTitle-}
       setTitle $ toMarkup title
       $(widgetFile "homepage")
   getHomeR' (Just _) = redirect NewAppR
 
-getNewAppR :: Handler RepHtml
+getNewAppR :: Handler Html
 getNewAppR = do
   _ <- requireAuth
   mmsgFromServer <- fmap renderMarkup <$> getMessage
@@ -36,7 +35,7 @@ getNewAppR = do
     $(widgetFile "new-design")
 
 
-getLoginPopupR :: Handler RepHtml
+getLoginPopupR :: Handler Html
 getLoginPopupR = do
   _ <- requireAuthId
   defaultLayout $ do
@@ -49,7 +48,7 @@ getLoginPopupR = do
     |]
 
 
-getTasksR :: Handler RepHtml
+getTasksR :: Handler Html
 getTasksR = do
   Entity userId user <- requireAuth
   mmsg <- fmap renderMarkup <$> getMessage
@@ -62,7 +61,7 @@ getTasksR = do
   title <- appTitle
   oldLayout $ do
     setTitle $ toMarkup title
-    addWidget $(widgetFile "tasks") where
+    $(widgetFile "tasks") where
 
 
 oneButton :: Text -> Text -> Route App -> Widget

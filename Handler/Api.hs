@@ -3,7 +3,7 @@ module Handler.Api where
 import Import
 import Util
 
-import Control.Monad.Trans.Error
+import Control.Monad.Trans.Except
 import Control.Monad.Trans.Maybe
 import qualified Data.Text as T
 import qualified Network.HTTP.Types as HTTP
@@ -11,10 +11,10 @@ import Network.Wai (requestHeaders)
 import Yesod.Auth.Email (isValidPass)
 import Yesod.Default.Config (AppConfig(..))
 
-postApiTasksR :: Handler RepJson
+postApiTasksR :: Handler Value
 postApiTasksR = do
   userId <- httpBasicAuth
-  newTask <- parseJsonBody_ -- TODO error page is HTML, not friendly!
+  newTask <- requireJsonBody -- TODO error page is HTML, not friendly!
 
   existingTask <- runDB $ runMaybeT $ do
     extTask <- toMaybeT $ newTaskExt newTask
@@ -26,23 +26,23 @@ postApiTasksR = do
     Just (extUpdated, Entity taskId _) -> do
       (taskUpdated, _) <- runDB $ updateTask undefined (TaskSyncEdit newTask) taskId
       setLocation $ TaskR taskId
-      jsonToRepJson $ object ["updated" .= (taskUpdated || extUpdated)]
+      returnJson $ object ["updated" .= (taskUpdated || extUpdated)]
     Nothing -> do
       Entity taskId _ <- runDB $ createTaskAtBottom userId newTask
       sendResponseCreated $ TaskR taskId
 
 
-getApiExtTasksForSourceR :: ExternalSourceName -> Handler RepJson
+getApiExtTasksForSourceR :: ExternalSourceName -> Handler Value
 getApiExtTasksForSourceR source = do
   userId <- httpBasicAuth
   extTasks <- runDB $ allExtTasksForSource userId source
-  jsonToRepJson $ map entityVal extTasks
+  returnJson $ map entityVal extTasks
 
 
-setLocation :: Route master -> GHandler sub master ()
+setLocation :: Route App -> Handler ()
 setLocation url = do
   r <- getUrlRender
-  setHeader "Location" $ r url
+  addHeader "Location" $ r url
 
 
 data AuthError = AuthCredentialsNotSupplied
@@ -52,20 +52,17 @@ data AuthError = AuthCredentialsNotSupplied
                | AuthErrorOther String
   deriving (Show)
 
-instance Error AuthError where
-  strMsg = AuthErrorOther
-
 
 httpBasicAuth :: Handler UserId
 httpBasicAuth = do
     root <- (appRoot . settings) <$> getYesod
-    auth <- runErrorT handleBasicAuth
+    auth <- runExceptT handleBasicAuth
     $logDebug $ T.pack $ "HTTP Basic auth: " ++ show auth
     case auth of
       Right userId -> return userId
 
       Left AuthCredentialsNotSupplied -> do
-        setHeader "WWW-Authenticate" $ T.concat ["Basic Realm=\"", root, "\""]
+        addHeader "WWW-Authenticate" $ T.concat ["Basic Realm=\"", root, "\""]
         permissionDenied "Authentication required"
       Left (AuthMalformedCredentials err) ->
         sendResponseStatus HTTP.badRequest400 $ RepPlain $ toContent $ T.pack err
@@ -75,18 +72,18 @@ httpBasicAuth = do
         $logWarn $ T.pack $ "unexpected auth error: " ++ err
         unauthorized "credentials not recognised"
   where
-  handleBasicAuth :: ErrorT AuthError Handler UserId
+  handleBasicAuth :: ExceptT AuthError Handler UserId
   handleBasicAuth = do
     request <- lift waiRequest
-    auth <- toErrorT $ maybeToEither AuthCredentialsNotSupplied $ lookup "Authorization" (requestHeaders request)
-    (email, clearPassword) <- toErrorT $ mapLeft AuthMalformedCredentials $ parseAuthorizationHeader auth
-    Entity _ email' <- ErrorT $ fmap (maybeToEither AuthCredentialsNotRecognised) $ runDB $ getBy $ UniqueEmail email
-    userId <- toErrorT $ maybeToEither (AuthErrorOther "email has no associated user account!") $ emailUser email'
-    user <- ErrorT $ fmap (maybeToEither $ AuthErrorOther "user account missing!") $ runDB $ get userId
+    auth <- toExceptT $ maybeToEither AuthCredentialsNotSupplied $ lookup "Authorization" (requestHeaders request)
+    (email, clearPassword) <- toExceptT $ mapLeft AuthMalformedCredentials $ parseAuthorizationHeader auth
+    Entity _ email' <- ExceptT $ fmap (maybeToEither AuthCredentialsNotRecognised) $ runDB $ getBy $ UniqueEmail email
+    userId <- toExceptT $ maybeToEither (AuthErrorOther "email has no associated user account!") $ emailUser email'
+    user <- ExceptT $ fmap (maybeToEither $ AuthErrorOther "user account missing!") $ runDB $ get userId
     if maybe False (isValidPass clearPassword) (userPassword user)
       then return userId
-      else throwError AuthCredentialsInvalid
+      else throwE AuthCredentialsInvalid
 
 
-unauthorized :: String -> GHandler sub master a
+unauthorized :: String -> Handler a
 unauthorized err = sendResponseStatus HTTP.unauthorized401 $ RepPlain $ toContent $ T.pack err
