@@ -5,6 +5,8 @@ Bugs
 	Fix background resizing
 	Check box sizing on non-retina screens
 Launch blockers
+	Finish porting to new Yesod
+		Clean up codebase
 	Landing page
 	Login UI
 	Handle session expiry properly
@@ -14,9 +16,8 @@ Launch blockers
 	Attribution for icons and backgrounds
 	Jigger routes around (no /new-design)
 Post-launch
-	Fix on Codeship Trusty
-		http://blog.codeship.io/2014/08/12/ubuntu-14-04-trusty-tahr-on-codeship.html
-		Cabal resolution error, because of ghc 7.6?
+	GHC 7.8
+	Replace n+1 query with join for task details
 	uncomplete
 	Pause?
 	Notes
@@ -28,7 +29,6 @@ Post-launch
 	Prompt to refresh on backend update
 	Get test coverage to 80%
 	cache-control headers (not just etag) on templates
-	Update buildpack for "set -e" etc
 	Google Analytics
 	Bugsnag/Yeller
 	Logout button
