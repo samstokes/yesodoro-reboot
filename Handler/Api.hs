@@ -11,10 +11,10 @@ import Network.Wai (requestHeaders)
 import Yesod.Auth.Email (isValidPass)
 import Yesod.Default.Config (AppConfig(..))
 
-{-postApiTasksR :: Handler RepJson-}
+postApiTasksR :: Handler Value
 postApiTasksR = do
   userId <- httpBasicAuth
-  newTask <- parseJsonBody_ -- TODO error page is HTML, not friendly!
+  newTask <- requireJsonBody -- TODO error page is HTML, not friendly!
 
   existingTask <- runDB $ runMaybeT $ do
     extTask <- toMaybeT $ newTaskExt newTask
@@ -26,17 +26,17 @@ postApiTasksR = do
     Just (extUpdated, Entity taskId _) -> do
       (taskUpdated, _) <- runDB $ updateTask undefined (TaskSyncEdit newTask) taskId
       setLocation $ TaskR taskId
-      jsonToRepJson $ object ["updated" .= (taskUpdated || extUpdated)]
+      returnJson $ object ["updated" .= (taskUpdated || extUpdated)]
     Nothing -> do
       Entity taskId _ <- runDB $ createTaskAtBottom userId newTask
       sendResponseCreated $ TaskR taskId
 
 
-{-getApiExtTasksForSourceR :: ExternalSourceName -> Handler RepJson-}
+getApiExtTasksForSourceR :: ExternalSourceName -> Handler Value
 getApiExtTasksForSourceR source = do
   userId <- httpBasicAuth
   extTasks <- runDB $ allExtTasksForSource userId source
-  jsonToRepJson $ map entityVal extTasks
+  returnJson $ map entityVal extTasks
 
 
 setLocation :: Route App -> Handler ()

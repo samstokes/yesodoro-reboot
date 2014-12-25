@@ -6,7 +6,6 @@ module Handler.Client (
 ) where
 
 import Data.Monoid ((<>))
-import Data.Aeson (ToJSON(..))
 import Data.Foldable (foldMap)
 import Data.String (IsString)
 import Text.Blaze (ToMarkup(..))

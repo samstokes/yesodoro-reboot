@@ -151,7 +151,7 @@ isSecure :: App -> Bool
 isSecure = isPrefixOf "https://" . appRoot . settings
 
 
-oldLayout :: Widget -> Handler RepHtml
+oldLayout :: Widget -> Handler Html
 oldLayout widget = do
   authed <- isJust <$> maybeAuthId
   when authed setXsrfCookie
@@ -162,7 +162,7 @@ oldLayout widget = do
   -- We break up the default layout into two components:
   -- default-layout is the contents of the body tag, and
   -- default-layout-wrapper is the entire page. Since the final
-  -- value passed to hamletToRepHtml cannot be a widget, this allows
+  -- value passed to giveUrlRenderer cannot be a widget, this allows
   -- you to use normal widget features in default-layout.
 
   pc <- widgetToPageContent $ do
@@ -174,10 +174,10 @@ oldLayout widget = do
 
       addAppJs
 
-  hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
+  giveUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
 
-newLayout :: Widget -> Handler RepHtml
+newLayout :: Widget -> Handler Html
 newLayout widget = do
   authed <- isJust <$> maybeAuthId
   when authed setXsrfCookie
@@ -188,7 +188,7 @@ newLayout widget = do
   -- We break up the layout into two components:
   -- new-layout is the contents of the body tag, and
   -- new-layout-wrapper is the entire page. Since the final
-  -- value passed to hamletToRepHtml cannot be a widget, this allows
+  -- value passed to giveUrlRenderer cannot be a widget, this allows
   -- you to use normal widget features in new-layout.
 
   pc <- widgetToPageContent $ do
@@ -198,7 +198,7 @@ newLayout widget = do
 
       addAppJs
 
-  hamletToRepHtml $(hamletFile "templates/new-layout-wrapper.hamlet")
+  giveUrlRenderer $(hamletFile "templates/new-layout-wrapper.hamlet")
 
 
 addDefaultLayoutCss :: Widget

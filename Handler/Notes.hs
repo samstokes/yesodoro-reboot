@@ -3,12 +3,12 @@ module Handler.Notes where
 import Import
 import Util.Angular
 
-{-postTaskNotesR :: TaskId -> Handler RepJson-}
+postTaskNotesR :: TaskId -> Handler Value
 postTaskNotesR taskId = do
   _ <- authedTask taskId
-  newNote <- parseJsonBody_ -- TODO error page is HTML, not friendly!
+  newNote <- requireJsonBody -- TODO error page is HTML, not friendly!
   noteEntity <- runDB $ createNote taskId newNote
-  jsonToRepJson noteEntity
+  returnJson noteEntity
 
 
 authedTask :: TaskId -> Handler (Entity Task)

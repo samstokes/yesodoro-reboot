@@ -21,7 +21,6 @@ import Database.Persist
 import Yesod.Auth
 import Yesod.Core
 import Yesod.Form.Types (FormMessage(MsgCsrfWarning))
-import Yesod.Json (jsonToRepJson)
 import Yesod.Persist
 
 import Util (passthru)
@@ -65,7 +64,7 @@ validateXsrfHeader = do
 
 respondUnauthorized :: MonadHandler m => m b
 respondUnauthorized = do
-  errorJson <- jsonToRepJson $ object ["message" .= ("Please log in." :: String)]
+  errorJson <- returnJson $ object ["message" .= ("Please log in." :: String)]
   sendResponseStatus HTTP.unauthorized401 errorJson
 
 

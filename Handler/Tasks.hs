@@ -7,7 +7,6 @@ import Handler
 import Import
 
 import Data.List (zipWith4)
-import Data.Aeson.Types (ToJSON, toJSON)
 import Util
 import Util.Angular
 
@@ -41,13 +40,13 @@ parseTaskSet = mkTaskSet <*> horizonFromParams where
       Nothing -> TasksAllSince
 
 
-getJsonTasksR :: Handler RepJson
+getJsonTasksR :: Handler Value
 getJsonTasksR = do
   query <- taskSetQuery <$> parseTaskSet
   user <- requireNgAuth
   tasks <- runDB $ query user
   tasksWithChildren <- fetchTaskChildren (entityVal user) tasks
-  jsonToRepJson tasksWithChildren
+  returnJson tasksWithChildren
 
 
 fetchTaskChildren :: User -> [Entity Task] -> Handler [TaskWithChildren]
@@ -65,23 +64,23 @@ fetchTaskChildren user tasks = zipWith4 TaskWithChildren tasks <$> extTasks <*> 
   features = userFeatureSettings user
 
 
-postTasksR :: Handler RepJson
+postTasksR :: Handler Value
 postTasksR = do
   userId <- requireNgAuthId
 
-  newTask <- parseJsonBody_ -- TODO error page is HTML, not friendly!
+  newTask <- requireJsonBody -- TODO error page is HTML, not friendly!
   taskEntity <- runDB $ createTaskAtBottom userId newTask
-  jsonToRepJson taskEntity
+  returnJson taskEntity
 
 
-postCompleteTaskR :: TaskId -> Handler RepJson
+postCompleteTaskR :: TaskId -> Handler Value
 postCompleteTaskR taskId = do
   taskEntity <- authedTaskPreventingXsrf taskId
   tz <- currentUserTimeZone
   (completed, recurred) <- runDB $ completeTask tz taskEntity
-  jsonToRepJson $ object ["completed" .= completed, "recurred" .= recurred]
+  returnJson $ object ["completed" .= completed, "recurred" .= recurred]
 
-postRestartTaskR :: TaskId -> Handler RepJson
+postRestartTaskR :: TaskId -> Handler Value
 postRestartTaskR taskId = do
   _ <- authedTaskPreventingXsrf taskId
   restarted <- runDB $ restartTask taskId
@@ -101,66 +100,66 @@ currentUserTimeZone :: Handler TimeZone
 currentUserTimeZone = userTimeZone <$> entityVal <$> requireAuth
 
 
-deleteTaskR :: TaskId -> Handler RepJson
+deleteTaskR :: TaskId -> Handler Value
 deleteTaskR taskId = do
   taskEntity <- authedTaskPreventingXsrf taskId
   runDB $ deleteTask taskEntity
-  jsonToRepJson True
+  returnJson True
 
 
-putTaskR :: TaskId -> Handler RepJson
+putTaskR :: TaskId -> Handler Value
 putTaskR taskId = do
   existingTask <- authedTaskPreventingXsrf taskId
   tz <- currentUserTimeZone
-  updatedTask <- ownedTask (taskUser $ entityVal existingTask) <$> parseJsonBody_ -- TODO error page is HTML, not friendly!
+  updatedTask <- ownedTask (taskUser $ entityVal existingTask) <$> requireJsonBody -- TODO error page is HTML, not friendly!
   let edit = existingTask `taskDiff` updatedTask
   (_, updatedTask') <- runDB $ updateTask tz edit taskId
   maybeJson taskId updatedTask'
   where taskDiff _ (Task { taskTitle = newTitle }) = TaskTitleEdit newTitle
 
 
-patchTaskR :: TaskId -> Handler RepJson
+patchTaskR :: TaskId -> Handler Value
 patchTaskR taskId = do
   _ <- authedTaskPreventingXsrf taskId
   tz <- currentUserTimeZone
-  edit <- parseJsonBody_ -- TODO error page is HTML, not friendly!
+  edit <- requireJsonBody -- TODO error page is HTML, not friendly!
   (_, updatedTask) <- runDB $ updateTask tz edit taskId
   maybeJson taskId updatedTask
 
 
-postPostponeTaskR :: TaskId -> Handler RepJson
+postPostponeTaskR :: TaskId -> Handler Value
 postPostponeTaskR taskId = do
   _ <- authedTaskPreventingXsrf taskId
   postponed <- runDB $ postponeTask (days 1) taskId
   maybeJson taskId postponed
 
-postUnpostponeTaskR :: TaskId -> Handler RepJson
+postUnpostponeTaskR :: TaskId -> Handler Value
 postUnpostponeTaskR taskId = do
   _ <- authedTaskPreventingXsrf taskId
   unpostponed <- runDB $ unpostponeTask taskId
   maybeJson taskId unpostponed
 
 
-maybeJson :: ToJSON (Entity val) => Key b val -> Maybe (Entity val) -> Handler RepJson
-maybeJson entityId = maybe (error $ "Disappeared out from under me: " ++ show entityId) jsonToRepJson
+maybeJson :: ToJSON (Entity val) => Key val -> Maybe (Entity val) -> Handler Value
+maybeJson entityId = maybe (error $ "Disappeared out from under me: " ++ show entityId) returnJson
 
 
-postPauseTaskR :: TaskId -> Handler RepJson
+postPauseTaskR :: TaskId -> Handler Value
 postPauseTaskR taskId = do
   _ <- authedTaskPreventingXsrf taskId
   paused <- runDB $ pauseTask taskId
   maybeJson taskId paused
 
-postUnpauseTaskR :: TaskId -> Handler RepJson
+postUnpauseTaskR :: TaskId -> Handler Value
 postUnpauseTaskR taskId = do
   _ <- authedTaskPreventingXsrf taskId
   unpaused <- runDB $ unpauseTask taskId
   maybeJson taskId unpaused
 
 
-postTaskEstimatesR :: TaskId -> Handler RepJson
+postTaskEstimatesR :: TaskId -> Handler Value
 postTaskEstimatesR taskId = do
   _ <- authedTaskPreventingXsrf taskId
-  estimate <- parseJsonBody_ -- TODO error page is HTML, not friendly!
+  estimate <- requireJsonBody -- TODO error page is HTML, not friendly!
   estimateId <- runDB . insert $ estimate { estimateTask = taskId }
-  jsonToRepJson $ Entity estimateId estimate
+  returnJson $ Entity estimateId estimate
