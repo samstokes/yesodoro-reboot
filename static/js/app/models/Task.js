@@ -16,10 +16,17 @@ angular.module('app.models')
     };
   }
 
+  // ridiculous function to zero pad numbers as strings
+  // only works for integers < 100
+  function zeroPad(num) {
+    return num < 10 ? '0' + num : num;
+  }
+
   function dateYMD(date) {
     var monthNum = date.getMonth() + 1,
-        month = monthNum < 10 ? '0' + monthNum : monthNum;
-    return date.getFullYear() + '-' + month + '-' + date.getDate();
+        month = zeroPad(monthNum),
+        day = zeroPad(date.getDate());
+    return date.getFullYear() + '-' + month + '-' + day;
   }
 
   function Task(taskData) {

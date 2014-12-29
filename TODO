@@ -1,5 +1,4 @@
 Bugs
-	undefined, undefined NaN on completed task
 	Sunday showing as Saturday?!
 	postponed task showing up as today (daylight savings issue?)
 	Fix background resizing
