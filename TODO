@@ -13,6 +13,7 @@ Launch blockers
 	Attribution for icons and backgrounds
 	Jigger routes around (no /new-design)
 Post-launch
+	delete old UI
 	GHC 7.8
 	Latest Yesod
 	Replace n+1 query with join for task details
