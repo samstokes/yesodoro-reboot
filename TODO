@@ -7,7 +7,7 @@ Launch blockers
 	Login UI
 	Handle session expiry properly
 	Lengthen session expiry
-	Support non-UK time zone?
+	Detect timezone (instead of defaulting to UTC)
 	Upgrade to new GoogleEmail plugin
 	Attribution for icons and backgrounds
 	Jigger routes around (no /new-design)
@@ -30,3 +30,6 @@ Post-launch
 	Google Analytics
 	Bugsnag/Yeller
 	Logout button
+	Handle timezones generally better
+		client-side (e.g. moment.js)
+		allow choice of timezone
