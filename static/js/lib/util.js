@@ -2,6 +2,7 @@
    isArray
  , mergeInto
  , getProperty
+ , zeroPad
  */
 
 // borrowed from Angular source
@@ -29,4 +30,12 @@ function getProperty(value, propName) {
     propValue = property;
   }
   return propValue;
+}
+
+// ridiculous function to zero pad numbers as strings
+// only works for integers < 100
+function zeroPad(num) {
+  'use strict';
+
+  return num < 10 ? '0' + num : num;
 }

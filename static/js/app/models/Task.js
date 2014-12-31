@@ -1,6 +1,7 @@
 /*global
    angular
  , mergeInto
+ , zeroPad
  */
 
 angular.module('app.models')
@@ -14,12 +15,6 @@ angular.module('app.models')
       schedule: defaultTaskSchedule,
       pomos: 0
     };
-  }
-
-  // ridiculous function to zero pad numbers as strings
-  // only works for integers < 100
-  function zeroPad(num) {
-    return num < 10 ? '0' + num : num;
   }
 
   function dateYMD(date) {

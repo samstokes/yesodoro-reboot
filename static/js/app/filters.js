@@ -2,6 +2,7 @@
    angular
  , getProperty
  , isArray
+ , zeroPad
  */
 
 (function filters() {
@@ -57,6 +58,10 @@
   /* very simple filter turning a day string "YYYY-MM-DD" into a date object */
   .filter('dateFromDay', function () {
     return function dateFromDayFilter(day) {
+      var offsetTotalMins = new Date().getTimezoneOffset(),
+          offsetHours = zeroPad(offsetTotalMins / 60),
+          offsetMins = zeroPad(offsetTotalMins % 60);
+      day = day + 'T' + offsetHours + ':' + offsetMins + 'Z';
       return new Date(day);
     };
   });
