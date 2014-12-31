@@ -1,5 +1,9 @@
 // Karma configuration
-// Generated on Tue Feb 25 2014 14:45:17 GMT-0800 (PST)
+
+// Force timezone to Hawaii, since:
+//  * it's fixed (doesn't depend on current system timezone)
+//  * we're not usually in Hawaii so it'll probably catch timezone bugs
+process.env['TZ'] = 'US/Hawaii';
 
 module.exports = function(config) {
   config.set({
