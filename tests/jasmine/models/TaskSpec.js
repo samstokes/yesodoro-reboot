@@ -60,4 +60,21 @@ describe('Task', function () {
       expect(task.estimatedRemaining()).toBe(0);
     });
   });
+
+
+  describe('dayDone date formatting', function () {
+    it('should return YYYY-MM-DD', function () {
+      var task = new Task({task: {done_at: '2014-08-04T14:41Z'}});
+
+      expect(task.dayDone()).toEqual('2014-08-04');
+    });
+
+    it('should be timezone aware', function () {
+      // relies on Hawaii timezone (-10) as forced in config/karma.conf.js
+
+      var task = new Task({task: {done_at: '2014-08-04T09:41Z'}});
+
+      expect(task.dayDone()).toEqual('2014-08-03');
+    });
+  });
 });
