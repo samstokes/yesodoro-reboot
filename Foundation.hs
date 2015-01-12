@@ -24,7 +24,7 @@ import Yesod
 import Yesod.Static
 import Yesod.Auth
 import Yesod.Auth.Email
-import Yesod.Auth.GoogleEmail
+import Yesod.Auth.GoogleEmail2
 import Yesod.Core.Types (Logger)
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
@@ -302,7 +302,10 @@ instance YesodAuth App where
                   fmap Just $ insert $ User (credsIdent creds) Nothing defaultTimeZone noFlags
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = authGoogleEmail : authHiddenEmail : ifDev [authEmail] []
+    authPlugins app = authGoogleEmail clientId clientSecret : authHiddenEmail : ifDev [authEmail] []
+      where
+        clientId = error "Edit this to contain the client id"
+        clientSecret = error "Edit this to contain the client secret"
 
     authHttpManager = httpManager
 
