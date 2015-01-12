@@ -96,7 +96,7 @@ parseExtra _ o = Extra
 
 getGoogleClientCredentials :: DefaultEnv -> IO (Text, Text)
 getGoogleClientCredentials env = do
-    dev <- loadDevSecrets -- skipped in prod due to laziness
+    dev <- loadDevSecrets env
     clientId <- getSecret dev env "GOOGLE_CLIENT_ID"
     clientSecret <- getSecret dev env "GOOGLE_CLIENT_SECRET"
     return (clientId, clientSecret)
@@ -105,10 +105,11 @@ type Secrets = [(String, Text)]
 
 getSecret :: Secrets -> DefaultEnv -> String -> IO Text
 getSecret dev Development varname = return $ fromMaybe (error $ "missing " ++ varname) $ lookup varname dev
+getSecret _ Testing _ = return "dummy"
 getSecret _ _ varname = T.pack <$> getEnv varname
 
-loadDevSecrets :: IO Secrets
-loadDevSecrets = do
+loadDevSecrets :: DefaultEnv -> IO Secrets
+loadDevSecrets Development = do
     contents <- TIO.readFile "config/dev-secrets.conf"
     return $ catMaybes $ map parseLine $ T.lines contents
   where
@@ -117,3 +118,4 @@ loadDevSecrets = do
     parseLine line = Just $ cleanup $ T.breakOn ":" line
     cleanup (name, "") = error $ "Bad syntax: " ++ T.unpack name
     cleanup (name, value) = (T.unpack name, T.strip $ T.drop 1 value)
+loadDevSecrets _ = return []
