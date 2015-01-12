@@ -8,7 +8,6 @@ Launch blockers
 	Handle session expiry properly
 	Lengthen session expiry
 	Detect timezone (instead of defaulting to UTC)
-	Upgrade to new GoogleEmail plugin
 	Attribution for icons and backgrounds
 	Jigger routes around (no /new-design)
 Post-launch
