@@ -60,7 +60,8 @@ instance (YesodDispatch site) => YesodSubDispatch Client (HandlerT site m) where
 -- migrations handled by Yesod.
 makeApplication :: AppConfig DefaultEnv Extra -> IO (Application, LogFunc)
 makeApplication conf = do
-    foundation <- makeFoundation conf
+    (clientId, clientSecret) <- getGoogleClientCredentials $ appEnv conf
+    foundation <- makeFoundation conf clientId clientSecret
 
     -- Initialize the logging middleware
     logWare <- mkRequestLogger def
@@ -80,8 +81,8 @@ makeApplication conf = do
       ],
       logFunc)
 
-makeFoundation :: AppConfig DefaultEnv Extra -> IO App
-makeFoundation conf = do
+makeFoundation :: AppConfig DefaultEnv Extra -> Text -> Text -> IO App
+makeFoundation conf clientId clientSecret = do
     manager <- newManager
     s <- staticSite
     (dbconf, p) <- makeDatabasePool conf
@@ -90,7 +91,7 @@ makeFoundation conf = do
     (getter, _) <- clockDateCacher
 
     let logger = Yesod.Core.Types.Logger loggerSet' getter
-        foundation = App conf logger s p manager dbconf Client
+        foundation = App conf clientId clientSecret logger s p manager dbconf Client
 
     -- Perform database migration using our application's logging settings.
     runLoggingT

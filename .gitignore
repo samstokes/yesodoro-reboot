@@ -13,3 +13,4 @@ coverage
 tmp
 cabal.sandbox.config
 yesod-devel
+config/dev-secrets.conf

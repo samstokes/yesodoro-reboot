@@ -60,6 +60,8 @@ import Util.HiddenAuthEmail
 -- access to the data present here.
 data App = App
     { settings :: AppConfig DefaultEnv Extra
+    , googleClientId :: Text
+    , googleClientSecret :: Text
     , getLogger :: Logger
     , getStatic :: Static -- ^ Settings for static file serving.
     , connPool :: Database.Persist.PersistConfigPool Settings.PersistConfig -- ^ Database connection pool.
@@ -304,8 +306,8 @@ instance YesodAuth App where
     -- You can add other plugins like BrowserID, email or OAuth here
     authPlugins app = authGoogleEmail clientId clientSecret : authHiddenEmail : ifDev [authEmail] []
       where
-        clientId = error "Edit this to contain the client id"
-        clientSecret = error "Edit this to contain the client secret"
+        clientId = googleClientId app
+        clientSecret = googleClientSecret app
 
     authHttpManager = httpManager
 

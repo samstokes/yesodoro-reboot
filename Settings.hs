@@ -1,3 +1,5 @@
+{-# LANGUAGE ViewPatterns #-}
+
 -- | Settings are centralized, as much as possible, into this file. This
 -- includes database connection settings, static file locations, etc.
 -- In addition, you can configure a number of different aspects of Yesod
@@ -10,6 +12,7 @@ module Settings
     , staticDir
     , Extra (..)
     , parseExtra
+    , getGoogleClientCredentials
     ) where
 
 import Prelude
@@ -20,11 +23,15 @@ import Yesod.Default.Config
 import Yesod.Default.Util
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
+import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
 import Data.Yaml
 import Control.Applicative
 import Settings.Development
 import Data.Default (def)
+import System.Environment (getEnv)
 import Text.Hamlet
+import Data.Maybe (catMaybes)
 
 -- | Which Persistent backend this site is using.
 type PersistConfig = PostgresConf
@@ -86,3 +93,27 @@ parseExtra _ o = Extra
     <*> o .:  "copyright"
     <*> o .:? "analytics"
     <*> fmap (fromMaybe False) (o .:? "is_heroku")
+
+getGoogleClientCredentials :: DefaultEnv -> IO (Text, Text)
+getGoogleClientCredentials env = do
+    dev <- loadDevSecrets -- skipped in prod due to laziness
+    clientId <- getSecret dev env "GOOGLE_CLIENT_ID"
+    clientSecret <- getSecret dev env "GOOGLE_CLIENT_SECRET"
+    return (clientId, clientSecret)
+
+type Secrets = [(String, Text)]
+
+getSecret :: Secrets -> DefaultEnv -> String -> IO Text
+getSecret dev Development varname = return $ fromMaybe (error $ "missing " ++ varname) $ lookup varname dev
+getSecret _ _ varname = T.pack <$> getEnv varname
+
+loadDevSecrets :: IO Secrets
+loadDevSecrets = do
+    contents <- TIO.readFile "config/dev-secrets.conf"
+    return $ catMaybes $ map parseLine $ T.lines contents
+  where
+    parseLine "" = Nothing
+    parseLine (T.head -> '#') = Nothing
+    parseLine line = Just $ cleanup $ T.breakOn ":" line
+    cleanup (name, "") = error $ "Bad syntax: " ++ T.unpack name
+    cleanup (name, value) = (T.unpack name, T.strip $ T.drop 1 value)
