@@ -293,10 +293,6 @@ instance YesodPersistRunner App where
     getDBRunner = defaultGetDBRunner connPool
 
 
-defaultTimeZone :: TimeZone
-defaultTimeZone = read "PST"
-
-
 instance YesodAuth App where
     type AuthId App = UserId
 
@@ -312,7 +308,7 @@ instance YesodAuth App where
         case x of
             Just (Entity uid _) -> return $ Just uid
             Nothing ->
-                  fmap Just $ insert $ User (credsIdent creds) Nothing defaultTimeZone noFlags
+                  fmap Just $ insert $ User (credsIdent creds) Nothing Nothing noFlags
 
     -- You can add other plugins like BrowserID, email or OAuth here
     authPlugins app = authGoogleEmail clientId clientSecret : authHiddenEmail : ifDev [authEmail] []
@@ -359,7 +355,7 @@ Please go to #{verurl}.
                 case emailUser e of
                     Just uid -> return $ Just uid
                     Nothing -> do
-                        uid <- insert $ User email Nothing defaultTimeZone noFlags
+                        uid <- insert $ User email Nothing Nothing noFlags
                         update eid [EmailUser =. Just uid, EmailVerkey =. Nothing]
                         return $ Just uid
     getPassword = runDB . fmap (join . fmap userPassword) . get

@@ -99,6 +99,10 @@ instance ToJavascript PersistValue where
   toJavascript _ = undefined
 
 
+defaultTimeZone :: TimeZone
+defaultTimeZone = read "PST"
+
+
 data TaskSet = TasksToday | TasksPostponed | TasksDoneSince { tasksDoneHorizon :: UTCTime } | TasksAllSince { tasksAllHorizon :: UTCTime }
 
 
@@ -107,14 +111,14 @@ taskSetQuery TasksToday (Entity userId user) = filterTodo <*> selectUserTasks us
   -- for now, filter in code - push into SQL once we can do more complex queries
   where filterTodo = do
           moment <- now
-          let tz = userTimeZone user
+          let tz = fromMaybe defaultTimeZone $ userTimeZone user
           return $ filter $ taskTodo tz moment . entityVal
 
 taskSetQuery TasksPostponed (Entity userId user) = filterPostponed <*> selectUserTasks userId [TaskDoneAt ==. Nothing, TaskActive ==. True] [Asc TaskScheduledFor]
   -- for now, filter in code - push into SQL once we can do more complex queries
   where filterPostponed = do
           moment <- now
-          let tz = userTimeZone user
+          let tz = fromMaybe defaultTimeZone $ userTimeZone user
           return $ filter $ taskPostponed tz moment . entityVal
 
 taskSetQuery (TasksDoneSince horizon) (Entity userId _) = selectUserTasks userId [TaskDoneAt >=. Just horizon] [Desc TaskDoneAt]

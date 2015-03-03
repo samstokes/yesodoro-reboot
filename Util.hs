@@ -134,6 +134,10 @@ mapLeft _ (Right a) = Right a
 mapLeft f (Left e) = Left $ f e
 
 
+textShow :: Show a => a -> Text
+textShow = Text.pack . show
+
+
 paras :: Text -> [Text]
 paras = map Text.unlines . splitBy Text.null . Text.split (== '\n')
 

@@ -37,4 +37,12 @@ var app = angular.module('HibiApp',
   if (messageFromServer) {
     Billboard.success(messageFromServer, {timeout: 10000});
   }
+})
+.run(function ($http, Billboard) {
+  $http.put('/hey', {timezone: {offset: -new Date().getTimezoneOffset()}})
+    .then(function (response) {
+      if (response.data && response.data.updated) {
+        Billboard.success("Updated your timezone to " + response.data.updated, {timeout: 10000});
+      }
+    });
 });

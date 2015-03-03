@@ -28,6 +28,8 @@
 
 /tasks/#TaskId/notes TaskNotesR POST
 
+/hey HeyR PUT
+
 /settings/features/#Feature/toggle ToggleFeatureR POST
 
 /api/tasks ApiTasksR POST
