@@ -1,6 +1,8 @@
 /*global angular */
 angular.module('homepage.services', ['app.models'])
 .factory('Tasks', function ($q, Task) {
+  'use strict';
+
   var Tasks = {};
 
   Tasks.create = function (task) {
@@ -31,6 +33,8 @@ angular.module('homepage.services', ['app.models'])
   return Tasks;
 })
 .factory('tasks', function (Task) {
+  'use strict';
+
   return [
     'Hello',
     'world'
