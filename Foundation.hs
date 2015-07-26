@@ -51,7 +51,6 @@ import Web.Cookie (SetCookie(..))
 import Text.Hamlet (hamletFile)
 import Text.Shakespeare.Text (st)
 import Data.Text (Text, isPrefixOf)
-import Data.Time (TimeZone(..))
 import Util
 import Util.Angular
 import Util.HiddenAuthEmail

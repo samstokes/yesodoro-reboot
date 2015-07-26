@@ -39,8 +39,8 @@ specifiedTimezone (Unknown dat) = error $ "Unknown timezone specifier: " ++ Text
 putHeyR :: Handler J.Value
 putHeyR = do
   (Entity uid user) <- requireNgAuth
-  settings <- requireJsonBody
-  let tz = specifiedTimezone $ usTimezone settings
+  heySettings <- requireJsonBody
+  let tz = specifiedTimezone $ usTimezone heySettings
   case userTimeZone user of
     Nothing -> do
       runDB $ update uid [UserTimeZone =. Just tz]
