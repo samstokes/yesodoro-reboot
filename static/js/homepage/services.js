@@ -1,30 +1,34 @@
 /*global angular */
 angular.module('homepage.services', ['app.models'])
-.factory('Tasks', function ($q, Task) {
+.factory('Tasks', function ($timeout, Task) {
   'use strict';
 
   var Tasks = {};
 
   Tasks.create = function (task) {
-    return $q.when(new Task({
-      task: task
-    }));
-  };
-
-  Tasks.complete = function (id) {
-    return $q.when({completed: {
-      task: {}
-    }});
-  };
-
-  Tasks.postpone = function (id) {
-    return $q.when({
-      task: {}
+    return soon(function () {
+      return new Task({task: task});
     });
   };
 
+  Tasks.complete = function (id) {
+    return soon(function () {
+      return {completed: {task: {}}};
+    });
+  };
+
+  Tasks.postpone = function (id) {
+    return soon(function () {
+      return {task: {}};
+    });
+  };
+
+  function soon(f) {
+    return $timeout(f, 200);
+  }
+
   function noop() {
-    return $q.when();
+    return soon(function () {});
   }
 
   Tasks.delete = noop;
