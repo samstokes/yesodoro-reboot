@@ -97,7 +97,7 @@ authedTaskPreventingXsrf taskId = do
 
 
 currentUserTimeZone :: Handler TimeZone
-currentUserTimeZone = userTimeZone <$> entityVal <$> requireAuth
+currentUserTimeZone = fromMaybe defaultTimeZone <$> userTimeZone <$> entityVal <$> requireAuth
 
 
 deleteTaskR :: TaskId -> Handler Value

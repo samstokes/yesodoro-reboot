@@ -38,7 +38,7 @@ parseArgs = parseArgs' <$> getArgs
 createTestUser :: (MonadLogger m, DB.PersistStore m, Sql.SqlBackend ~ DB.PersistMonadBackend m) => Text -> Text -> m ()
 createTestUser email saltedPassword = do
   tz <- liftIO getCurrentTimeZone
-  uid <- DB.insert $ User email (Just saltedPassword) tz noFlags
+  uid <- DB.insert $ User email (Just saltedPassword) (Just tz) noFlags
   eid <- DB.insert $ Email email (Just uid) Nothing
   logInfoN $ Text.intercalate " " [
       "Created user"
