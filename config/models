@@ -1,7 +1,7 @@
 User
     ident Text
     password Text Maybe
-    timeZone TimeZone default='PST'
+    timeZone TimeZone Maybe
     features FlagsFeature default='[]'
     UniqueUser ident
     deriving Typeable

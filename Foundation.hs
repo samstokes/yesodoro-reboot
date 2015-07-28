@@ -49,7 +49,6 @@ import Web.Cookie (SetCookie(..))
 import Text.Hamlet (hamletFile)
 import Text.Shakespeare.Text (st)
 import Data.Text (Text, isPrefixOf)
-import Data.Time (TimeZone(..))
 import Util
 import Util.Angular
 import Util.HiddenAuthEmail
@@ -247,12 +246,14 @@ addAppJs = do
   addScript $ StaticR js_app_services_billboard_js
   addScript $ StaticR js_app_services_exceptionHandler_js
   addScript $ StaticR js_app_services_httpErrorHandler_js
+  addScript $ StaticR js_app_services_Settings_js
   addScript $ StaticR js_app_services_Tasks_js
 
   addScript $ StaticR js_app_controllers_js
   addScript $ StaticR js_app_controllers_PlansCtrl_js
   addScript $ StaticR js_app_controllers_TasksCtrl_js
   addScript $ StaticR js_app_controllers_NotesCtrl_js
+  addScript $ StaticR js_app_controllers_SettingsCtrl_js
 
   addScript $ StaticR js_app_directives_js
   addScript $ StaticR js_app_directives_billboard_js
@@ -282,10 +283,6 @@ instance YesodPersistRunner App where
     getDBRunner = defaultGetDBRunner connPool
 
 
-defaultTimeZone :: TimeZone
-defaultTimeZone = read "PST"
-
-
 instance YesodAuth App where
     type AuthId App = UserId
 
@@ -301,7 +298,7 @@ instance YesodAuth App where
         case x of
             Just (Entity uid _) -> return $ Just uid
             Nothing ->
-                  fmap Just $ insert $ User (credsIdent creds) Nothing defaultTimeZone noFlags
+                  fmap Just $ insert $ User (credsIdent creds) Nothing Nothing noFlags
 
     -- You can add other plugins like BrowserID, email or OAuth here
     authPlugins app = authGoogleEmail clientId clientSecret : authHiddenEmail : ifDev [authEmail] []
@@ -348,7 +345,7 @@ Please go to #{verurl}.
                 case emailUser e of
                     Just uid -> return $ Just uid
                     Nothing -> do
-                        uid <- insert $ User email Nothing defaultTimeZone noFlags
+                        uid <- insert $ User email Nothing Nothing noFlags
                         update eid [EmailUser =. Just uid, EmailVerkey =. Nothing]
                         return $ Just uid
     getPassword = runDB . fmap (join . fmap userPassword) . get

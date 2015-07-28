@@ -1,3 +1,9 @@
 <article.settings>
   <header>
     <h1>Settings
+  < ng-show="loggedIn">
+    <p>Hello you are logged in!
+    <form method="POST" action="@{AuthR LogoutR}">
+      <button type="submit">Logout
+  < ng-hide="loggedIn">
+    <p>How curious, you are somehow not logged in.

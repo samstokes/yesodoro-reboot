@@ -1,6 +1,5 @@
 Bugs
 	Login opens in new window since OAuth2
-	postponed task showing up as today (daylight savings issue?)
 	Fix background resizing
 	Check box sizing on non-retina screens
 Launch blockers
@@ -9,10 +8,10 @@ Launch blockers
 		Handle cancelled login ("missing code" error)
 	Handle session expiry properly
 	Lengthen session expiry
-	Detect timezone (instead of defaulting to UTC)
 	Attribution for icons and backgrounds
 	Jigger routes around (no /new-design)
 	Deuglify Billboard (or at least remove welcome message)
+	Style logout button
 Post-launch
 	delete old UI
 	GHC 7.8
@@ -31,7 +30,6 @@ Post-launch
 	cache-control headers (not just etag) on templates
 	Google Analytics
 	Bugsnag/Yeller
-	Logout button
 	Handle timezones generally better
 		client-side (e.g. moment.js)
 		allow choice of timezone
