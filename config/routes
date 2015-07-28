@@ -29,6 +29,7 @@
 /tasks/#TaskId/notes TaskNotesR POST
 
 /settings/features/#Feature/toggle ToggleFeatureR POST
+/settings/timezone TimezoneR PUT
 
 /api/tasks ApiTasksR POST
 /api/ext_tasks/#ExternalSourceName ApiExtTasksForSourceR GET

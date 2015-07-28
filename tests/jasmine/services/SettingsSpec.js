@@ -37,4 +37,36 @@ describe('Settings', function () {
       expect(loggedIn).toBe(true);
     });
   });
+
+  describe('.syncTimezone()', function () {
+    it('should return a promise of truth if we updated the timezone on the server', function () {
+      $httpBackend.expectPUT('/settings/timezone').respond({
+        updated: '-0400'
+      });
+
+      var pUpdated = Settings.syncTimezone();
+      expect(pUpdated.then).toBeDefined();
+
+      var updated;
+      pUpdated.then(function (_updated) { updated = _updated; });
+      $httpBackend.flush();
+
+      expect(updated).toBe(true);
+    });
+
+    it('should return a promise of falsehood if the server timezone was already in sync', function () {
+      $httpBackend.expectPUT('/settings/timezone').respond({
+        updated: false
+      });
+
+      var pUpdated = Settings.syncTimezone();
+      expect(pUpdated.then).toBeDefined();
+
+      var updated;
+      pUpdated.then(function (_updated) { updated = _updated; });
+      $httpBackend.flush();
+
+      expect(updated).toBe(false);
+    });
+  });
 });

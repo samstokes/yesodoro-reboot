@@ -50,7 +50,21 @@ stateResolves StateSettings = [
     ("loggedIn", [julius|function (Settings) { return Settings.isAuthed(); }|])
   ]
 stateResolves StateTasksToday = [
-    ("tasks", [julius|function (Tasks) { return Tasks.today(); }|])
+    ("tasks", [julius|function (Settings, Tasks, $log, $q) {
+      var pUpdatedTimezone = Settings.syncTimezone();
+      var pTasks = Tasks.today();
+      return $q.all([pUpdatedTimezone, pTasks]).then(function (results) {
+        var updatedTimezone = results[0];
+        var tasks = results[1];
+
+        if (updatedTimezone) {
+          $log.info('re-requesting tasks because the server had the wrong timezone for us');
+          return Tasks.today();
+        } else {
+          return $q.when(tasks);
+        }
+      });
+    }|])
   ]
 stateResolves StateTasksLater = [
     ("tasks", [julius|function (Tasks) { return Tasks.later(); }|])

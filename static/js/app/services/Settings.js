@@ -18,5 +18,17 @@ angular.module('app.services')
       });
   };
 
+  Settings.syncTimezone = function syncTimezone() {
+    return $http.put('/settings/timezone', {
+      offset: getTimezoneOffset()
+    }).then(function (response) {
+      return response.data && !!response.data.updated;
+    });
+  };
+
+  function getTimezoneOffset() {
+    return -new Date().getTimezoneOffset();
+  }
+
   return Settings;
 });
