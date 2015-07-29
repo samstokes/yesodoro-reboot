@@ -19,6 +19,20 @@ var app = angular.module('HibiApp',
 
   #{rawJS (declareStates "$stateProvider")}
 })
+.run(function ($log, Billboard) {
+  Billboard.watch(function (event) {
+    if (null === event) return;
+
+    var message = 'Billboard: ' + event.message;
+
+    switch (event.severity) {
+    case 'success': $log.info(message); break;
+    case 'error': $log.warn(message); break;
+    default:
+      $log.warn('[Unexpected severity ' + event.severity + '] ' + message);
+    }
+  });
+})
 .run(function ($rootScope, Billboard) {
   $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams, error) {
     var message;
