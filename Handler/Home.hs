@@ -39,13 +39,9 @@ getLoginPopupR :: Handler Html
 getLoginPopupR = do
   _ <- requireAuthId
   defaultLayout $ do
-    toWidgetHead [hamlet|
-      <script>window.close();
-    |]
+    toWidgetHead [hamlet|<script>window.close();|]
     setTitle "Please close this window."
-    [whamlet|
-      <h1>Please close this window.
-    |]
+    [whamlet|<h1>Please close this window.|]
 
 
 getTasksR :: Handler Html
