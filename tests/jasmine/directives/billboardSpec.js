@@ -6,13 +6,18 @@ describe('billboard directive', function () {
   var $window,
       $compile,
       $rootScope,
+      FakePopup,
       Billboard,
       elem;
 
   beforeEach(module(function ($provide) {
-    $provide.factory('$window', function () {
-      $window = angular.mock.createMockWindow();
-      return $window;
+    $window = angular.mock.createMockWindow();
+    $provide.value('$window', $window);
+
+    $provide.factory('Popup', function ($q) {
+      FakePopup = {};
+      FakePopup.open = jasmine.createSpy('open').and.returnValue($q.when('fake'));
+      return FakePopup;
     });
   }));
 
@@ -108,9 +113,6 @@ describe('billboard directive', function () {
     var action;
 
     beforeEach(function () {
-      $window.open = function fakeOpen() {};
-      spyOn($window, 'open');
-
       Billboard.error('Kaboom', {
         action: {
           message: 'Click to fix',
@@ -129,8 +131,8 @@ describe('billboard directive', function () {
 
     it('should popup the url when you click the action', function () {
       action.click();
-      expect($window.open).toHaveBeenCalled();
-      expect($window.open.calls.mostRecent().args[0]).toBe('/fix');
+      expect(FakePopup.open).toHaveBeenCalled();
+      expect(FakePopup.open.calls.mostRecent().args[0]).toBe('/fix');
     });
 
     it('should dismiss the error when you click the action', function () {
@@ -140,14 +142,13 @@ describe('billboard directive', function () {
     });
 
     describe('with an onCloseMessage', function () {
-      var $timeout,
-          fakePopup;
+      var $timeout, fakePopupDeferred;
 
-      beforeEach(inject(function (_$timeout_) {
+      beforeEach(inject(function (_$timeout_, $q) {
         $timeout = _$timeout_;
 
-        fakePopup = {};
-        $window.open.and.returnValue(fakePopup);
+        fakePopupDeferred = $q.defer();
+        FakePopup.open.and.returnValue(fakePopupDeferred.promise);
 
         Billboard.error('Kaboom', {
           action: {
@@ -159,19 +160,21 @@ describe('billboard directive', function () {
         $rootScope.$digest();
 
         action.click();
-
-        expect(fakePopup.onunload).toBeDefined();
-        fakePopup.onunload();
-        $rootScope.$digest();
       }));
 
       it('should display the message when the popup closes', function () {
+        fakePopupDeferred.resolve('done');
+        $rootScope.$digest();
+
         var message = elem.find('.message');
         expect(message).not.toBeEmpty();
         expect(message.text()).toBe('Fixed that for you');
       });
 
       it('should dismiss the message after a while', function () {
+        fakePopupDeferred.resolve('done');
+        $rootScope.$digest();
+
         $timeout.flush();
 
         expect(elem).toHaveClass('empty');

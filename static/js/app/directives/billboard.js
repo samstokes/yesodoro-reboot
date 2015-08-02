@@ -1,7 +1,7 @@
 /*global angular */
 
 angular.module('app.directives')
-.directive('billboard', function ($window, Billboard) {
+.directive('billboard', function ($window, Popup, Billboard) {
   'use strict';
 
   return {
@@ -25,17 +25,12 @@ angular.module('app.directives')
     link: function (scope, elem, attrs) {
       scope.dismiss = Billboard.clear.bind(Billboard);
 
-      var POPUP_FEATURES = [
-        'height=300',
-        'width=400',
-        'menubar=0',
-        'toolbar=0',
-        'location=1'
-      ].join(',');
+      var POPUP_OPTIONS = {
+        height: 300,
+        width: 400,
+        location: true
+      };
 
-      function popup(url) {
-        return $window.open(url, 'popup', POPUP_FEATURES);
-      }
       function reload() {
         $window.location.reload();
       }
@@ -44,11 +39,12 @@ angular.module('app.directives')
         if (action.reload !== undefined) {
           reload();
         } else if (action.url) {
-          var poppedUp = popup(action.url);
+          var popup = Popup.open(action.url, POPUP_OPTIONS);
+
           if (action.onCloseMessage) {
-            poppedUp.onunload = function onPopupClose() {
+            popup.then(function onPopupClose() {
               Billboard.success(action.onCloseMessage, {timeout: 10000});
-            };
+            });
           }
         }
 

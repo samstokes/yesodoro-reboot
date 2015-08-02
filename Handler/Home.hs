@@ -39,7 +39,13 @@ getLoginPopupR :: Handler Html
 getLoginPopupR = do
   _ <- requireAuthId
   defaultLayout $ do
-    toWidgetHead [hamlet|<script>window.close();|]
+    toWidgetHead [hamlet|
+      <script>
+        if (window.opener && window.opener.$setPopupResult) {
+          window.opener.$setPopupResult();
+        }
+        window.close();
+    |]
     setTitle "Please close this window."
     [whamlet|<h1>Please close this window.|]
 
