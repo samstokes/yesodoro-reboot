@@ -247,6 +247,7 @@ addAppJs = do
   addScript $ StaticR js_app_services_exceptionHandler_js
   addScript $ StaticR js_app_services_httpErrorHandler_js
   addScript $ StaticR js_app_services_Popup_js
+  addScript $ StaticR js_app_services_LoginPopup_js
   addScript $ StaticR js_app_services_Settings_js
   addScript $ StaticR js_app_services_Tasks_js
 

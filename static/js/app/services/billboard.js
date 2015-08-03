@@ -43,11 +43,16 @@ angular.module('app.services')
       throw new Error('Invalid event action: ' + reason);
     }
 
-    if ((action.reload !== undefined) === (!!action.url)) { // jshint ignore:line
-      invalid('must have either "reload" or "url" properties but not both');
-    }
+    var numActions = 0;
+    if (action.reload !== undefined) ++numActions;
+    if (action.url) ++numActions;
+    if (action.login !== undefined) ++numActions;
+
+    if (0 === numActions) invalid('must specify one of "reload", "url" or "login"');
+    if (numActions > 1) invalid('must specify only one of "reload", "url" or "login"');
 
     if (action.reload !== undefined && !action.reload) invalid('"reload: ' + action.reload + '" does not make sense');
+    if (action.login !== undefined && !action.login) invalid('"login: ' + action.login + '" does not make sense');
 
     if (action.url && !isRelativeUrl(action.url)) {
       invalid("can't popup absolute URLs");
@@ -55,6 +60,13 @@ angular.module('app.services')
 
     if (action.onCloseMessage && !action.url) {
       invalid('"onCloseMessage" can only be used with a url');
+    }
+
+    if (action.successMessage && !action.login) {
+      invalid('"successMessage" can only be used with the "login" action');
+    }
+    if (action.login && !action.successMessage) {
+      action.successMessage = 'You are now logged in';
     }
   }
 

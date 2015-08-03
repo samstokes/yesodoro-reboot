@@ -20,9 +20,9 @@ angular.module('app.services')
         case 401:
           Billboard.error('Sorry, your session has expired.', {
             action: {
-              url: '/login_popup',
               message: 'Click here to log in.',
-              onCloseMessage: 'Now please try again.'
+              login: true,
+              successMessage: 'Now please try again.'
             }
           });
           break;

@@ -1,7 +1,10 @@
-/*global angular */
+/*global
+   angular
+ , mergeInto
+ */
 
 angular.module('app.directives')
-.directive('billboard', function ($window, Popup, Billboard) {
+.directive('billboard', function ($window, Popup, LoginPopup, Billboard) {
   'use strict';
 
   return {
@@ -25,17 +28,17 @@ angular.module('app.directives')
     link: function (scope, elem, attrs) {
       scope.dismiss = Billboard.clear.bind(Billboard);
 
-      var POPUP_OPTIONS = {
-        height: 300,
-        width: 400,
-        location: true
-      };
-
       function reload() {
         $window.location.reload();
       }
 
       scope.performAction = function performAction(action) {
+        var POPUP_OPTIONS = {
+          height: 300,
+          width: 400,
+          location: true
+        };
+
         if (action.reload !== undefined) {
           reload();
         } else if (action.url) {
@@ -46,6 +49,8 @@ angular.module('app.directives')
               Billboard.success(action.onCloseMessage, {timeout: 10000});
             });
           }
+        } else if (action.login !== undefined) {
+          LoginPopup.open(mergeInto(POPUP_OPTIONS, {successMessage: action.successMessage}));
         }
 
         this.dismiss(scope.event);

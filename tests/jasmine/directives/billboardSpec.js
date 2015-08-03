@@ -7,6 +7,7 @@ describe('billboard directive', function () {
       $compile,
       $rootScope,
       FakePopup,
+      FakeLoginPopup,
       Billboard,
       elem;
 
@@ -18,6 +19,12 @@ describe('billboard directive', function () {
       FakePopup = {};
       FakePopup.open = jasmine.createSpy('open').and.returnValue($q.when('fake'));
       return FakePopup;
+    });
+
+    $provide.factory('LoginPopup', function ($q) {
+      FakeLoginPopup = {};
+      FakeLoginPopup.open = jasmine.createSpy('open').and.returnValue($q.when('fake'));
+      return FakeLoginPopup;
     });
   }));
 
@@ -180,6 +187,45 @@ describe('billboard directive', function () {
         expect(elem).toHaveClass('empty');
         expect(elem.text()).not.toContain('Fixed that for you');
       });
+    });
+  });
+
+  describe('with a login action', function () {
+    var action;
+
+    beforeEach(function () {
+      Billboard.error('You have been logged out', {
+        action: {
+          message: 'Click to log back in',
+          login: true,
+          successMessage: 'You are logged in once more'
+        }
+      });
+      $rootScope.$digest();
+
+      action = elem.find('.action');
+    });
+
+    it('should display the action message with class .action', function () {
+      expect(action).not.toBeEmpty();
+      expect(action.text()).toBe('Click to log back in');
+    });
+
+    it('should display a login popup when you click the action', function () {
+      action.click();
+      expect(FakeLoginPopup.open).toHaveBeenCalled();
+    });
+
+    it('should pass through the successMessage', function () {
+      action.click();
+      expect(FakeLoginPopup.open).toHaveBeenCalledWith(jasmine.objectContaining(
+            {successMessage: 'You are logged in once more'}));
+    });
+
+    it('should dismiss the error when you click the action', function () {
+      action.click();
+      expect(elem).toHaveClass('empty');
+      expect(elem.text()).not.toContain('You have been logged out');
     });
   });
 
