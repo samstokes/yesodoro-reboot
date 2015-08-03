@@ -46,6 +46,7 @@ library
                      Util
                      Util.Http
                      Util.Angular
+                     Util.AuthGoogleEmail
                      Util.HiddenAuthEmail
                      Util.Templates
                      Widget.Expandy
@@ -121,6 +122,9 @@ library
                  , monad-logger
                  , fast-logger
                  , wai-logger
+                 , random
+                 , mime-mail
+                 , blaze-builder
 
 executable         yesodoro-reboot
     if flag(library-only)

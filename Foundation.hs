@@ -24,7 +24,7 @@ import Yesod
 import Yesod.Static
 import Yesod.Auth
 import Yesod.Auth.Email
-import Yesod.Auth.GoogleEmail2
+import qualified Yesod.Auth.Message as AuthMsg
 import Yesod.Core.Types (Logger)
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
@@ -41,6 +41,7 @@ import Model
 import Model.Note
 import Model.Plan
 import Control.Applicative ((<$>))
+import Control.Arrow ((&&&))
 import Control.Monad (join, when)
 import Data.Maybe (isJust)
 import Text.Jasmine (minifym)
@@ -51,6 +52,7 @@ import Text.Shakespeare.Text (st)
 import Data.Text (Text, isPrefixOf)
 import Util
 import Util.Angular
+import Util.AuthGoogleEmail
 import Util.HiddenAuthEmail
 
 -- | The site argument for your application. This can be a good place to
@@ -290,6 +292,9 @@ instance YesodAuth App where
 
     redirectToReferer _ = True
 
+    -- override login page handler
+    loginHandler = getLogin
+
     -- Where to send a user after successful login
     loginDest _ = HomeR
     -- Where to send a user after logout
@@ -303,12 +308,23 @@ instance YesodAuth App where
                   fmap Just $ insert $ User (credsIdent creds) Nothing Nothing noFlags
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins app = authGoogleEmail clientId clientSecret : authHiddenEmail : ifDev [authEmail] []
+    authPlugins app = authBetterGoogleEmail clientId clientSecret : authHiddenEmail : ifDev [authEmail] []
       where
         clientId = googleClientId app
         clientSecret = googleClientSecret app
 
     authHttpManager = httpManager
+
+
+getLogin :: AuthHandler App Html
+getLogin = do
+  parentRoute <- getRouteToParent
+  lift $ authLayout $ do
+    setTitleI AuthMsg.LoginTitle
+    plugins <- authPlugins <$> getYesod
+    let pluginWidgets = map (apName &&& flip apLogin parentRoute) plugins
+    $(widgetFile "login")
+
 
 -- This instance is required to use forms. You can modify renderMessage to
 -- achieve customized and internationalized form validation messages.
