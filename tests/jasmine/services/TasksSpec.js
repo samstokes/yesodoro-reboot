@@ -35,7 +35,7 @@ describe('Tasks', function () {
 
     it('should return a promise of an array of tasks', function () {
       var allTasks = Tasks.all();
-      expect(allTasks.then).toBeDefined();
+      expect(allTasks).toBeAPromise();
 
       var tasks;
       allTasks.then(function (_tasks) { tasks = _tasks; });
@@ -70,7 +70,7 @@ describe('Tasks', function () {
 
     it('should return a promise of an array of tasks', function () {
       var todayTasks = Tasks.today();
-      expect(todayTasks.then).toBeDefined();
+      expect(todayTasks).toBeAPromise();
 
       var tasks;
       todayTasks.then(function (_tasks) { tasks = _tasks; });

@@ -72,7 +72,7 @@ describe('Popup', function () {
     it('should return a promise and fulfil it when $setPopupResult is called', function () {
       var popup = Popup.open('/foo');
 
-      expect(popup.then).toBeDefined();
+      expect(popup).toBeAPromise();
 
       var result;
       popup.then(function (_result) { result = _result; });
@@ -92,7 +92,7 @@ describe('Popup', function () {
     it('should reject the promise if $cancelPopup is called', function () {
       var popup = Popup.open('/foo');
 
-      expect(popup.then).toBeDefined();
+      expect(popup).toBeAPromise();
 
       var reason;
       popup.then(null, function (_reason) { reason = _reason; });

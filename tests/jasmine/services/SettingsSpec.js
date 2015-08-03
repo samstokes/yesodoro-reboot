@@ -28,7 +28,7 @@ describe('Settings', function () {
 
     it('should return a promise of the login status', function () {
       var status = Settings.isAuthed();
-      expect(status.then).toBeDefined();
+      expect(status).toBeAPromise();
 
       var loggedIn;
       status.then(function (_loggedIn) { loggedIn = _loggedIn; });
@@ -45,7 +45,7 @@ describe('Settings', function () {
       });
 
       var pUpdated = Settings.syncTimezone();
-      expect(pUpdated.then).toBeDefined();
+      expect(pUpdated).toBeAPromise();
 
       var updated;
       pUpdated.then(function (_updated) { updated = _updated; });
@@ -60,7 +60,7 @@ describe('Settings', function () {
       });
 
       var pUpdated = Settings.syncTimezone();
-      expect(pUpdated.then).toBeDefined();
+      expect(pUpdated).toBeAPromise();
 
       var updated;
       pUpdated.then(function (_updated) { updated = _updated; });

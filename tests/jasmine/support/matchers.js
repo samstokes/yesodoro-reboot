@@ -25,6 +25,17 @@ beforeEach(function () {
           return result;
         }
       };
+    },
+
+    toBeAPromise: function () {
+      return {
+        compare: function toBeAPromise(actual) {
+          var result = {
+            pass: actual && typeof(actual.then) === 'function'
+          };
+          return result;
+        }
+      };
     }
   });
 });
