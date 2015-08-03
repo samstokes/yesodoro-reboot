@@ -6,8 +6,7 @@ Bugs
 	Horrible error on unauthed state change
 Launch blockers
 	Demo on landing page
-	Login UI
-		Handle cancelled login ("missing code" error)
+	Handle cancelled login ("missing code" error)
 	Handle session expiry properly
 	Lengthen session expiry
 	Attribution for icons and backgrounds
