@@ -1,4 +1,4 @@
 <.content>
-  $forall pluginWidget <- pluginWidgets
-    <.auth-plugin>
+  $forall (pluginName, pluginWidget) <- pluginWidgets
+    <.auth-plugin .auth-plugin-#{pluginName}>
       ^{pluginWidget}

@@ -42,6 +42,7 @@ import Model
 import Model.Note
 import Model.Plan
 import Control.Applicative ((<$>))
+import Control.Arrow ((&&&))
 import Control.Monad (join, when)
 import Data.Maybe (isJust)
 import Text.Jasmine (minifym)
@@ -321,7 +322,7 @@ getLogin = do
   lift $ authLayout $ do
     setTitleI AuthMsg.LoginTitle
     plugins <- authPlugins <$> getYesod
-    let pluginWidgets = map (flip apLogin parentRoute) plugins
+    let pluginWidgets = map (apName &&& flip apLogin parentRoute) plugins
     $(widgetFile "login")
 
 
