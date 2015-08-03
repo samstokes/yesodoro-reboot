@@ -1,0 +1,18 @@
+.auth-plugin-googleemail2 a {
+  outline: 0;
+}
+
+.auth-plugin-googleemail2 .button-sign-in {
+  height: 54px; /* half the height of the (double-resolution) button image */
+  background-image: url('@{StaticR images_google_sign_in_Blue_signin_Long_normal_44dp_v3_png}');
+  background-size: auto 54px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.auth-plugin-googleemail2 .button-sign-in:hover {
+  background-image: url('@{StaticR images_google_sign_in_Blue_signin_Long_focused_44dp_v3_png}');
+}
+.auth-plugin-googleemail2 .button-sign-in:active {
+  background-image: url('@{StaticR images_google_sign_in_Blue_signin_Long_pressed_44dp_v3_png}');
+}

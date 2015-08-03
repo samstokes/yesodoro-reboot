@@ -24,7 +24,6 @@ import Yesod
 import Yesod.Static
 import Yesod.Auth
 import Yesod.Auth.Email
-import Yesod.Auth.GoogleEmail2
 import qualified Yesod.Auth.Message as AuthMsg
 import Yesod.Core.Types (Logger)
 import Yesod.Default.Config
@@ -53,6 +52,7 @@ import Text.Shakespeare.Text (st)
 import Data.Text (Text, isPrefixOf)
 import Util
 import Util.Angular
+import Util.AuthGoogleEmail
 import Util.HiddenAuthEmail
 
 -- | The site argument for your application. This can be a good place to
@@ -308,7 +308,7 @@ instance YesodAuth App where
                   fmap Just $ insert $ User (credsIdent creds) Nothing Nothing noFlags
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins app = authGoogleEmail clientId clientSecret : authHiddenEmail : ifDev [authEmail] []
+    authPlugins app = authBetterGoogleEmail clientId clientSecret : authHiddenEmail : ifDev [authEmail] []
       where
         clientId = googleClientId app
         clientSecret = googleClientSecret app
