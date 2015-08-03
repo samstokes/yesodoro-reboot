@@ -2,6 +2,8 @@ Bugs
 	Login opens in new window since OAuth2
 	Fix background resizing
 	Check box sizing on non-retina screens
+	With reauth popup, what if I reauth as a different account?
+	Horrible error on unauthed state change
 Launch blockers
 	Demo on landing page
 	Login UI
