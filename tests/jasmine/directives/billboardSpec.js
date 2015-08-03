@@ -6,7 +6,6 @@ describe('billboard directive', function () {
   var $window,
       $compile,
       $rootScope,
-      FakePopup,
       FakeLoginPopup,
       Billboard,
       elem;
@@ -14,12 +13,6 @@ describe('billboard directive', function () {
   beforeEach(module(function ($provide) {
     $window = angular.mock.createMockWindow();
     $provide.value('$window', $window);
-
-    $provide.factory('Popup', function ($q) {
-      FakePopup = {};
-      FakePopup.open = jasmine.createSpy('open').and.returnValue($q.when('fake'));
-      return FakePopup;
-    });
 
     $provide.factory('LoginPopup', function ($q) {
       FakeLoginPopup = {};
@@ -113,80 +106,6 @@ describe('billboard directive', function () {
 
       expect(elem).toHaveClass('empty');
       expect(elem.text()).not.toContain('Everything is wrong');
-    });
-  });
-
-  describe('with a popup action', function () {
-    var action;
-
-    beforeEach(function () {
-      Billboard.error('Kaboom', {
-        action: {
-          message: 'Click to fix',
-          url: '/fix'
-        }
-      });
-      $rootScope.$digest();
-
-      action = elem.find('.action');
-    });
-
-    it('should display the action message with class .action', function () {
-      expect(action).not.toBeEmpty();
-      expect(action.text()).toBe('Click to fix');
-    });
-
-    it('should popup the url when you click the action', function () {
-      action.click();
-      expect(FakePopup.open).toHaveBeenCalled();
-      expect(FakePopup.open.calls.mostRecent().args[0]).toBe('/fix');
-    });
-
-    it('should dismiss the error when you click the action', function () {
-      action.click();
-      expect(elem).toHaveClass('empty');
-      expect(elem.text()).not.toContain('Kaboom');
-    });
-
-    describe('with an onCloseMessage', function () {
-      var $timeout, fakePopupDeferred;
-
-      beforeEach(inject(function (_$timeout_, $q) {
-        $timeout = _$timeout_;
-
-        fakePopupDeferred = $q.defer();
-        FakePopup.open.and.returnValue(fakePopupDeferred.promise);
-
-        Billboard.error('Kaboom', {
-          action: {
-            message: 'Click to fix',
-            url: '/fix',
-            onCloseMessage: 'Fixed that for you'
-          }
-        });
-        $rootScope.$digest();
-
-        action.click();
-      }));
-
-      it('should display the message when the popup closes', function () {
-        fakePopupDeferred.resolve('done');
-        $rootScope.$digest();
-
-        var message = elem.find('.message');
-        expect(message).not.toBeEmpty();
-        expect(message.text()).toBe('Fixed that for you');
-      });
-
-      it('should dismiss the message after a while', function () {
-        fakePopupDeferred.resolve('done');
-        $rootScope.$digest();
-
-        $timeout.flush();
-
-        expect(elem).toHaveClass('empty');
-        expect(elem.text()).not.toContain('Fixed that for you');
-      });
     });
   });
 

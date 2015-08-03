@@ -114,54 +114,6 @@ describe('Billboard service', function () {
   });
 
   describe('actions', function () {
-    describe('popup', function () {
-      it('should allow specifying a popup URL to respond to the event', function () {
-        Billboard.error('Unauthorised', {
-          action: {message: 'Try logging in again', url: '/login'}
-        });
-        $rootScope.$apply();
-
-        expect(lastEvent.action).not.toBeFalsy();
-        expect(lastEvent.action.message).toBe('Try logging in again');
-        expect(lastEvent.action.url).toBe('/login');
-      });
-
-      it('should set a default message if not specified', function () {
-        Billboard.error('Unauthorised', {action: {url: '/login'}});
-        $rootScope.$apply();
-
-        expect(lastEvent.action.message).not.toBeFalsy();
-        expect(lastEvent.action.message).not.toBeEmpty();
-      });
-
-      it('should allow setting a message for when the popup closes', function () {
-        Billboard.error('Unauthorised', {
-          action: {url: '/login', onCloseMessage: 'Done!'}
-        });
-        $rootScope.$apply();
-
-        expect(lastEvent.action.onCloseMessage).toBe('Done!');
-      });
-
-      it('should not allow setting an external URL', function () {
-        [
-          'https://www.google.com',
-          'http://samstokes.co.uk',
-          '//www.google.com'
-        ].forEach(function (badUrl) {
-          expect(function () {
-            Billboard.error('Boing', {action: {url: badUrl}});
-          }).toThrow();
-        });
-      });
-
-      it('should error if you try to set a successMessage', function () {
-        expect(function () {
-          Billboard.error('Unauthorised', {action: {url: '/login', successMessage: 'Try again'}});
-        }).toThrow();
-      });
-    });
-
     describe('login', function () {
       it('should allow showing a login link to resolve the error', function () {
         Billboard.error('Unauthorised', {
@@ -200,12 +152,6 @@ describe('Billboard service', function () {
 
         expect(lastEvent.action.successMessage).toBe('Done!');
       });
-
-      it('should error if you try to set an onCloseMessage', function () {
-        expect(function () {
-          Billboard.error('Unauthorised', {action: {login: true, onCloseMessage: 'Try again'}});
-        }).toThrow();
-      });
     });
 
     describe('reload', function () {
@@ -226,12 +172,6 @@ describe('Billboard service', function () {
         });
       });
 
-      it('should error if you try to set an onCloseMessage', function () {
-        expect(function () {
-          Billboard.error('Unauthorised', {action: {reload: true, onCloseMessage: 'Try again'}});
-        }).toThrow();
-      });
-
       it('should error if you try to set a successMessage', function () {
         expect(function () {
           Billboard.error('Unauthorised', {action: {reload: true, successMessage: 'Try again'}});
@@ -246,34 +186,12 @@ describe('Billboard service', function () {
         }).toThrow();
       });
 
-      it('should error if both reload and url are specified', function () {
-        expect(function () {
-          Billboard.error('Unauthorised', {
-            action: {
-              reload: true,
-              url: '/login'
-            }
-          });
-        }).toThrow();
-      });
-
       it('should error if both reload and login are specified', function () {
         expect(function () {
           Billboard.error('Unauthorised', {
             action: {
               reload: true,
               login: true
-            }
-          });
-        }).toThrow();
-      });
-
-      it('should error if both url and login are specified', function () {
-        expect(function () {
-          Billboard.error('Unauthorised', {
-            action: {
-              url: '/login',
-              login: true,
             }
           });
         }).toThrow();

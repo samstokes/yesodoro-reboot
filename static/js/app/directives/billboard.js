@@ -4,7 +4,7 @@
  */
 
 angular.module('app.directives')
-.directive('billboard', function ($window, Popup, LoginPopup, Billboard) {
+.directive('billboard', function ($window, LoginPopup, Billboard) {
   'use strict';
 
   return {
@@ -41,14 +41,6 @@ angular.module('app.directives')
 
         if (action.reload !== undefined) {
           reload();
-        } else if (action.url) {
-          var popup = Popup.open(action.url, POPUP_OPTIONS);
-
-          if (action.onCloseMessage) {
-            popup.then(function onPopupClose() {
-              Billboard.success(action.onCloseMessage, {timeout: 10000});
-            });
-          }
         } else if (action.login !== undefined) {
           LoginPopup.open(mergeInto(POPUP_OPTIONS, {successMessage: action.successMessage}));
         }
