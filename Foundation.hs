@@ -25,6 +25,7 @@ import Yesod.Static
 import Yesod.Auth
 import Yesod.Auth.Email
 import Yesod.Auth.GoogleEmail2
+import qualified Yesod.Auth.Message as AuthMsg
 import Yesod.Core.Types (Logger)
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
@@ -290,6 +291,9 @@ instance YesodAuth App where
 
     redirectToReferer _ = True
 
+    -- override login page handler
+    loginHandler = getLogin
+
     -- Where to send a user after successful login
     loginDest _ = HomeR
     -- Where to send a user after logout
@@ -309,6 +313,17 @@ instance YesodAuth App where
         clientSecret = googleClientSecret app
 
     authHttpManager = httpManager
+
+
+getLogin :: AuthHandler App Html
+getLogin = do
+  parentRoute <- getRouteToParent
+  lift $ authLayout $ do
+    setTitleI AuthMsg.LoginTitle
+    plugins <- authPlugins <$> getYesod
+    let pluginWidgets = map (flip apLogin parentRoute) plugins
+    $(widgetFile "login")
+
 
 -- This instance is required to use forms. You can modify renderMessage to
 -- achieve customized and internationalized form validation messages.
