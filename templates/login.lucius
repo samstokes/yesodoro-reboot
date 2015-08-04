@@ -13,6 +13,6 @@
 .auth-plugin-googleemail2 .button-sign-in:hover, .auth-plugin-googleemail2 a:focus .button-sign-in {
   background-image: url('@{StaticR images_google_sign_in_Blue_signin_Long_focused_44dp_v3_png}');
 }
-.auth-plugin-googleemail2 .button-sign-in:active {
+.auth-plugin-googleemail2 a:active .button-sign-in {
   background-image: url('@{StaticR images_google_sign_in_Blue_signin_Long_pressed_44dp_v3_png}');
 }
