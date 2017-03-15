@@ -39,6 +39,16 @@ getApiExtTasksForSourceR source = do
   returnJson $ map entityVal extTasks
 
 
+deleteApiTaskR :: TaskId -> Handler Value
+deleteApiTaskR taskId = do
+  userId <- httpBasicAuth
+  maybeAuthedTask <- runDB $ selectFirst [TaskId ==. taskId, TaskUser ==. userId] []
+  case maybeAuthedTask of
+    Just task ->
+      runDB (deleteTask task) >> returnJson True
+    Nothing -> notFound
+
+
 setLocation :: Route App -> Handler ()
 setLocation url = do
   r <- getUrlRender

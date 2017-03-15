@@ -32,6 +32,7 @@
 /settings/timezone TimezoneR PUT
 
 /api/tasks ApiTasksR POST
+/api/tasks/#TaskId ApiTaskR DELETE
 /api/ext_tasks/#ExternalSourceName ApiExtTasksForSourceR GET
 
 /templates/tasks TemplateOldTasksR GET
